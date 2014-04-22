@@ -31,7 +31,7 @@ public class UserPreference implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
     @Basic(optional = false)
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition="nvarchar2(64)")
     private String name;
     @Lob
     @Column(name = "PREFERENCES")

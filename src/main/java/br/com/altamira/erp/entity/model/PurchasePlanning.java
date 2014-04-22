@@ -48,18 +48,18 @@ public class PurchasePlanning implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Basic(optional = false)
-    @Column(name = "CREATOR_NAME")
+    @Column(name = "CREATOR_NAME", columnDefinition="nvarchar2(255)")
     private String creatorName;
     @Column(name = "APPROVE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date approveDate;
-    @Column(name = "APPROVE_USER")
+    @Column(name = "APPROVE_USER", columnDefinition="nvarchar2(255)")
     private String approveUser;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -72,21 +72,21 @@ public class PurchasePlanning implements Serializable {
     public PurchasePlanning() {
     }
 
-    public PurchasePlanning(long id) {
+    public PurchasePlanning(Long id) {
         this.id = id;
     }
 
-    public PurchasePlanning(long id, Date createdDate, String creatorName) {
+    public PurchasePlanning(Long id, Date createdDate, String creatorName) {
         this.id = id;
         this.createdDate = createdDate;
         this.creatorName = creatorName;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -150,7 +150,7 @@ public class PurchasePlanning implements Serializable {
         this.purchasePlanningItemSet = purchasePlanningItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -168,7 +168,7 @@ public class PurchasePlanning implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

@@ -38,12 +38,12 @@ public class SupplierContact implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition="nvarchar2(100)")
     private String name;
     @Basic(optional = false)
-    @Column(name = "MAIL_ADDRESS")
+    @Column(name = "MAIL_ADDRESS", columnDefinition="nvarchar2(150)")
     private String mailAddress;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -52,21 +52,21 @@ public class SupplierContact implements Serializable {
     public SupplierContact() {
     }
 
-    public SupplierContact(long id) {
+    public SupplierContact(Long id) {
         this.id = id;
     }
 
-    public SupplierContact(long id, String name, String mailAddress) {
+    public SupplierContact(Long id, String name, String mailAddress) {
         this.id = id;
         this.name = name;
         this.mailAddress = mailAddress;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -94,7 +94,7 @@ public class SupplierContact implements Serializable {
         this.supplier = supplier;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -112,7 +112,7 @@ public class SupplierContact implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

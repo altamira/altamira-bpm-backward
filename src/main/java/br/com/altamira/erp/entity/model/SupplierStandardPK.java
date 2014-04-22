@@ -7,7 +7,6 @@
 package br.com.altamira.erp.entity.model;
 
 import java.io.Serializable;
-import java.math.BigInteger;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
@@ -24,32 +23,32 @@ public class SupplierStandardPK implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Basic(optional = false)
     @Column(name = "SUPPLIER")
-    private BigInteger supplier;
+    private Long supplier;
     @Basic(optional = false)
     @Column(name = "STANDARD")
-    private BigInteger standard;
+    private Long standard;
 
     public SupplierStandardPK() {
     }
 
-    public SupplierStandardPK(BigInteger supplier, BigInteger standard) {
+    public SupplierStandardPK(Long supplier, Long standard) {
         this.supplier = supplier;
         this.standard = standard;
     }
 
-    public BigInteger getSupplier() {
+    public Long getSupplier() {
         return supplier;
     }
 
-    public void setSupplier(BigInteger supplier) {
+    public void setSupplier(Long supplier) {
         this.supplier = supplier;
     }
 
-    public BigInteger getStandard() {
+    public Long getStandard() {
         return standard;
     }
 
-    public void setStandard(BigInteger standard) {
+    public void setStandard(Long standard) {
         this.standard = standard;
     }
 

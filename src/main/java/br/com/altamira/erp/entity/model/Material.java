@@ -45,7 +45,7 @@ public class Material implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "LAMINATION", columnDefinition="char(2)")
     private String lamination;
@@ -73,11 +73,11 @@ public class Material implements Serializable {
     public Material() {
     }
 
-    public Material(long id) {
+    public Material(Long id) {
         this.id = id;
     }
 
-    public Material(long id, String lamination, String treatment, BigDecimal thickness, BigDecimal width, BigDecimal length) {
+    public Material(Long id, String lamination, String treatment, BigDecimal thickness, BigDecimal width, BigDecimal length) {
         this.id = id;
         this.lamination = lamination;
         this.treatment = treatment;
@@ -86,11 +86,11 @@ public class Material implements Serializable {
         this.length = length;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -172,7 +172,7 @@ public class Material implements Serializable {
         this.requestItemSet = requestItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -190,7 +190,7 @@ public class Material implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

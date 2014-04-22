@@ -46,13 +46,13 @@ public class Request implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Basic(optional = false)
-    @Column(name = "CREATOR_NAME")
+    @Column(name = "CREATOR_NAME", columnDefinition="nvarchar2(255)")
     private String creatorName;
     @Column(name = "SEND_DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,21 +65,21 @@ public class Request implements Serializable {
     public Request() {
     }
 
-    public Request(long id) {
+    public Request(Long id) {
         this.id = id;
     }
 
-    public Request(long id, Date createdDate, String creatorName) {
+    public Request(Long id, Date createdDate, String creatorName) {
         this.id = id;
         this.createdDate = createdDate;
         this.creatorName = creatorName;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -125,7 +125,7 @@ public class Request implements Serializable {
         this.quotationRequest = quotationRequest;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -143,7 +143,7 @@ public class Request implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

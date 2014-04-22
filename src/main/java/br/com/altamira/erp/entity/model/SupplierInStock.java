@@ -39,7 +39,7 @@ public class SupplierInStock implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "WIDTH")
     private BigDecimal width;
@@ -56,22 +56,22 @@ public class SupplierInStock implements Serializable {
     public SupplierInStock() {
     }
 
-    public SupplierInStock(long id) {
+    public SupplierInStock(Long id) {
         this.id = id;
     }
 
-    public SupplierInStock(long id, BigDecimal width, BigDecimal length, BigDecimal weight) {
+    public SupplierInStock(Long id, BigDecimal width, BigDecimal length, BigDecimal weight) {
         this.id = id;
         this.width = width;
         this.length = length;
         this.weight = weight;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -107,7 +107,7 @@ public class SupplierInStock implements Serializable {
         this.quotationItemQuote = quotationItemQuote;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -125,7 +125,7 @@ public class SupplierInStock implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

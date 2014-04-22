@@ -24,36 +24,36 @@ public class MaterialStandardPK implements Serializable {
 	private static final long serialVersionUID = 1L;
 	@Basic(optional = false)
     @Column(name = "MATERIAL")
-    private long material;
+    private Long material;
     @Basic(optional = false)
     @Column(name = "STANDARD")
-    private long standard;
+    private Long standard;
 
     public MaterialStandardPK() {
     }
 
-    public MaterialStandardPK(long material, long standard) {
+    public MaterialStandardPK(Long material, Long standard) {
         this.material = material;
         this.standard = standard;
     }
 
-    public long getMaterial() {
+    public Long getMaterial() {
         return material;
     }
 
-    public void setMaterial(long material) {
+    public void setMaterial(Long material) {
         this.material = material;
     }
 
-    public long getStandard() {
+    public Long getStandard() {
         return standard;
     }
 
-    public void setStandard(long standard) {
+    public void setStandard(Long standard) {
         this.standard = standard;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (material != null ? material.hashCode() : 0);
@@ -75,7 +75,7 @@ public class MaterialStandardPK implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

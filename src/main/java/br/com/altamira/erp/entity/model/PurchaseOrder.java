@@ -46,7 +46,7 @@ public class PurchaseOrder implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,20 +66,20 @@ public class PurchaseOrder implements Serializable {
     public PurchaseOrder() {
     }
 
-    public PurchaseOrder(long id) {
+    public PurchaseOrder(Long id) {
         this.id = id;
     }
 
-    public PurchaseOrder(long id, Date createdDate) {
+    public PurchaseOrder(Long id, Date createdDate) {
         this.id = id;
         this.createdDate = createdDate;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -125,7 +125,7 @@ public class PurchaseOrder implements Serializable {
         this.purchaseOrderItemSet = purchaseOrderItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -143,7 +143,7 @@ public class PurchaseOrder implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

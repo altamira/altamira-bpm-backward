@@ -41,7 +41,7 @@ public class SupplierPriceList implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "CHANGE_DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -59,21 +59,21 @@ public class SupplierPriceList implements Serializable {
     public SupplierPriceList() {
     }
 
-    public SupplierPriceList(long id) {
+    public SupplierPriceList(Long id) {
         this.id = id;
     }
 
-    public SupplierPriceList(long id, Date changeDate, BigDecimal price) {
+    public SupplierPriceList(Long id, Date changeDate, BigDecimal price) {
         this.id = id;
         this.changeDate = changeDate;
         this.price = price;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -109,7 +109,7 @@ public class SupplierPriceList implements Serializable {
         this.material = material;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -127,7 +127,7 @@ public class SupplierPriceList implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

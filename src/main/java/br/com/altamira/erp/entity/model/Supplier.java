@@ -40,9 +40,9 @@ public class Supplier implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition="nvarchar2(50)")
     private String name;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<QuotationItemQuote> quotationItemQuoteSet;
@@ -60,20 +60,20 @@ public class Supplier implements Serializable {
     public Supplier() {
     }
 
-    public Supplier(long id) {
+    public Supplier(Long id) {
         this.id = id;
     }
 
-    public Supplier(long id, String name) {
+    public Supplier(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -145,7 +145,7 @@ public class Supplier implements Serializable {
         this.purchasePlanningItemSet = purchasePlanningItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -163,7 +163,7 @@ public class Supplier implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

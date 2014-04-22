@@ -34,6 +34,7 @@ import javax.xml.bind.annotation.XmlRootElement;
     @NamedQuery(name = "MaterialStandard.findByAccept", query = "SELECT m FROM MaterialStandard m WHERE m.accept = :accept")})
 public class MaterialStandard implements Serializable {
     private static final long serialVersionUID = 1L;
+    
     @EmbeddedId
     protected MaterialStandardPK materialStandardPK;
     @Basic(optional = false)
@@ -58,7 +59,7 @@ public class MaterialStandard implements Serializable {
         this.accept = accept;
     }
 
-    public MaterialStandard(BigInteger material, BigInteger standard) {
+    public MaterialStandard(long material, long standard) {
         this.materialStandardPK = new MaterialStandardPK(material, standard);
     }
 
@@ -78,20 +79,20 @@ public class MaterialStandard implements Serializable {
         this.accept = accept;
     }
 
-    public Standard getStandard1() {
-        return standard1;
+    public Standard getStandard() {
+        return standard;
     }
 
-    public void setStandard1(Standard standard1) {
-        this.standard1 = standard1;
+    public void setStandard(Standard standard) {
+        this.standard = standard;
     }
 
     public Material getMaterial1() {
-        return material1;
+        return material;
     }
 
-    public void setMaterial1(Material material1) {
-        this.material1 = material1;
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     @Override

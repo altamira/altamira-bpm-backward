@@ -58,7 +58,7 @@ public class SupplierStandard implements Serializable {
         this.available = available;
     }
 
-    public SupplierStandard(BigInteger supplier, BigInteger standard) {
+    public SupplierStandard(Long supplier, Long standard) {
         this.supplierStandardPK = new SupplierStandardPK(supplier, standard);
     }
 
@@ -78,20 +78,20 @@ public class SupplierStandard implements Serializable {
         this.available = available;
     }
 
-    public Supplier getSupplier1() {
-        return supplier1;
+    public Supplier getSupplier() {
+        return supplier;
     }
 
-    public void setSupplier1(Supplier supplier1) {
-        this.supplier1 = supplier1;
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public Standard getStandard1() {
-        return standard1;
+        return standard;
     }
 
-    public void setStandard1(Standard standard1) {
-        this.standard1 = standard1;
+    public void setStandard1(Standard standard) {
+        this.standard = standard;
     }
 
     @Override

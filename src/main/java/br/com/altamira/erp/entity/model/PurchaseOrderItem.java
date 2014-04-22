@@ -43,7 +43,7 @@ public class PurchaseOrderItem implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -65,21 +65,21 @@ public class PurchaseOrderItem implements Serializable {
     public PurchaseOrderItem() {
     }
 
-    public PurchaseOrderItem(long id) {
+    public PurchaseOrderItem(Long id) {
         this.id = id;
     }
 
-    public PurchaseOrderItem(long id, Date date, BigDecimal weight) {
+    public PurchaseOrderItem(Long id, Date date, BigDecimal weight) {
         this.id = id;
         this.date = date;
         this.weight = weight;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -131,7 +131,7 @@ public class PurchaseOrderItem implements Serializable {
         this.purchaseOrder = purchaseOrder;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -149,7 +149,7 @@ public class PurchaseOrderItem implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

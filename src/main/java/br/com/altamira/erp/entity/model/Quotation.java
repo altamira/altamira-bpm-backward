@@ -45,13 +45,13 @@ public class Quotation implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
     @Basic(optional = false)
-    @Column(name = "CREATOR_NAME")
+    @Column(name = "CREATOR_NAME", columnDefinition="nvarchar2(255)")
     private String creatorName;
     @Column(name = "CLOSED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,21 +66,21 @@ public class Quotation implements Serializable {
     public Quotation() {
     }
 
-    public Quotation(long id) {
+    public Quotation(Long id) {
         this.id = id;
     }
 
-    public Quotation(long id, Date createdDate, String creatorName) {
+    public Quotation(Long id, Date createdDate, String creatorName) {
         this.id = id;
         this.createdDate = createdDate;
         this.creatorName = creatorName;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -138,7 +138,7 @@ public class Quotation implements Serializable {
         this.quotationItemSet = quotationItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -156,7 +156,7 @@ public class Quotation implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

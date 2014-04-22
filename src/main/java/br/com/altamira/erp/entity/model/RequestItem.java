@@ -46,7 +46,7 @@ public class RequestItem implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "ARRIVAL_DATE")
     @Temporal(TemporalType.TIMESTAMP)
@@ -66,21 +66,21 @@ public class RequestItem implements Serializable {
     public RequestItem() {
     }
 
-    public RequestItem(long id) {
+    public RequestItem(Long id) {
         this.id = id;
     }
 
-    public RequestItem(long id, Date arrivalDate, BigDecimal weight) {
+    public RequestItem(Long id, Date arrivalDate, BigDecimal weight) {
         this.id = id;
         this.arrivalDate = arrivalDate;
         this.weight = weight;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -126,7 +126,7 @@ public class RequestItem implements Serializable {
         this.purchasePlanningItemSet = purchasePlanningItemSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -144,7 +144,7 @@ public class RequestItem implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

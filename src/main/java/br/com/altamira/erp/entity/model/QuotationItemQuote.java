@@ -44,7 +44,7 @@ public class QuotationItemQuote implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
     @Column(name = "WEIGHT")
     private BigDecimal weight;
@@ -66,22 +66,22 @@ public class QuotationItemQuote implements Serializable {
     public QuotationItemQuote() {
     }
 
-    public QuotationItemQuote(long id) {
+    public QuotationItemQuote(Long id) {
         this.id = id;
     }
 
-    public QuotationItemQuote(long id, BigDecimal weight, BigDecimal price, String standard) {
+    public QuotationItemQuote(Long id, BigDecimal weight, BigDecimal price, String standard) {
         this.id = id;
         this.weight = weight;
         this.price = price;
         this.standard = standard;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -135,7 +135,7 @@ public class QuotationItemQuote implements Serializable {
         this.supplierInStockSet = supplierInStockSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -153,7 +153,7 @@ public class QuotationItemQuote implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

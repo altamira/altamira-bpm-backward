@@ -1,10 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>br.com.altamira</groupId>
   <artifactId>altamira-bpm</artifactId>
   <version>1.0.0-SNAPSHOT</version>
   <packaging>war</packaging>
+  <properties>
+    <version.junit>4.11</version.junit>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.arquillian_core>1.1.4.Final</version.arquillian_core>
+  </properties>
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -28,6 +34,18 @@
         <version>2.0</version>
       </dependency>
       <dependency>
+        <groupId>javax.ejb</groupId>
+        <artifactId>ejb-api</artifactId>
+        <version>3.0-alpha-1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian_core}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
         <groupId>org.jboss.spec</groupId>
         <artifactId>jboss-javaee-6.0</artifactId>
         <version>3.0.2.Final</version>
@@ -36,8 +54,8 @@
       </dependency>
       <dependency>
         <groupId>javax.ejb</groupId>
-        <artifactId>ejb-api</artifactId>
-        <version>3.0-alpha-1</version>
+        <artifactId>javax.ejb-api</artifactId>
+        <version>3.2</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -76,8 +94,25 @@
       <artifactId>jboss-transaction-api_1.1_spec</artifactId>
     </dependency>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>${version.junit}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.6.4</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>javax.ejb</groupId>
-      <artifactId>ejb-api</artifactId>
+      <artifactId>javax.ejb-api</artifactId>
     </dependency>
   </dependencies>
   <repositories>
@@ -107,26 +142,32 @@
       </plugin>
     </plugins>
   </build>
-<profiles>
-        <profile>
-<!-- When built in OpenShift the openshift profile will be used when invoking mvn. -->
-<!-- Use this profile for any OpenShift specific customization your app will need. -->
-<!-- By default that is to put the resulting archive into the deployments folder. -->
-<!-- http://maven.apache.org/guides/mini/guide-building-for-different-environments.html -->
-<id>openshift</id>
-<build>
-   <finalName>altamira-bpm</finalName>
-   <plugins>
-     <plugin>
-       <artifactId>maven-war-plugin</artifactId>
-       <version>2.2</version>
-       <configuration>
-         <outputDirectory>deployments</outputDirectory>
-         <warName>ROOT</warName>
-       </configuration>
-     </plugin>
-   </plugins>
- </build>
-</profile>
-    </profiles>
+  <profiles>
+    <profile>
+      <id>arquillian-jbossas-remote-7</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.14.1</version>
+            <configuration>
+              <systemPropertyVariables>
+                <arquillian.launch>jbossas-remote-7</arquillian.launch>
+              </systemPropertyVariables>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-arquillian-container-remote</artifactId>
+          <version>7.2.0.Final</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
 </project>

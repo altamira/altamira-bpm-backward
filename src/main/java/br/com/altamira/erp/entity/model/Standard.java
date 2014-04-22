@@ -41,9 +41,9 @@ public class Standard implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
-    @Column(name = "NAME")
+    @Column(name = "NAME", columnDefinition="nvarchar2(20)")
     private String name;
     @Lob
     @Column(name = "DESCRIPTION")
@@ -56,20 +56,20 @@ public class Standard implements Serializable {
     public Standard() {
     }
 
-    public Standard(long id) {
+    public Standard(Long id) {
         this.id = id;
     }
 
-    public Standard(long id, String name) {
+    public Standard(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -109,7 +109,7 @@ public class Standard implements Serializable {
         this.supplierStandardSet = supplierStandardSet;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -127,7 +127,7 @@ public class Standard implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {

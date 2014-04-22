@@ -46,12 +46,12 @@ public class QuotationItem implements Serializable {
     @Id
     @Basic(optional = false)
     @Column(name = "ID")
-    private long id;
+    private Long id;
     @Basic(optional = false)
-    @Column(name = "LAMINATION")
+    @Column(name = "LAMINATION", columnDefinition="nvarchar2(2)")
     private String lamination;
     @Basic(optional = false)
-    @Column(name = "TREATMENT")
+    @Column(name = "TREATMENT", columnDefinition="nvarchar2(2)")
     private String treatment;
     @Basic(optional = false)
     @Column(name = "THICKNESS")
@@ -71,11 +71,11 @@ public class QuotationItem implements Serializable {
     public QuotationItem() {
     }
 
-    public QuotationItem(long id) {
+    public QuotationItem(Long id) {
         this.id = id;
     }
 
-    public QuotationItem(long id, String lamination, String treatment, BigDecimal thickness, BigInteger standard, BigDecimal weight) {
+    public QuotationItem(Long id, String lamination, String treatment, BigDecimal thickness, BigInteger standard, BigDecimal weight) {
         this.id = id;
         this.lamination = lamination;
         this.treatment = treatment;
@@ -84,11 +84,11 @@ public class QuotationItem implements Serializable {
         this.weight = weight;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -150,7 +150,7 @@ public class QuotationItem implements Serializable {
         this.quotation = quotation;
     }
 
-    /*@Override
+    @Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -168,7 +168,7 @@ public class QuotationItem implements Serializable {
             return false;
         }
         return true;
-    }*/
+    }
 
     @Override
     public String toString() {
