@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.1" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+  <persistence-unit name="altamira-bpm-PU" transaction-type="JTA">
+    <description>Altamira BPM Persistence Unit</description>
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <jta-data-source>java:jboss/datasources/ProcessEngine</jta-data-source>
+    <class>br.com.altamira.erp.entity.model.QuotationItem</class>
+    <class>br.com.altamira.erp.entity.model.Request</class>
+    <class>br.com.altamira.erp.entity.model.Quotation</class>
+    <class>br.com.altamira.erp.entity.model.MaterialStandard</class>
+    <class>br.com.altamira.erp.entity.model.PurchaseOrderItem</class>
+    <class>br.com.altamira.erp.entity.model.SupplierStandard</class>
+    <class>br.com.altamira.erp.entity.model.UserPreference</class>
+    <class>br.com.altamira.erp.entity.model.PurchaseOrder</class>
+    <class>br.com.altamira.erp.entity.model.SupplierContact</class>
+    <class>br.com.altamira.erp.entity.model.QuotationRequest</class>
+    <class>br.com.altamira.erp.entity.model.Material</class>
+    <class>br.com.altamira.erp.entity.model.Standard</class>
+    <class>br.com.altamira.erp.entity.model.Supplier</class>
+    <class>br.com.altamira.erp.entity.model.QuotationItemQuote</class>
+    <class>br.com.altamira.erp.entity.model.SupplierInStock</class>
+    <class>br.com.altamira.erp.entity.model.RequestItem</class>
+    <class>br.com.altamira.erp.entity.model.SupplierPriceList</class>
+    <class>br.com.altamira.erp.entity.model.PurchasePlanningItem</class>
+    <class>br.com.altamira.erp.entity.model.PurchasePlanning</class>
+    <exclude-unlisted-classes>false</exclude-unlisted-classes>
+    <properties>
+      <property name="hibernate.hbm2ddl.auto" value="validate"/>
+      <property name="hibernate.show_sql" value="true"/>
+      <property name="hibernate.format_sql" value="true"/>
+      <!--       <property name="hibernate.transaction.flush_before_completion" value="true"/> -->
+      <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+    </properties>
+  </persistence-unit>
+</persistence>
