@@ -1,6 +1,8 @@
 package br.com.altamira.erp.entity.services;
 
-import br.com.altamira.erp.entity.model.Material;
+import java.math.BigDecimal;
+
+import br.com.altamira.erp.entity.model.*;
 import br.com.altamira.erp.entity.services.MaterialEndpoint;
 
 import javax.inject.Inject;
@@ -28,7 +30,14 @@ public class MaterialEndpointTest
    public static JavaArchive createDeployment()
    {
       return ShrinkWrap.create(JavaArchive.class, "altamira-bpm.jar")
-            .addClasses(MaterialEndpoint.class, Material.class)
+            .addClasses(MaterialEndpoint.class, 
+            		Material.class, Quotation.class, QuotationItem.class, 
+            		Request.class, RequestItem.class, Supplier.class,
+            		MaterialStandard.class, PurchaseOrder.class, PurchaseOrderItem.class,
+            		PurchasePlanning.class, PurchasePlanningItem.class, Quotation.class, QuotationItem.class,
+            		QuotationItemQuote.class, QuotationRequest.class, Standard.class,
+            		SupplierContact.class, SupplierInStock.class, SupplierPriceList.class, SupplierStandard.class,
+            		UserPreference.class, SupplierStandardPK.class, MaterialStandardPK.class)
             .addAsManifestResource("META-INF/persistence.xml", "persistence.xml")
             .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
    }
@@ -42,7 +51,15 @@ public class MaterialEndpointTest
    @Test
    public void CreateMaterialTest() {
 	   Material m = new Material();
-	   Assert.assertEquals((Long) 0l, m.getId());
+	   
+	   m.setLamination("TT");
+	   m.setLength(new BigDecimal(1.5));
+	   m.setTax(new BigDecimal(3.4));
+	   m.setThickness(new BigDecimal(9.8));
+	   m.setTreatment("TT");
+	   m.setWidth(new BigDecimal(9.9));
+	   
+	   Assert.assertEquals(null, m.getId());
 	   materialendpoint.create(m);
 	   Assert.assertNotEquals((Long) 0l, m.getId());
    }
