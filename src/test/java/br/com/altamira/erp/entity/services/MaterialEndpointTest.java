@@ -2,6 +2,8 @@ package br.com.altamira.erp.entity.services;
 
 import java.math.BigDecimal;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import br.com.altamira.erp.entity.model.*;
 import br.com.altamira.erp.entity.services.MaterialEndpoint;
 
@@ -48,19 +50,36 @@ public class MaterialEndpointTest
       Assert.assertNotNull(materialendpoint);
    }
    
+   @PersistenceContext(unitName = "altamira-bpm-PU")
+   private EntityManager em;
+   
+   @Inject
+   private Material material;
+   
    @Test
    public void CreateMaterialTest() {
-	   Material m = new Material();
 	   
-	   m.setLamination("TT");
-	   m.setLength(new BigDecimal(1.5));
-	   m.setTax(new BigDecimal(3.4));
-	   m.setThickness(new BigDecimal(9.8));
-	   m.setTreatment("TT");
-	   m.setWidth(new BigDecimal(9.9));
+	   material.setLamination("TT");
+	   material.setLength(new BigDecimal(1.5));
+	   material.setTax(new BigDecimal(3.4));
+	   material.setThickness(new BigDecimal(9.8));
+	   material.setTreatment("TT");
+	   material.setWidth(new BigDecimal(9.9));
 	   
-	   Assert.assertEquals(null, m.getId());
-	   materialendpoint.create(m);
-	   Assert.assertNotEquals((Long) 0l, m.getId());
+	   Assert.assertEquals(null, material.getId());
+	   materialendpoint.create(material);
+	   Assert.assertNotEquals((Long) 0l, material.getId());
+	   
+	   Material m = em.find(Material.class, material.getId());
+	   
+	   Assert.assertEquals(m.getLamination(), material.getLamination());
+	   
+	   materialendpoint.deleteById(material.getId());
+   }
+   
+   @Test 
+   public void RemoveMaterialTest() {
+	   
+	   
    }
 }
