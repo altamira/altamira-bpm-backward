@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.altamira.erp.entity.model;
 
 import java.io.Serializable;
@@ -15,12 +14,15 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -30,155 +32,157 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
- * 
+ *
  * @author Alessandro
  */
 @Entity
 @Table(name = "PURCHASE_PLANNING")
 @XmlRootElement
 @NamedQueries({
-		@NamedQuery(name = "PurchasePlanning.findAll", query = "SELECT p FROM PurchasePlanning p"),
-		@NamedQuery(name = "PurchasePlanning.findById", query = "SELECT p FROM PurchasePlanning p WHERE p.id = :id"),
-		@NamedQuery(name = "PurchasePlanning.findByCreatedDate", query = "SELECT p FROM PurchasePlanning p WHERE p.createdDate = :createdDate"),
-		@NamedQuery(name = "PurchasePlanning.findByCreatorName", query = "SELECT p FROM PurchasePlanning p WHERE p.creatorName = :creatorName"),
-		@NamedQuery(name = "PurchasePlanning.findByApproveDate", query = "SELECT p FROM PurchasePlanning p WHERE p.approveDate = :approveDate"),
-		@NamedQuery(name = "PurchasePlanning.findByApproveUser", query = "SELECT p FROM PurchasePlanning p WHERE p.approveUser = :approveUser") })
+    @NamedQuery(name = "PurchasePlanning.findAll", query = "SELECT p FROM PurchasePlanning p"),
+    @NamedQuery(name = "PurchasePlanning.findById", query = "SELECT p FROM PurchasePlanning p WHERE p.id = :id"),
+    @NamedQuery(name = "PurchasePlanning.findByCreatedDate", query = "SELECT p FROM PurchasePlanning p WHERE p.createdDate = :createdDate"),
+    @NamedQuery(name = "PurchasePlanning.findByCreatorName", query = "SELECT p FROM PurchasePlanning p WHERE p.creatorName = :creatorName"),
+    @NamedQuery(name = "PurchasePlanning.findByApproveDate", query = "SELECT p FROM PurchasePlanning p WHERE p.approveDate = :approveDate"),
+    @NamedQuery(name = "PurchasePlanning.findByApproveUser", query = "SELECT p FROM PurchasePlanning p WHERE p.approveUser = :approveUser")})
 public class PurchasePlanning implements Serializable {
-	private static final long serialVersionUID = 1L;
-	// @Max(value=?) @Min(value=?)//if you know range of your decimal fields
-	// consider using these annotations to enforce field validation
-	@Id
-	@Basic(optional = false)
-	@Column(name = "ID")
-	private Long id;
-	@Basic(optional = false)
-	@Column(name = "CREATED_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdDate;
-	@Basic(optional = false)
-	@Column(name = "CREATOR_NAME", columnDefinition = "nvarchar2(255)")
-	private String creatorName;
-	@Column(name = "APPROVE_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date approveDate;
-	@Column(name = "APPROVE_USER", columnDefinition = "nvarchar2(255)")
-	private String approveUser;
-	@JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Quotation quotation;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
-	private Set<PurchaseOrder> purchaseOrderSet;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "planning", fetch = FetchType.LAZY)
-	private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
-	public PurchasePlanning() {
-	}
+    private static final long serialVersionUID = 1L;
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
+    @Id
+    @SequenceGenerator(name = "PurchasePlanningSequence", sequenceName = "PURCHASE_PLANNING_SEQUENCE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PurchasePlanningSequence")
+    @Column(name = "ID")
+    private Long id;
+    @Basic(optional = false)
+    @Column(name = "CREATED_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdDate;
+    @Basic(optional = false)
+    @Column(name = "CREATOR_NAME", columnDefinition = "nvarchar2(255)")
+    private String creatorName;
+    @Column(name = "APPROVE_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date approveDate;
+    @Column(name = "APPROVE_USER", columnDefinition = "nvarchar2(255)")
+    private String approveUser;
+    @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Quotation quotation;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
+    private Set<PurchaseOrder> purchaseOrderSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planning", fetch = FetchType.LAZY)
+    private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
-	public PurchasePlanning(Long id) {
-		this.id = id;
-	}
+    public PurchasePlanning() {
+    }
 
-	public PurchasePlanning(Long id, Date createdDate, String creatorName) {
-		this.id = id;
-		this.createdDate = createdDate;
-		this.creatorName = creatorName;
-	}
+    public PurchasePlanning(Long id) {
+        this.id = id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public PurchasePlanning(Long id, Date createdDate, String creatorName) {
+        this.id = id;
+        this.createdDate = createdDate;
+        this.creatorName = creatorName;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Date getCreatedDate() {
-		return createdDate;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setCreatedDate(Date createdDate) {
-		this.createdDate = createdDate;
-	}
+    public Date getCreatedDate() {
+        return createdDate;
+    }
 
-	public String getCreatorName() {
-		return creatorName;
-	}
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
 
-	public void setCreatorName(String creatorName) {
-		this.creatorName = creatorName;
-	}
+    public String getCreatorName() {
+        return creatorName;
+    }
 
-	public Date getApproveDate() {
-		return approveDate;
-	}
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
 
-	public void setApproveDate(Date approveDate) {
-		this.approveDate = approveDate;
-	}
+    public Date getApproveDate() {
+        return approveDate;
+    }
 
-	public String getApproveUser() {
-		return approveUser;
-	}
+    public void setApproveDate(Date approveDate) {
+        this.approveDate = approveDate;
+    }
 
-	public void setApproveUser(String approveUser) {
-		this.approveUser = approveUser;
-	}
+    public String getApproveUser() {
+        return approveUser;
+    }
 
-	public Quotation getQuotation() {
-		return quotation;
-	}
+    public void setApproveUser(String approveUser) {
+        this.approveUser = approveUser;
+    }
 
-	public void setQuotation(Quotation quotation) {
-		this.quotation = quotation;
-	}
+    public Quotation getQuotation() {
+        return quotation;
+    }
 
-	@XmlTransient
-	@JsonIgnore
-	public Set<PurchaseOrder> getPurchaseOrderSet() {
-		return purchaseOrderSet;
-	}
+    public void setQuotation(Quotation quotation) {
+        this.quotation = quotation;
+    }
 
-	public void setPurchaseOrderSet(Set<PurchaseOrder> purchaseOrderSet) {
-		this.purchaseOrderSet = purchaseOrderSet;
-	}
+    @XmlTransient
+    @JsonIgnore
+    public Set<PurchaseOrder> getPurchaseOrderSet() {
+        return purchaseOrderSet;
+    }
 
-	@XmlTransient
-	@JsonIgnore
-	public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
-		return purchasePlanningItemSet;
-	}
+    public void setPurchaseOrderSet(Set<PurchaseOrder> purchaseOrderSet) {
+        this.purchaseOrderSet = purchaseOrderSet;
+    }
 
-	public void setPurchasePlanningItemSet(
-			Set<PurchasePlanningItem> purchasePlanningItemSet) {
-		this.purchasePlanningItemSet = purchasePlanningItemSet;
-	}
+    @XmlTransient
+    @JsonIgnore
+    public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
+        return purchasePlanningItemSet;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
+    public void setPurchasePlanningItemSet(
+            Set<PurchasePlanningItem> purchasePlanningItemSet) {
+        this.purchasePlanningItemSet = purchasePlanningItemSet;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are
-		// not set
-		if (!(object instanceof PurchasePlanning)) {
-			return false;
-		}
-		PurchasePlanning other = (PurchasePlanning) object;
-		if ((this.id == null && other.id != null)
-				|| (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
-	@Override
-	public String toString() {
-		return "br.com.altamira.erp.entity.model.PurchasePlanning[ id=" + id
-				+ " ]";
-	}
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
+        if (!(object instanceof PurchasePlanning)) {
+            return false;
+        }
+        PurchasePlanning other = (PurchasePlanning) object;
+        if ((this.id == null && other.id != null)
+                || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "br.com.altamira.erp.entity.model.PurchasePlanning[ id=" + id
+                + " ]";
+    }
 
 }

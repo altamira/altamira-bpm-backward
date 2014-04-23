@@ -78,7 +78,7 @@ public class MaterialEndpointTest {
 	private Material material;
 
 	@Test
-	public void CreateMaterialTest() {
+	public void testCreate() {
 
 		material.setLamination("TT");
 		material.setLength(new BigDecimal(1.5));
@@ -96,11 +96,6 @@ public class MaterialEndpointTest {
 		Assert.assertEquals(m.getLamination(), material.getLamination());
 
 		materialendpoint.deleteById(material.getId());
-	}
-
-	@Test
-	public void testCreate() {
-		fail("Not yet implemented"); // TODO
 	}
 
 	@Test

@@ -23,78 +23,79 @@ import javax.ws.rs.core.UriBuilder;
 import br.com.altamira.erp.entity.model.Standard;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/standards")
 public class StandardEndpoint {
-	@PersistenceContext(unitName = "altamira-bpm-PU")
-	private EntityManager em;
 
-	@POST
-	@Consumes("application/json")
-	public Response create(Standard entity) {
-		em.persist(entity);
-		return Response.created(
-				UriBuilder.fromResource(StandardEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
-	}
+    @PersistenceContext(unitName = "altamira-bpm-PU")
+    private EntityManager em;
 
-	@DELETE
-	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") long id) {
-		Standard entity = em.find(Standard.class, id);
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		em.remove(entity);
-		return Response.noContent().build();
-	}
+    @POST
+    @Consumes("application/json")
+    public Response create(Standard entity) {
+        em.persist(entity);
+        return Response.created(
+                UriBuilder.fromResource(StandardEndpoint.class)
+                .path(String.valueOf(entity.getId())).build()).build();
+    }
 
-	@GET
-	@Path("/{id:[0-9][0-9]*}")
-	@Produces("application/json")
-	public Response findById(@PathParam("id") long id) {
-		TypedQuery<Standard> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet WHERE s.id = :entityId ORDER BY s.id",
-						Standard.class);
-		findByIdQuery.setParameter("entityId", id);
-		Standard entity;
-		try {
-			entity = findByIdQuery.getSingleResult();
-		} catch (NoResultException nre) {
-			entity = null;
-		}
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		return Response.ok(entity).build();
-	}
+    @DELETE
+    @Path("/{id:[0-9][0-9]*}")
+    public Response deleteById(@PathParam("id") long id) {
+        Standard entity = em.find(Standard.class, id);
+        if (entity == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        em.remove(entity);
+        return Response.noContent().build();
+    }
 
-	@GET
-	@Produces("application/json")
-	public List<Standard> listAll(@QueryParam("start") Integer startPosition,
-			@QueryParam("max") Integer maxResult) {
-		TypedQuery<Standard> findAllQuery = em
-				.createQuery(
-						"SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet ORDER BY s.id",
-						Standard.class);
-		if (startPosition != null) {
-			findAllQuery.setFirstResult(startPosition);
-		}
-		if (maxResult != null) {
-			findAllQuery.setMaxResults(maxResult);
-		}
-		final List<Standard> results = findAllQuery.getResultList();
-		return results;
-	}
+    @GET
+    @Path("/{id:[0-9][0-9]*}")
+    @Produces("application/json")
+    public Response findById(@PathParam("id") long id) {
+        TypedQuery<Standard> findByIdQuery = em
+                .createQuery(
+                        "SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet WHERE s.id = :entityId ORDER BY s.id",
+                        Standard.class);
+        findByIdQuery.setParameter("entityId", id);
+        Standard entity;
+        try {
+            entity = findByIdQuery.getSingleResult();
+        } catch (NoResultException nre) {
+            entity = null;
+        }
+        if (entity == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        return Response.ok(entity).build();
+    }
 
-	@PUT
-	@Path("/{id:[0-9][0-9]*}")
-	@Consumes("application/json")
-	public Response update(Standard entity) {
-		entity = em.merge(entity);
-		return Response.noContent().build();
-	}
+    @GET
+    @Produces("application/json")
+    public List<Standard> listAll(@QueryParam("start") Integer startPosition,
+            @QueryParam("max") Integer maxResult) {
+        TypedQuery<Standard> findAllQuery = em
+                .createQuery(
+                        "SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet ORDER BY s.id",
+                        Standard.class);
+        if (startPosition != null) {
+            findAllQuery.setFirstResult(startPosition);
+        }
+        if (maxResult != null) {
+            findAllQuery.setMaxResults(maxResult);
+        }
+        final List<Standard> results = findAllQuery.getResultList();
+        return results;
+    }
+
+    @PUT
+    @Path("/{id:[0-9][0-9]*}")
+    @Consumes("application/json")
+    public Response update(Standard entity) {
+        entity = em.merge(entity);
+        return Response.noContent().build();
+    }
 }

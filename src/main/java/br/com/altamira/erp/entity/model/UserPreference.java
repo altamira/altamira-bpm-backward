@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.altamira.erp.entity.model;
 
 import java.io.Serializable;
@@ -19,74 +18,75 @@ import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * 
+ *
  * @author Alessandro
  */
 @Entity
 @Table(name = "USER_PREFERENCE")
 @XmlRootElement
 @NamedQueries({
-		@NamedQuery(name = "UserPreference.findAll", query = "SELECT u FROM UserPreference u"),
-		@NamedQuery(name = "UserPreference.findByName", query = "SELECT u FROM UserPreference u WHERE u.name = :name") })
+    @NamedQuery(name = "UserPreference.findAll", query = "SELECT u FROM UserPreference u"),
+    @NamedQuery(name = "UserPreference.findByName", query = "SELECT u FROM UserPreference u WHERE u.name = :name")})
 public class UserPreference implements Serializable {
-	private static final long serialVersionUID = 1L;
-	@Id
-	@Basic(optional = false)
-	@Column(name = "NAME", columnDefinition = "nvarchar2(64)")
-	private String name;
-	@Lob
-	@Column(name = "PREFERENCES")
-	private String preferences;
 
-	public UserPreference() {
-	}
+    private static final long serialVersionUID = 1L;
+    @Id
+    @Basic(optional = false)
+    @Column(name = "NAME", columnDefinition = "nvarchar2(64)")
+    private String name;
+    @Lob
+    @Column(name = "PREFERENCES")
+    private String preferences;
 
-	public UserPreference(String name) {
-		this.name = name;
-	}
+    public UserPreference() {
+    }
 
-	public String getName() {
-		return name;
-	}
+    public UserPreference(String name) {
+        this.name = name;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getPreferences() {
-		return preferences;
-	}
+    public void setName(String name) {
+        this.name = name;
+    }
 
-	public void setPreferences(String preferences) {
-		this.preferences = preferences;
-	}
+    public String getPreferences() {
+        return preferences;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (name != null ? name.hashCode() : 0);
-		return hash;
-	}
+    public void setPreferences(String preferences) {
+        this.preferences = preferences;
+    }
 
-	@Override
-	public boolean equals(Object object) {
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (name != null ? name.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
 		// TODO: Warning - this method won't work in the case the id fields are
-		// not set
-		if (!(object instanceof UserPreference)) {
-			return false;
-		}
-		UserPreference other = (UserPreference) object;
-		if ((this.name == null && other.name != null)
-				|| (this.name != null && !this.name.equals(other.name))) {
-			return false;
-		}
-		return true;
-	}
+        // not set
+        if (!(object instanceof UserPreference)) {
+            return false;
+        }
+        UserPreference other = (UserPreference) object;
+        if ((this.name == null && other.name != null)
+                || (this.name != null && !this.name.equals(other.name))) {
+            return false;
+        }
+        return true;
+    }
 
-	@Override
-	public String toString() {
-		return "br.com.altamira.erp.entity.model.UserPreference[ name=" + name
-				+ " ]";
-	}
+    @Override
+    public String toString() {
+        return "br.com.altamira.erp.entity.model.UserPreference[ name=" + name
+                + " ]";
+    }
 
 }

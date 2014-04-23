@@ -23,79 +23,80 @@ import javax.ws.rs.core.UriBuilder;
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 
 /**
- * 
+ *
  */
 @Stateless
 @Path("/purchaseorders")
 public class PurchaseOrderEndpoint {
-	@PersistenceContext(unitName = "altamira-bpm-PU")
-	private EntityManager em;
 
-	@POST
-	@Consumes("application/json")
-	public Response create(PurchaseOrder entity) {
-		em.persist(entity);
-		return Response.created(
-				UriBuilder.fromResource(PurchaseOrderEndpoint.class)
-						.path(String.valueOf(entity.getId())).build()).build();
-	}
+    @PersistenceContext(unitName = "altamira-bpm-PU")
+    private EntityManager em;
 
-	@DELETE
-	@Path("/{id:[0-9][0-9]*}")
-	public Response deleteById(@PathParam("id") long id) {
-		PurchaseOrder entity = em.find(PurchaseOrder.class, id);
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		em.remove(entity);
-		return Response.noContent().build();
-	}
+    @POST
+    @Consumes("application/json")
+    public Response create(PurchaseOrder entity) {
+        em.persist(entity);
+        return Response.created(
+                UriBuilder.fromResource(PurchaseOrderEndpoint.class)
+                .path(String.valueOf(entity.getId())).build()).build();
+    }
 
-	@GET
-	@Path("/{id:[0-9][0-9]*}")
-	@Produces("application/json")
-	public Response findById(@PathParam("id") long id) {
-		TypedQuery<PurchaseOrder> findByIdQuery = em
-				.createQuery(
-						"SELECT DISTINCT p FROM PurchaseOrder p LEFT JOIN FETCH p.supplier LEFT JOIN FETCH p.purchasePlanning LEFT JOIN FETCH p.purchaseOrderItemSet WHERE p.id = :entityId ORDER BY p.id",
-						PurchaseOrder.class);
-		findByIdQuery.setParameter("entityId", id);
-		PurchaseOrder entity;
-		try {
-			entity = findByIdQuery.getSingleResult();
-		} catch (NoResultException nre) {
-			entity = null;
-		}
-		if (entity == null) {
-			return Response.status(Status.NOT_FOUND).build();
-		}
-		return Response.ok(entity).build();
-	}
+    @DELETE
+    @Path("/{id:[0-9][0-9]*}")
+    public Response deleteById(@PathParam("id") long id) {
+        PurchaseOrder entity = em.find(PurchaseOrder.class, id);
+        if (entity == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        em.remove(entity);
+        return Response.noContent().build();
+    }
 
-	@GET
-	@Produces("application/json")
-	public List<PurchaseOrder> listAll(
-			@QueryParam("start") Integer startPosition,
-			@QueryParam("max") Integer maxResult) {
-		TypedQuery<PurchaseOrder> findAllQuery = em
-				.createQuery(
-						"SELECT DISTINCT p FROM PurchaseOrder p LEFT JOIN FETCH p.supplier LEFT JOIN FETCH p.purchasePlanning LEFT JOIN FETCH p.purchaseOrderItemSet ORDER BY p.id",
-						PurchaseOrder.class);
-		if (startPosition != null) {
-			findAllQuery.setFirstResult(startPosition);
-		}
-		if (maxResult != null) {
-			findAllQuery.setMaxResults(maxResult);
-		}
-		final List<PurchaseOrder> results = findAllQuery.getResultList();
-		return results;
-	}
+    @GET
+    @Path("/{id:[0-9][0-9]*}")
+    @Produces("application/json")
+    public Response findById(@PathParam("id") long id) {
+        TypedQuery<PurchaseOrder> findByIdQuery = em
+                .createQuery(
+                        "SELECT DISTINCT p FROM PurchaseOrder p LEFT JOIN FETCH p.supplier LEFT JOIN FETCH p.purchasePlanning LEFT JOIN FETCH p.purchaseOrderItemSet WHERE p.id = :entityId ORDER BY p.id",
+                        PurchaseOrder.class);
+        findByIdQuery.setParameter("entityId", id);
+        PurchaseOrder entity;
+        try {
+            entity = findByIdQuery.getSingleResult();
+        } catch (NoResultException nre) {
+            entity = null;
+        }
+        if (entity == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        return Response.ok(entity).build();
+    }
 
-	@PUT
-	@Path("/{id:[0-9][0-9]*}")
-	@Consumes("application/json")
-	public Response update(PurchaseOrder entity) {
-		entity = em.merge(entity);
-		return Response.noContent().build();
-	}
+    @GET
+    @Produces("application/json")
+    public List<PurchaseOrder> listAll(
+            @QueryParam("start") Integer startPosition,
+            @QueryParam("max") Integer maxResult) {
+        TypedQuery<PurchaseOrder> findAllQuery = em
+                .createQuery(
+                        "SELECT DISTINCT p FROM PurchaseOrder p LEFT JOIN FETCH p.supplier LEFT JOIN FETCH p.purchasePlanning LEFT JOIN FETCH p.purchaseOrderItemSet ORDER BY p.id",
+                        PurchaseOrder.class);
+        if (startPosition != null) {
+            findAllQuery.setFirstResult(startPosition);
+        }
+        if (maxResult != null) {
+            findAllQuery.setMaxResults(maxResult);
+        }
+        final List<PurchaseOrder> results = findAllQuery.getResultList();
+        return results;
+    }
+
+    @PUT
+    @Path("/{id:[0-9][0-9]*}")
+    @Consumes("application/json")
+    public Response update(PurchaseOrder entity) {
+        entity = em.merge(entity);
+        return Response.noContent().build();
+    }
 }

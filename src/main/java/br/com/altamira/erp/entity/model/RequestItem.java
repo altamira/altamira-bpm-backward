@@ -3,7 +3,6 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
 package br.com.altamira.erp.entity.model;
 
 import java.io.Serializable;
@@ -16,145 +15,151 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
- * 
+ *
  * @author Alessandro
  */
 @Entity
-@Table(name = "REQUEST_ITEM")
+@Table(name = "REQUEST_ITEM", uniqueConstraints = @UniqueConstraint(columnNames = {"REQUEST", "MATERIAL", "ARRIVAL_DATE"}))
 @XmlRootElement
 @NamedQueries({
-		@NamedQuery(name = "RequestItem.findAll", query = "SELECT r FROM RequestItem r"),
-		@NamedQuery(name = "RequestItem.findById", query = "SELECT r FROM RequestItem r WHERE r.id = :id"),
-		@NamedQuery(name = "RequestItem.findByArrivalDate", query = "SELECT r FROM RequestItem r WHERE r.arrivalDate = :arrivalDate"),
-		@NamedQuery(name = "RequestItem.findByWeight", query = "SELECT r FROM RequestItem r WHERE r.weight = :weight") })
+    @NamedQuery(name = "RequestItem.findAll", query = "SELECT r FROM RequestItem r"),
+    @NamedQuery(name = "RequestItem.findById", query = "SELECT r FROM RequestItem r WHERE r.id = :id"),
+    @NamedQuery(name = "RequestItem.findByArrivalDate", query = "SELECT r FROM RequestItem r WHERE r.arrivalDate = :arrivalDate"),
+    @NamedQuery(name = "RequestItem.findByWeight", query = "SELECT r FROM RequestItem r WHERE r.weight = :weight")})
 public class RequestItem implements Serializable {
-	private static final long serialVersionUID = 1L;
-	// @Max(value=?) @Min(value=?)//if you know range of your decimal fields
-	// consider using these annotations to enforce field validation
-	@Id
-	@Basic(optional = false)
-	@Column(name = "ID")
-	private Long id;
-	@Basic(optional = false)
-	@Column(name = "ARRIVAL_DATE")
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date arrivalDate;
-	@Basic(optional = false)
-	@Column(name = "WEIGHT")
-	private BigDecimal weight;
-	@JoinColumn(name = "REQUEST", referencedColumnName = "ID")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Request request;
-	@JoinColumn(name = "MATERIAL", referencedColumnName = "ID")
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
-	private Material material;
-	@OneToMany(cascade = CascadeType.ALL, mappedBy = "requestItem", fetch = FetchType.LAZY)
-	private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
-	public RequestItem() {
-	}
+    private static final long serialVersionUID = 1L;
+    // @Max(value=?) @Min(value=?)//if you know range of your decimal fields
+    // consider using these annotations to enforce field validation
+    @Id
+    @SequenceGenerator(name = "RequestItemSequence", sequenceName = "REQUEST_ITEM_SEQUENCE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RequestItemSequence")
+    @Column(name = "ID")
+    private Long id;
+    @Basic(optional = false)
+    @Column(name = "ARRIVAL_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date arrivalDate;
+    @Basic(optional = false)
+    @Column(name = "WEIGHT")
+    private BigDecimal weight;
+    @JoinColumn(name = "REQUEST", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Request request;
+    @JoinColumn(name = "MATERIAL", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Material material;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "requestItem", fetch = FetchType.LAZY)
+    private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
-	public RequestItem(Long id) {
-		this.id = id;
-	}
+    public RequestItem() {
+    }
 
-	public RequestItem(Long id, Date arrivalDate, BigDecimal weight) {
-		this.id = id;
-		this.arrivalDate = arrivalDate;
-		this.weight = weight;
-	}
+    public RequestItem(Long id) {
+        this.id = id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public RequestItem(Long id, Date arrivalDate, BigDecimal weight) {
+        this.id = id;
+        this.arrivalDate = arrivalDate;
+        this.weight = weight;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public Long getId() {
+        return id;
+    }
 
-	public Date getArrivalDate() {
-		return arrivalDate;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setArrivalDate(Date arrivalDate) {
-		this.arrivalDate = arrivalDate;
-	}
+    public Date getArrivalDate() {
+        return arrivalDate;
+    }
 
-	public BigDecimal getWeight() {
-		return weight;
-	}
+    public void setArrivalDate(Date arrivalDate) {
+        this.arrivalDate = arrivalDate;
+    }
 
-	public void setWeight(BigDecimal weight) {
-		this.weight = weight;
-	}
+    public BigDecimal getWeight() {
+        return weight;
+    }
 
-	public Request getRequest() {
-		return request;
-	}
+    public void setWeight(BigDecimal weight) {
+        this.weight = weight;
+    }
 
-	public void setRequest(Request request) {
-		this.request = request;
-	}
+    public Request getRequest() {
+        return request;
+    }
 
-	public Material getMaterial() {
-		return material;
-	}
+    public void setRequest(Request request) {
+        this.request = request;
+    }
 
-	public void setMaterial(Material material) {
-		this.material = material;
-	}
+    public Material getMaterial() {
+        return material;
+    }
 
-	@XmlTransient
-	@JsonIgnore
-	public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
-		return purchasePlanningItemSet;
-	}
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
 
-	public void setPurchasePlanningItemSet(
-			Set<PurchasePlanningItem> purchasePlanningItemSet) {
-		this.purchasePlanningItemSet = purchasePlanningItemSet;
-	}
+    @XmlTransient
+    @JsonIgnore
+    public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
+        return purchasePlanningItemSet;
+    }
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
+    public void setPurchasePlanningItemSet(
+            Set<PurchasePlanningItem> purchasePlanningItemSet) {
+        this.purchasePlanningItemSet = purchasePlanningItemSet;
+    }
 
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are
-		// not set
-		if (!(object instanceof RequestItem)) {
-			return false;
-		}
-		RequestItem other = (RequestItem) object;
-		if ((this.id == null && other.id != null)
-				|| (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
 
-	@Override
-	public String toString() {
-		return "br.com.altamira.erp.entity.model.RequestItem[ id=" + id + " ]";
-	}
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are
+        // not set
+        if (!(object instanceof RequestItem)) {
+            return false;
+        }
+        RequestItem other = (RequestItem) object;
+        if ((this.id == null && other.id != null)
+                || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public String toString() {
+        return "br.com.altamira.erp.entity.model.RequestItem[ id=" + id + " ]";
+    }
 
 }
