@@ -16,6 +16,7 @@
         <extension module="org.jboss.as.jdr"/>
         <extension module="org.jboss.as.jmx"/>
         <extension module="org.jboss.as.jpa"/>
+		<extension module="org.jboss.as.jsf"/>
         <extension module="org.jboss.as.jsr77"/>
         <extension module="org.jboss.as.logging"/>
         <extension module="org.jboss.as.mail"/>
@@ -31,6 +32,7 @@
         <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
+        <extension module="org.camunda.bpm.jboss.camunda-jboss-subsystem"/>
     </extensions>
     
     <system-properties>
@@ -38,11 +40,28 @@
     </system-properties>
 
     <management>
+        <security-realms>
+            <security-realm name="ManagementRealm">
+                <authentication>
+                    <local default-user="$local"/>
+                    <properties path="mgmt-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+            </security-realm>
+            <security-realm name="ApplicationRealm">
+                <authentication>
+                    <local default-user="$local" allowed-users="*"/>
+                    <properties path="application-users.properties" relative-to="jboss.server.config.dir"/>
+                </authentication>
+                <authorization>
+                    <properties path="application-roles.properties" relative-to="jboss.server.config.dir"/>
+                </authorization>
+            </security-realm>
+        </security-realms>
         <management-interfaces>
-            <native-interface>
+            <native-interface security-realm="ManagementRealm">
                 <socket-binding native="management-native"/>
             </native-interface>
-            <http-interface>
+            <http-interface security-realm="ManagementRealm">
                 <socket-binding http="management-http"/>
             </http-interface>
         </management-interfaces>
@@ -51,15 +70,27 @@
     <profile>
         <subsystem xmlns="urn:jboss:domain:logging:1.1">
             <console-handler name="CONSOLE">
+                <level name="INFO"/>
                 <formatter>
-                    <pattern-formatter pattern="%d{yyyy/MM/dd HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+                    <pattern-formatter pattern="%K{level}%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
                 </formatter>
             </console-handler>
+            <periodic-rotating-file-handler name="FILE" autoflush="true">
+                <formatter>
+                    <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+                </formatter>
+                <file relative-to="jboss.server.log.dir" path="server.log"/>
+                <suffix value=".yyyy-MM-dd"/>
+                <append value="true"/>
+            </periodic-rotating-file-handler>
             <logger category="com.arjuna">
                 <level name="WARN"/>
             </logger>
             <logger category="org.apache.tomcat.util.modeler">
                 <level name="WARN"/>
+            </logger>
+            <logger category="org.jboss.as.config">
+                <level name="DEBUG"/>
             </logger>
             <logger category="sun.rmi">
                 <level name="WARN"/>
@@ -74,6 +105,7 @@
                 <level name="INFO"/>
                 <handlers>
                     <handler name="CONSOLE"/>
+                    <handler name="FILE"/>
                 </handlers>
             </root-logger>
         </subsystem>
@@ -87,6 +119,22 @@
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
+                    </security>
+                </datasource>
+				<datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:h2:./camunda-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>
+				</datasource>
+                <datasource jta="true" jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:oracle:thin:@altamira-head-db.ci3m0ww55h4q.sa-east-1.rds.amazonaws.com:1521:ORCL</connection-url>
+                    <driver>oracle</driver>
+                    <security>
+                        <user-name>head_user_db</user-name>
+                        <password>brkm39$sxz</password>
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/MySQLDS" enabled="${mysql.enabled}" use-java-context="true" pool-name="MySQLDS" use-ccm="true">
@@ -124,6 +172,9 @@
 					</pool>
                 </datasource>
                 <drivers>
+					<driver name="oracle" module="com.oracle.ojdbc6">
+                        <xa-datasource-class>oracle.jdbc.OracleDriver</xa-datasource-class>
+                    </driver>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
@@ -178,7 +229,8 @@
                     <keepalive-time time="100" unit="milliseconds"/>
                 </thread-pool>
             </thread-pools>
-            <!--iiop enable-by-default="false" use-qualified-name="false"/-->
+            <default-security-domain value="other"/>
+            <default-missing-method-permissions-deny-access value="true"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:infinispan:1.2" default-cache-container="cluster">
             <cache-container name="cluster" aliases="ha-partition" default-cache="default">
@@ -241,21 +293,22 @@
         <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jca:1.1">
             <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
-            <bean-validation enabled="false"/>
+            <bean-validation enabled="true"/>
             <default-workmanager>
                 <short-running-threads>
-                        <core-threads count="10"/>
-                        <queue-length count="10" />
-                        <max-threads count="10" />
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
                     <keepalive-time time="10" unit="seconds"/>
                 </short-running-threads>
                 <long-running-threads>
-                        <core-threads count="10"/>
-                        <queue-length count="10" />
-                        <max-threads count="10" />
+                    <core-threads count="50"/>
+                    <queue-length count="50"/>
+                    <max-threads count="50"/>
                     <keepalive-time time="10" unit="seconds"/>
                 </long-running-threads>
             </default-workmanager>
+            <cached-connection-manager/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
         <subsystem xmlns="urn:jboss:domain:jgroups:1.0" default-stack="tcp">
@@ -297,10 +350,11 @@
             <show-model value="true"/>
             <remoting-connector/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:jpa:1.0">
-            <jpa default-datasource=""/>
+        <subsystem xmlns="urn:jboss:domain:jpa:1.1">
+            <jpa default-datasource="" default-extended-persistence-inheritance="DEEP"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
+		<subsystem xmlns="urn:jboss:domain:jsf:1.0"/>
         <subsystem xmlns="urn:jboss:domain:mail:1.0">
             <mail-session jndi-name="java:jboss/mail/Default">
                 <smtp-server outbound-socket-binding-ref="mail-smtp"/>
@@ -443,7 +497,7 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:pojo:1.0"/>
         <subsystem xmlns="urn:jboss:domain:remoting:1.1">
-            <connector name="remoting-connector" socket-binding="remoting"/>
+            <connector name="remoting-connector" socket-binding="remoting" security-realm="ApplicationRealm"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:resource-adapters:1.0"/>
         <subsystem xmlns="urn:jboss:domain:sar:1.0"/>
@@ -451,7 +505,12 @@
             <security-domains>
                 <security-domain name="other" cache-type="default">
                     <authentication>
-                        <login-module code="UsersRoles" flag="required"/>
+                        <login-module code="Remoting" flag="optional">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
+                        <login-module code="RealmDirect" flag="required">
+                            <module-option name="password-stacking" value="useFirstPass"/>
+                        </login-module>
                     </authentication>
                 </security-domain>
                 <security-domain name="jboss-web-policy" cache-type="default">
@@ -474,7 +533,14 @@
                 </security-domain>
             </security-domains>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1">
+            <bounded-queue-thread-pool name="job-executor-tp" allow-core-timeout="true">
+                <core-threads count="3"/>
+                <queue-length count="3"/>
+                <max-threads count="10"/>
+                <keepalive-time time="10" unit="seconds"/>
+            </bounded-queue-thread-pool>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -502,6 +568,65 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+        <subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>
+                        java:jboss/datasources/ProcessEngine
+                    </datasource>
+                    <history-level>
+                        full
+                    </history-level>
+                    <configuration>
+                        org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration
+                    </configuration>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">
+                            default
+                        </property>
+                        <property name="isAutoSchemaUpdate">
+                            true
+                        </property>
+                        <property name="authorizationEnabled">
+                            true
+                        </property>
+                        <property name="jobExecutorDeploymentAware">
+                            true
+                        </property>
+                    </properties>
+                    <plugins>
+                        <plugin>
+                            <class>
+                                org.camunda.bpm.application.impl.event.ProcessApplicationEventListenerPlugin
+                            </class>
+                        </plugin>
+                    </plugins>
+                </process-engine>
+            </process-engines>
+            <job-executor>
+                <thread-pool-name>
+                    job-executor-tp
+                </thread-pool-name>
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>
+                            SEQUENTIAL
+                        </acquisition-strategy>
+                        <properties>
+                            <property name="lockTimeInMillis">
+                                300000
+                            </property>
+                            <property name="waitTimeInMillis">
+                                5000
+                            </property>
+                            <property name="maxJobsPerAcquisition">
+                                3
+                            </property>
+                        </properties>
+                    </job-acquisition>
+                </job-acquisitions>
+            </job-executor>
+        </subsystem>
     </profile>
 
     <interfaces>
