@@ -2,11 +2,7 @@ package br.com.altamira.erp.entity.services;
 
 import static org.junit.Assert.fail;
 
-import java.math.BigDecimal;
-
 import javax.inject.Inject;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -40,16 +36,16 @@ import br.com.altamira.erp.entity.model.SupplierStandardPK;
 import br.com.altamira.erp.entity.model.UserPreference;
 
 @RunWith(Arquillian.class)
-public class MaterialEndpointTest {
+public class UserPreferenceEndpointTest {
 
 	@Inject
-	private MaterialEndpoint materialendpoint;
+	private UserPreferenceEndpoint userpreferenceendpoint;
 
 	@Deployment
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap
 				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(MaterialEndpoint.class, Material.class,
+				.addClasses(PurchasePlanningEndpoint.class, Material.class,
 						Quotation.class, QuotationItem.class, Request.class,
 						RequestItem.class, Supplier.class,
 						MaterialStandard.class, PurchaseOrder.class,
@@ -68,36 +64,9 @@ public class MaterialEndpointTest {
 
 	@Test
 	public void should_be_deployed() {
-		Assert.assertNotNull(materialendpoint);
+		Assert.assertNotNull(userpreferenceendpoint);
 	}
-
-	@PersistenceContext(unitName = "altamira-bpm-PU")
-	private EntityManager em;
-
-	@Inject
-	private Material material;
-
-	@Test
-	public void CreateMaterialTest() {
-
-		material.setLamination("TT");
-		material.setLength(new BigDecimal(1.5));
-		material.setTax(new BigDecimal(3.4));
-		material.setThickness(new BigDecimal(9.8));
-		material.setTreatment("TT");
-		material.setWidth(new BigDecimal(9.9));
-
-		Assert.assertEquals(null, material.getId());
-		materialendpoint.create(material);
-		Assert.assertNotEquals((Long) 0l, material.getId());
-
-		Material m = em.find(Material.class, material.getId());
-
-		Assert.assertEquals(m.getLamination(), material.getLamination());
-
-		materialendpoint.deleteById(material.getId());
-	}
-
+	
 	@Test
 	public void testCreate() {
 		fail("Not yet implemented"); // TODO
@@ -122,5 +91,4 @@ public class MaterialEndpointTest {
 	public void testUpdate() {
 		fail("Not yet implemented"); // TODO
 	}
-
 }
