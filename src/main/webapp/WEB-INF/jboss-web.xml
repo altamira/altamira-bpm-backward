@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jboss-web>
   <context-root>/altamira-bpm</context-root>
+  <security-domain>form-auth</security-domain>
+  <disable-audit>true</disable-audit>
 </jboss-web>

@@ -72,14 +72,14 @@ public class RequestDao {
     }
 
     public byte[] getRequestReportJasperFile() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM REQUEST_REPORT WHERE REPORT_ID = (SELECT MAX(REPORT_ID) FROM REQUEST_REPORT)")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM REQUEST_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM REQUEST_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
     }
 
     public byte[] getRequestReportAltamiraImage() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM REQUEST_REPORT WHERE ROWNUM = 1")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM REQUEST_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM REQUEST_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
@@ -87,21 +87,21 @@ public class RequestDao {
 
     public List selectRequestReportDataById(long requestId) {
         StringBuffer selectSql = new StringBuffer().append(" SELECT M.ID, ")
-                .append("        M.LAMINATION, ")
-                .append("        M.TREATMENT, ")
-                .append("        M.THICKNESS, ")
-                .append("        M.WIDTH, ")
-                .append("        M.LENGTH, ")
-                .append("        RT.WEIGHT, ")
-                .append("        RT.ARRIVAL_DATE ")
-                .append(" FROM REQUEST R, REQUEST_ITEM RT, MATERIAL M ")
-                .append(" WHERE R.ID = RT.REQUEST_ID ")
-                .append(" AND RT.MATERIAL_ID = M.ID ")
-                .append(" AND R.ID = :request_id ");
+                                                   .append("        M.LAMINATION, ")
+                                                   .append("        M.TREATMENT, ")
+                                                   .append("        M.THICKNESS, ")
+                                                   .append("        M.WIDTH, ")
+                                                   .append("        M.LENGTH, ")
+                                                   .append("        RT.WEIGHT, ")
+                                                   .append("        RT.ARRIVAL_DATE ")
+                                                   .append(" FROM REQUEST R, REQUEST_ITEM RT, MATERIAL M ")
+                                                   .append(" WHERE R.ID = RT.REQUEST ")
+                                                   .append(" AND RT.MATERIAL = M.ID ")
+                                                   .append(" AND R.ID = :request_id ");
 
         List<Object[]> list = entityManager.createNativeQuery(selectSql.toString())
-                .setParameter("request_id", requestId)
-                .getResultList();
+                                           .setParameter("request_id", requestId)
+                                           .getResultList();
 
         return list;
     }

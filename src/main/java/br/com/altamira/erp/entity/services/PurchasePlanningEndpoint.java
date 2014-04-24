@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -21,6 +22,21 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.PurchasePlanning;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import org.hibernate.Session;
+import org.hibernate.jdbc.ReturningWork;
 
 /**
  *
@@ -31,6 +47,9 @@ public class PurchasePlanningEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    private PurchasePlanningDao planningDao;
 
     @POST
     @Consumes("application/json")
@@ -98,5 +117,80 @@ public class PurchasePlanningEndpoint {
     public Response update(PurchasePlanning entity) {
         entity = em.merge(entity);
         return Response.noContent().build();
+    }
+    
+    @GET
+    @Path("{id:[0-9][0-9]*}/report")
+    @Produces("application/pdf")
+    public Response getPlanningReportInPdf(@PathParam("id") long planningId) {
+
+        // generate report
+        JasperPrint jasperPrint = null;
+
+        try {
+            byte[] planningReportJasper = planningDao.getPlanningReportJasperFile();
+            byte[] planningReportAltamiraimage = planningDao.getPlanningReportAltamiraImage();
+            byte[] pdf = null;
+
+            final ByteArrayInputStream reportStream = new ByteArrayInputStream(planningReportJasper);
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+
+            parameters.put("PLANNING_ID", new BigDecimal(planningId));
+
+            Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
+            parameters.put("REPORT_LOCALE", locale);
+
+            BufferedImage imfg = null;
+            try {
+                InputStream in = new ByteArrayInputStream(planningReportAltamiraimage);
+                imfg = ImageIO.read(in);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            parameters.put("altamira_logo", imfg);
+            parameters.put("USERNAME", "Parth");
+
+            Session session = em.unwrap(Session.class);
+
+            jasperPrint = session.doReturningWork(new ReturningWork<JasperPrint>() {
+                @Override
+                public JasperPrint execute(Connection connection) {
+                    JasperPrint jasperPrint = null;
+
+                    try {
+                        jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return jasperPrint;
+                }
+            });
+
+            pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
+
+            Response.ResponseBuilder response = Response.ok(pdfStream);
+            response.header("Content-Disposition","inline; filename=Planning Report.pdf");
+            
+            return response.build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (jasperPrint != null) {
+                    // store generated report in database
+                    planningDao.insertGeneratedPlanningReport(jasperPrint);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Could not insert generated report in database.");
+            }
+        }
+
     }
 }

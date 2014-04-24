@@ -5,8 +5,13 @@
 package br.com.altamira.erp.entity.services;
 
 import br.com.altamira.erp.entity.dao.OrderDao;
+import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
+import br.com.altamira.erp.entity.dao.SupplierDao;
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
+import br.com.altamira.erp.entity.model.PurchasePlanning;
+import br.com.altamira.erp.entity.model.PurchasePlanningItem;
+import br.com.altamira.erp.entity.model.Supplier;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -25,7 +30,14 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
 
     @Inject
     private OrderDao orderDao;
+    
+    @Inject
+    private PurchasePlanningDao planningDao;
+    
+    @Inject
+    private SupplierDao supplierDao;
 
+    @Override
     public void execute(DelegateExecution de) throws Exception {
 
         System.out.println("Generate Order service task execution started...");
@@ -43,8 +55,13 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
             for (BigDecimal supplierId : supplierList) {
 
                 PurchaseOrder purchaseOrder = new PurchaseOrder();
-                //purchaseOrder.setPurchasePlanningId(planningId.longValue());
-                //purchaseOrder.setSupplierId(supplierId.longValue());
+                
+                PurchasePlanning planning = planningDao.findPurchasePlanningById(planningId.longValue());
+                purchaseOrder.setPurchasePlanning(planning);
+                
+                Supplier supplier = supplierDao.find(supplierId.longValue());
+                purchaseOrder.setSupplier(supplier);
+                
                 purchaseOrder.setCreatedDate(new Date());
                 purchaseOrder.setComments(null);
 
@@ -63,8 +80,11 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
                     BigDecimal tax = (BigDecimal) rs[4];
 
                     PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-                    //purchaseOrderItem.setPurchaseOrderId(purchaseOrderId);
-                    //purchaseOrderItem.setPlanningItemId(planningItemId.longValue());
+                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+                    
+                    PurchasePlanningItem planningItem = planningDao.findPurchasePlanningItemById(planningItemId.longValue());
+                    purchaseOrderItem.setPlanningItem(planningItem);
+                    
                     purchaseOrderItem.setDate(date);
                     purchaseOrderItem.setWeight(weight);
                     purchaseOrderItem.setPrice(price);

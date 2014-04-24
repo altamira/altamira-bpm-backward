@@ -13,7 +13,7 @@ import br.com.altamira.erp.entity.model.Quotation;
 import br.com.altamira.erp.entity.model.QuotationReportLog;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
-import javax.mail.Session;
+import org.hibernate.Session;
 import net.sf.jasperreports.engine.JasperPrint;
 import org.joda.time.DateTime;
 
@@ -82,14 +82,14 @@ public class QuotationDao {
     }
 
     public byte[] getQuotationReportJasperFile() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM QUOTATION_REPORT WHERE REPORT_ID = (SELECT MAX(REPORT_ID) FROM QUOTATION_REPORT)")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM QUOTATION_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM QUOTATION_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
     }
 
     public byte[] getQuotationReportAltamiraImage() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM QUOTATION_REPORT WHERE ROWNUM = 1")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM QUOTATION_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM QUOTATION_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
@@ -97,12 +97,12 @@ public class QuotationDao {
 
     public List selectQuotationReportDataById(long quotationId) {
         StringBuffer selectSql = new StringBuffer().append(" SELECT QI.LAMINATION, ")
-                .append("        QI.TREATMENT, ")
-                .append("        QI.THICKNESS ")
-                .append(" FROM QUOTATION_ITEM QI ")
-                .append(" WHERE QI.QUOTATION_ID = :quotation_id ")
-                .append(" GROUP BY QI.LAMINATION, QI.TREATMENT, QI.THICKNESS ")
-                .append(" ORDER BY QI.LAMINATION, QI.TREATMENT, QI.THICKNESS ");
+                                                   .append("        QI.TREATMENT, ")
+                                                   .append("        QI.THICKNESS ")
+                                                   .append(" FROM QUOTATION_ITEM QI ")
+                                                   .append(" WHERE QI.QUOTATION = :quotation_id ")
+                                                   .append(" GROUP BY QI.LAMINATION, QI.TREATMENT, QI.THICKNESS ")
+                                                   .append(" ORDER BY QI.LAMINATION, QI.TREATMENT, QI.THICKNESS ");
 
         List<Object[]> list = entityManager.createNativeQuery(selectSql.toString())
                 .setParameter("quotation_id", quotationId)

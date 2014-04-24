@@ -30,14 +30,14 @@ public class OrderDao {
     private EntityManager entityManager;
 
     public byte[] getPurchaseOrderReportJasperFile() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM PURCHASE_ORDER_REPORT WHERE REPORT_ID = (SELECT MAX(REPORT_ID) FROM PURCHASE_ORDER_REPORT)")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM PURCHASE_ORDER_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM PURCHASE_ORDER_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
     }
 
     public byte[] getPurchaseOrderReportAltamiraImage() throws SQLException {
-        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM PURCHASE_ORDER_REPORT WHERE REPORT_ID = (SELECT MAX(REPORT_ID) FROM PURCHASE_ORDER_REPORT)")
+        Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT ALTAMIRA_LOGO FROM PURCHASE_ORDER_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM PURCHASE_ORDER_REPORT)")
                 .getSingleResult();
 
         return tempBlob.getBytes(1, (int) tempBlob.length());
@@ -86,10 +86,10 @@ public class OrderDao {
 
     public List selectDistinctSuppliersFromPurchasePlan(long planningId) {
 
-        StringBuffer selectSql = new StringBuffer().append(" SELECT DISTINCT PPI.SUPPLIER_ID ")
-                .append(" FROM PURCHASE_PLANNING_ITEM PPI ")
-                .append(" WHERE PPI.PLANNING_ID = :planning_id ")
-                .append(" ORDER BY PPI.SUPPLIER_ID ");
+        StringBuffer selectSql = new StringBuffer().append(" SELECT DISTINCT PPI.SUPPLIER ")
+                                                   .append(" FROM PURCHASE_PLANNING_ITEM PPI ")
+                                                   .append(" WHERE PPI.PLANNING = :planning_id ")
+                                                   .append(" ORDER BY PPI.SUPPLIER ");
 
         return entityManager.createNativeQuery(selectSql.toString())
                 .setParameter("planning_id", planningId)
@@ -98,30 +98,30 @@ public class OrderDao {
 
     public List selectOrderItemDetailsBySupplierId(long planningId,
             long supplierId) {
-        StringBuffer selectSql = new StringBuffer().append(" SELECT PPI.ID AS PLANNING_ITEM_ID,")
-                .append("        RI.ARRIVAL_DATE AS \"DATE\",")
-                .append("        PPI.WEIGHT AS WEIGHT,")
-                .append("        QIQ.PRICE AS PRICE,")
-                .append("        M.TAX AS TAX")
-                .append(" FROM PURCHASE_PLANNING_ITEM PPI,")
-                .append("      REQUEST_ITEM RI,")
-                .append("      REQUEST R,")
-                .append("      MATERIAL M,")
-                .append("      QUOTATION_ITEM QI,")
-                .append("      QUOTATION_REQUEST QR,")
-                .append("      QUOTATION_ITEM_QUOTE QIQ")
-                .append(" WHERE PPI.PLANNING_ID = :planning_id")
-                .append(" AND PPI.SUPPLIER_ID = :supplier_id")
-                .append(" AND PPI.REQUEST_ITEM_ID = RI.ID")
-                .append(" AND RI.MATERIAL_ID = M.ID")
-                .append(" AND RI.REQUEST_ID = R.ID")
-                .append(" AND R.ID = QR.REQUEST_ID")
-                .append(" AND QR.QUOTATION_ID = QI.QUOTATION_ID ")
-                .append(" AND QIQ.SUPPLIER_ID = PPI.SUPPLIER_ID ")
-                .append(" AND QI.LAMINATION = M.LAMINATION")
-                .append(" AND QI.TREATMENT = M.TREATMENT")
-                .append(" AND QI.THICKNESS = M.THICKNESS")
-                .append(" AND QI.ID = QIQ.QUOTATION_ITEM_ID");
+        StringBuffer selectSql = new StringBuffer().append(" SELECT PPI.ID AS PLANNING_ITEM, ")
+                                                   .append("        RI.ARRIVAL_DATE AS \"DATE\", ")
+                                                   .append("        PPI.WEIGHT AS WEIGHT, ")
+                                                   .append("        QIQ.PRICE AS PRICE, ")
+                                                   .append("        M.TAX AS TAX ")
+                                                   .append(" FROM PURCHASE_PLANNING_ITEM PPI, ")
+                                                   .append("      REQUEST_ITEM RI, ")
+                                                   .append("      REQUEST R, ")
+                                                   .append("      MATERIAL M, ")
+                                                   .append("      QUOTATION_ITEM QI, ")
+                                                   .append("      QUOTATION_REQUEST QR, ")
+                                                   .append("      QUOTATION_ITEM_QUOTE QIQ ")
+                                                   .append(" WHERE PPI.PLANNING = :planning_id ")
+                                                   .append(" AND PPI.SUPPLIER = :supplier_id ")
+                                                   .append(" AND PPI.REQUEST_ITEM = RI.ID ")
+                                                   .append(" AND RI.MATERIAL = M.ID")
+                                                   .append(" AND RI.REQUEST = R.ID")
+                                                   .append(" AND R.ID = QR.REQUEST")
+                                                   .append(" AND QR.QUOTATION = QI.QUOTATION ")
+                                                   .append(" AND QIQ.SUPPLIER = PPI.SUPPLIER ")
+                                                   .append(" AND QI.LAMINATION = M.LAMINATION ")
+                                                   .append(" AND QI.TREATMENT = M.TREATMENT ")
+                                                   .append(" AND QI.THICKNESS = M.THICKNESS ")
+                                                   .append(" AND QI.ID = QIQ.QUOTATION_ITEM ");
 
         return entityManager.createNativeQuery(selectSql.toString())
                 .setParameter("planning_id", planningId)
@@ -144,14 +144,14 @@ public class OrderDao {
     public Map getSupplierMailAddressForPurchaseOrder(BigDecimal purchaseOrderId) {
 
         StringBuffer selectSql = new StringBuffer().append(" SELECT PO.ID, ")
-                .append("        S.NAME, ")
-                .append("        SC.MAIL_ADDRESS ")
-                .append(" FROM PURCHASE_ORDER PO, ")
-                .append("      SUPPLIER S, ")
-                .append("      SUPPLIER_CONTACT SC ")
-                .append(" WHERE PO.ID = :purchase_order_id ")
-                .append(" AND PO.SUPPLIER_ID = S.ID ")
-                .append(" AND S.SUPPLIER_CONTACT_ID = SC.ID ");
+                                                   .append("        S.NAME, ")
+                                                   .append("        SC.MAIL_ADDRESS ")
+                                                   .append(" FROM PURCHASE_ORDER PO, ")
+                                                   .append("      SUPPLIER S, ")
+                                                   .append("      SUPPLIER_CONTACT SC ")
+                                                   .append(" WHERE PO.ID = :purchase_order_id ")
+                                                   .append(" AND PO.SUPPLIER = S.ID ")
+                                                   .append(" AND S.ID = SC.SUPPLIER ");
 
         Object[] result = (Object[]) entityManager.createNativeQuery(selectSql.toString())
                 .setParameter("purchase_order_id", purchaseOrderId)

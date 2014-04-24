@@ -23,4 +23,9 @@
     <param-value>/rest</param-value>
   </context-param>
   
+  <login-config>
+    <auth-method>FORM</auth-method>
+    <realm-name>form-auth</realm-name>
+  </login-config>
+  
 </web-app>

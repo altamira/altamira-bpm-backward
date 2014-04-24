@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.QuotationDao;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -21,6 +22,31 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Quotation;
+import org.codehaus.jackson.map.ObjectMapper;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.codehaus.jackson.type.TypeReference;
+import org.hibernate.Session;
+import org.hibernate.jdbc.ReturningWork;
 
 /**
  *
@@ -31,6 +57,9 @@ public class QuotationEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    private QuotationDao quotationDao;
 
     @POST
     @Consumes("application/json")
@@ -97,5 +126,202 @@ public class QuotationEndpoint {
     public Response update(Quotation entity) {
         entity = em.merge(entity);
         return Response.noContent().build();
+    }
+    
+    @GET
+    @Path("{id:[0-9][0-9]*}/report")
+    @Produces("application/pdf")
+    public Response getQuotationReportInPdf(@PathParam("id") long quotationId) {
+        
+        // generate report
+        JasperPrint jasperPrint = null;
+
+        try {
+            byte[] quotationReportJasper = quotationDao.getQuotationReportJasperFile();
+            byte[] quotationReportAltamiraimage = quotationDao.getQuotationReportAltamiraImage();
+            byte[] pdf = null;
+
+            final ByteArrayInputStream reportStream = new ByteArrayInputStream(quotationReportJasper);
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+
+            List<Object[]> list = quotationDao.selectQuotationReportDataById(quotationId);
+            List<BigDecimal> priceList = new ArrayList<BigDecimal>();
+
+            // set pricelist for quotation items
+            for (Object[] rs : list) {
+                String materialLamination = rs[0].toString();
+                String materialTreatment = rs[1].toString();
+                String materialThickness = rs[2].toString();
+
+                String str = "http://localhost:8080/altamira-bpm/rest/quotations/test/priceList?lamination=" + materialLamination + "&treatment=" + materialTreatment + "&thickness=" + materialThickness;
+
+                HttpClient httpClient = new DefaultHttpClient();
+                HttpGet get = new HttpGet(str);
+                get.addHeader("accept", "application/json");
+
+                HttpResponse httpResponse = httpClient.execute(get);
+
+                BufferedReader br = new BufferedReader(new InputStreamReader((httpResponse.getEntity().getContent())));
+
+                StringBuffer jsonObject = new StringBuffer();
+                String json = new String();
+                System.out.println("Output from Server .... \n");
+
+                while ((json = br.readLine()) != null) {
+                    jsonObject.append(json);
+                    System.out.println(jsonObject);
+                }
+
+                // parse json response
+                Map<String, Object> quotationItem = new HashMap<String, Object>();
+                try {
+                    quotationItem = new ObjectMapper().readValue(jsonObject.toString(), new TypeReference<HashMap<String, Object>>() {
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                List<Map> materialList = (List<Map>) ((Map<String, Object>) quotationItem.get("data")).get("materials");
+
+                Map<String, String> map = materialList.get(0);
+                String avgPrice = map.get("averageprice");
+
+                priceList.add(new BigDecimal(avgPrice));
+
+            }
+
+            parameters.put("QUOTATION_ID", new BigDecimal(quotationId));
+            parameters.put("PRICELIST", priceList);
+
+            // set current pricelist code
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpGet get = new HttpGet("http://localhost:8080/altamira-bpm/rest/quotations/test/current");
+            get.addHeader("accept", "application/json");
+
+            HttpResponse httpResponse = httpClient.execute(get);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader((httpResponse.getEntity().getContent())));
+
+            StringBuffer jsonObject = new StringBuffer();
+            String json = new String();
+            System.out.println("Output from Server .... \n");
+            while ((json = br.readLine()) != null) {
+                jsonObject.append(json);
+                System.out.println(jsonObject);
+            }
+
+            httpClient.getConnectionManager().shutdown();
+
+            // parse json response
+            Map<String, Object> currentPriceList = new HashMap<String, Object>();
+            try {
+                currentPriceList = new ObjectMapper().readValue(jsonObject.toString(), new TypeReference<HashMap<String, Object>>() {
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            parameters.put("PRICELIST_CODE", ((Map<String, Object>) currentPriceList.get("data")).get("pricelist"));
+
+            // set quotation Date
+            Quotation quotation = quotationDao.getQuotationDetailsById(quotationId);
+            parameters.put("QUOTATION_DATE", quotation.getCreatedDate());
+
+            Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
+            parameters.put("REPORT_LOCALE", locale);
+
+            parameters.put("USERNAME", "Parth");
+
+            BufferedImage imfg = null;
+            try {
+                InputStream in = new ByteArrayInputStream(quotationReportAltamiraimage);
+                imfg = ImageIO.read(in);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            parameters.put("altamira_logo", imfg);
+
+            Session session = quotationDao.unwrap();
+
+            jasperPrint = session.doReturningWork(new ReturningWork<JasperPrint>() {
+                @Override
+                public JasperPrint execute(Connection connection) {
+                    JasperPrint jasperPrint = null;
+
+                    try {
+                        jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return jasperPrint;
+                }
+            });
+
+            pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
+
+            Response.ResponseBuilder response = Response.ok(pdfStream);
+            response.header("Content-Disposition","inline; filename=Quotation Report.pdf");
+            
+            return response.build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (jasperPrint != null) {
+                    // store generated report in database
+                    quotationDao.insertGeneratedQuotationReport(jasperPrint);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Could not insert generated report in database.");
+            }
+        }
+    }
+    
+    @GET
+    @Path("/test/priceList")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ReturnMessage getPriceList(@QueryParam("lamination") String lamination,
+                                      @QueryParam("treatment") String treatment,
+                                      @QueryParam("thickness") String thickness) {
+        
+        ReturnMessage message = new ReturnMessage();
+        
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put("pricelist", "BL");
+
+        List<Map> materialList = new ArrayList<Map>();
+
+        Map<String, String> material = new HashMap<String, String>();
+        material.put("code", "WBO00233");
+        material.put("description", "AÇO LAMINADO FINA FRIO 2,65mm");
+        material.put("baseprice", "2368");
+        material.put("averageprice", new BigDecimal(thickness).multiply(new BigDecimal(1000)).toString());
+        material.put("tax", "18");
+
+        materialList.add(material);
+        resultMap.put("materials", materialList);
+
+        message.setData(resultMap);
+        return message;
+    }
+    
+    @GET
+    @Path("/test/current")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ReturnMessage getCurrentPriceList() {
+        
+        ReturnMessage message = new ReturnMessage();
+        
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        resultMap.put("pricelist", "BL");
+
+        message.setData(resultMap);
+        return message;
     }
 }

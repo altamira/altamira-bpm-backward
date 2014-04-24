@@ -18,7 +18,6 @@ import java.util.Map;
 import javax.ejb.Stateless;
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.mail.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -31,6 +30,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.hibernate.jdbc.ReturningWork;
 
 import br.com.altamira.erp.entity.dao.OrderDao;
+import org.hibernate.Session;
 
 /**
  *
@@ -52,6 +52,7 @@ public class SendOrdersService implements JavaDelegate {
     @Inject
     private MailService mailService;
 
+    @Override
     public void execute(DelegateExecution de) throws Exception {
 
         System.out.println("Send Orders To Suppliers service task execution started...");
@@ -124,7 +125,6 @@ public class SendOrdersService implements JavaDelegate {
 
             Session session = entityManager.unwrap(Session.class);
 
-            /*
             jasperPrint = session.doReturningWork(new ReturningWork<JasperPrint>() {
                 @Override
                 public JasperPrint execute(Connection connection) {
@@ -139,7 +139,6 @@ public class SendOrdersService implements JavaDelegate {
                     return jasperPrint;
                 }
             });
-            */
             
             pdf = JasperExportManager.exportReportToPdf(jasperPrint);
 

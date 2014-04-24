@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.RequestDao;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -21,6 +22,24 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Request;
+import br.com.altamira.erp.entity.model.RequestReportData;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 /**
  *
@@ -31,6 +50,9 @@ public class RequestEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    private RequestDao requestDao;
 
     @POST
     @Consumes("application/json")
@@ -97,5 +119,150 @@ public class RequestEndpoint {
     public Response update(Request entity) {
         entity = em.merge(entity);
         return Response.noContent().build();
+    }
+    
+    @GET
+    @Path("/{id:[0-9][0-9]*}/report")
+    @Produces("application/pdf")
+    public Response getRequestReportInPdf(@PathParam("id") long requestId) {
+
+        // generate report
+        JasperPrint jasperPrint = null;
+        
+        try {
+            byte[] requestReportJasper = requestDao.getRequestReportJasperFile();
+            byte[] requestReportAltamiraimage = requestDao.getRequestReportAltamiraImage();
+            byte[] pdf = null;
+
+            ByteArrayInputStream reportStream = new ByteArrayInputStream(requestReportJasper);
+            Map<String, Object> parameters = new HashMap<String, Object>();
+
+            List<Object[]> list = requestDao.selectRequestReportDataById(requestId);
+
+            //Vector requestReportList = new Vector();
+            ArrayList requestReportList = new ArrayList();
+            List<Date> dateList = new ArrayList<Date>();
+
+            BigDecimal lastMaterialId = new BigDecimal(0);
+            int count = 0;
+            BigDecimal sumRequestWeight = new BigDecimal(0);
+            BigDecimal totalWeight = new BigDecimal(0);
+
+            RequestReportData r = new RequestReportData();
+            r.setId(null);
+            r.setLamination(null);
+            r.setLength(null);
+            r.setThickness(null);
+            r.setTreatment(null);
+            r.setWidth(null);
+            r.setArrivalDate(null);
+            r.setWeight(null);
+
+            requestReportList.add(r);
+
+            for (Object[] rs : list) {
+                RequestReportData rr = new RequestReportData();
+
+                BigDecimal currentMaterialId = new BigDecimal(rs[0].toString());
+
+                if (lastMaterialId.compareTo(currentMaterialId) == 0) {
+                    rr.setWeight(new BigDecimal(rs[6].toString()));
+                    rr.setArrivalDate((Date) rs[7]);
+
+                    // copy REQUEST_DATE into dateList
+                    dateList.add((Date) rs[7]);
+
+                    System.out.println(new BigDecimal(rs[6].toString()));
+                    totalWeight = totalWeight.add(new BigDecimal(rs[6].toString()));
+                    sumRequestWeight = sumRequestWeight.add(new BigDecimal(rs[6].toString()));
+                    count++;
+                } else {
+                    rr.setId(new BigDecimal(rs[0].toString()));
+                    rr.setLamination((String) rs[1]);
+                    rr.setTreatment((String) rs[2]);
+                    rr.setThickness(new BigDecimal(rs[3].toString()));
+                    rr.setWidth(new BigDecimal(rs[4].toString()));
+
+                    if (rs[5] != null) {
+                        rr.setLength(new BigDecimal(rs[5].toString()));
+                    }
+
+                    rr.setWeight(new BigDecimal(rs[6].toString()));
+                    rr.setArrivalDate((Date) rs[7]);
+
+                    // copy ARRIVAL_DATE into dateList
+                    dateList.add((Date) rs[7]);
+
+                    totalWeight = totalWeight.add(new BigDecimal(rs[6].toString()));
+                    lastMaterialId = currentMaterialId;
+
+                    if (count != 0) {
+                        RequestReportData addition = new RequestReportData();
+                        addition.setWeight(sumRequestWeight);
+
+                        requestReportList.add(addition);
+                    }
+
+                    sumRequestWeight = new BigDecimal(rs[6].toString());
+                    count = 0;
+                }
+
+                requestReportList.add(rr);
+            }
+
+            if (count > 0) {
+                RequestReportData addition = new RequestReportData();
+                addition.setWeight(sumRequestWeight);
+
+                requestReportList.add(addition);
+            }
+
+            BufferedImage imfg = null;
+            try {
+                InputStream in = new ByteArrayInputStream(requestReportAltamiraimage);
+                imfg = ImageIO.read(in);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            Collections.sort(dateList);
+
+            parameters.put("REQUEST_START_DATE", dateList.get(0));
+            parameters.put("REQUEST_END_DATE", dateList.get(dateList.size() - 1));
+            parameters.put("REQUEST_ID", requestId);
+            parameters.put("TOTAL_WEIGHT", totalWeight);
+            parameters.put("altamira_logo", imfg);
+            parameters.put("USERNAME", "Parth");
+
+            Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
+            parameters.put("REPORT_LOCALE", locale);
+
+            JRDataSource dataSource = new JRBeanCollectionDataSource(requestReportList, false);
+
+            jasperPrint = JasperFillManager.fillReport(reportStream, parameters, dataSource);
+
+            pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
+
+            Response.ResponseBuilder response = Response.ok(pdfStream);
+            response.header("Content-Disposition", "inline; filename=Request Report.pdf");
+
+            return response.build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (jasperPrint != null) {
+                    // store generated report in database
+                    requestDao.insertGeneratedRequestReport(jasperPrint);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Could not insert generated report in database.");
+            }
+        }
     }
 }

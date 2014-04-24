@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.OrderDao;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -21,6 +22,22 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.PurchaseOrder;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+import javax.imageio.ImageIO;
+import javax.inject.Inject;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import org.hibernate.Session;
+import org.hibernate.jdbc.ReturningWork;
 
 /**
  *
@@ -31,6 +48,9 @@ public class PurchaseOrderEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    OrderDao orderDao;
 
     @POST
     @Consumes("application/json")
@@ -98,5 +118,82 @@ public class PurchaseOrderEndpoint {
     public Response update(PurchaseOrder entity) {
         entity = em.merge(entity);
         return Response.noContent().build();
+    }
+    
+    @GET
+    @Path("{id}/report")
+    @Produces("application/pdf")
+    public Response getPurchaseOrderReportInPdf(@PathParam("id") long orderId) {
+        // generate report
+        JasperPrint jasperPrint = null;
+
+        try {
+            byte[] purchaseOrderReportJasper = orderDao.getPurchaseOrderReportJasperFile();
+            byte[] purchaseOrderReportAltamiraimage = orderDao.getPurchaseOrderReportAltamiraImage();
+            byte[] pdf = null;
+
+            final ByteArrayInputStream reportStream = new ByteArrayInputStream(purchaseOrderReportJasper);
+            final Map<String, Object> parameters = new HashMap<String, Object>();
+
+            parameters.put("PURCHASE_ORDER_ID", new BigDecimal(orderId));
+
+            Date purchaseOrderDate = orderDao.getPurchaseOrderCreatedDateById(orderId);
+
+            parameters.put("PURCHASE_ORDER_DATE", purchaseOrderDate);
+            parameters.put("USERNAME", "Parth");
+
+            Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
+            parameters.put("REPORT_LOCALE", locale);
+
+            BufferedImage imfg = null;
+            try {
+                InputStream in = new ByteArrayInputStream(purchaseOrderReportAltamiraimage);
+                imfg = ImageIO.read(in);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+            parameters.put("altamira_logo", imfg);
+
+            Session session = em.unwrap(Session.class);
+
+            jasperPrint = session.doReturningWork(new ReturningWork<JasperPrint>() {
+                @Override
+                public JasperPrint execute(Connection connection) {
+                    JasperPrint jasperPrint = null;
+
+                    try {
+                        jasperPrint = JasperFillManager.fillReport(reportStream, parameters, connection);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    return jasperPrint;
+                }
+            });
+
+            pdf = JasperExportManager.exportReportToPdf(jasperPrint);
+
+            ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
+
+            Response.ResponseBuilder response = Response.ok(pdfStream);
+            response.header("Content-Disposition","inline; filename=Planning Report.pdf");
+            
+            return response.build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        } finally {
+            try {
+                if (jasperPrint != null) {
+                    // store generated report in database
+                    orderDao.insertGeneratedPurchaseOrderReport(jasperPrint);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                System.out.println("Could not insert generated report in database.");
+            }
+        }
     }
 }
