@@ -49,6 +49,7 @@ public class MaterialEndpoint {
             return Response.status(Status.NOT_FOUND).build();
         }
         em.remove(entity);
+        em.flush();
         return Response.noContent().build();
     }
 

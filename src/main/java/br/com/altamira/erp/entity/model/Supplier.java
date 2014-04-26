@@ -51,17 +51,17 @@ public class Supplier implements Serializable {
     @Basic(optional = false)
     @Column(name = "NAME", columnDefinition = "nvarchar2(50)")
     private String name;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<QuotationItemQuote> quotationItemQuoteSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierPriceList> supplierPriceListSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierContact> supplierContactSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<PurchaseOrder> purchaseOrderSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierStandard> supplierStandardSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "supplier", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
     public Supplier() {

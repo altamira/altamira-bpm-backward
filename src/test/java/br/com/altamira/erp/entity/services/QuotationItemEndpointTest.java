@@ -40,6 +40,9 @@ public class QuotationItemEndpointTest {
 
 	@Inject
 	private QuotationItemEndpoint quotationitemendpoint;
+	
+	@Inject
+	private QuotationItem quotationItem;
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -56,7 +59,7 @@ public class QuotationItemEndpointTest {
 						SupplierContact.class, SupplierInStock.class,
 						SupplierPriceList.class, SupplierStandard.class,
 						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class)
+						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
 				.addAsManifestResource("META-INF/persistence.xml",
 						"persistence.xml")
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
@@ -84,7 +87,7 @@ public class QuotationItemEndpointTest {
 
 	@Test
 	public void testListAll() {
-		fail("Not yet implemented"); // TODO
+		Assert.assertFalse(quotationitemendpoint.listAll(1, 1).isEmpty());
 	}
 
 	@Test

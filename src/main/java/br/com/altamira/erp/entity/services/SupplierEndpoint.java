@@ -92,7 +92,7 @@ public class SupplierEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Supplier entity) {
         entity = em.merge(entity);

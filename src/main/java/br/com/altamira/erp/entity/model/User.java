@@ -6,6 +6,8 @@
 
 package br.com.altamira.erp.entity.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -23,10 +25,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "USER_PREFERENCE"/*, uniqueConstraints = @UniqueConstraint(columnNames = "NAME")*/)
 @NamedQueries({
-    @NamedQuery(name = "User.list", query = "SELECT u FROM User u ORDER BY u.id")
+    @NamedQuery(name = "User.list", query = "SELECT u FROM User u ORDER BY u.name")
 })
-public class User {
-private static final long serialVersionUID = 1L;
+public class User implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
     @Id
     @Column(name = "NAME", columnDefinition = "NVARCHAR2", length = 64)

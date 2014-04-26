@@ -40,6 +40,9 @@ public class PurchasePlanningItemEndpointTest {
 
 	@Inject
 	private PurchasePlanningItemEndpoint purchaseplanningitemendpoint;
+	
+	@Inject
+	private PurchasePlanningItem purchasePlanningItem;
 
 	@Deployment
 	public static JavaArchive createDeployment() {
@@ -56,7 +59,7 @@ public class PurchasePlanningItemEndpointTest {
 						SupplierContact.class, SupplierInStock.class,
 						SupplierPriceList.class, SupplierStandard.class,
 						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class)
+						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
 				.addAsManifestResource("META-INF/persistence.xml",
 						"persistence.xml")
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
@@ -84,7 +87,7 @@ public class PurchasePlanningItemEndpointTest {
 
 	@Test
 	public void testListAll() {
-		fail("Not yet implemented"); // TODO
+		Assert.assertFalse(purchaseplanningitemendpoint.listAll(1, 1).isEmpty());
 	}
 
 	@Test

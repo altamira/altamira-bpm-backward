@@ -23,13 +23,17 @@
     <class>br.com.altamira.erp.entity.model.SupplierPriceList</class>
     <class>br.com.altamira.erp.entity.model.PurchasePlanningItem</class>
     <class>br.com.altamira.erp.entity.model.PurchasePlanning</class>
+    <class>br.com.altamira.bpm.AltamiraCustomDialect</class>
+    <class>br.com.altamira.erp.entity.model.SupplierStandardPK</class>
+    <class>br.com.altamira.erp.entity.model.MaterialStandardPK</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
       <property name="hibernate.hbm2ddl.auto" value="validate"/>
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.format_sql" value="true"/>
+      <!--<property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>-->
       <!--       <property name="hibernate.transaction.flush_before_completion" value="true"/> -->
-      <property name="hibernate.dialect" value="br.com.altamira.bpm.AltamiraCustomDialect"/>
+      <property name="hibernate.dialect" value="br.com.altamira.bpm.AltamiraCustomDialect"/> 
     </properties>
   </persistence-unit>
 </persistence>

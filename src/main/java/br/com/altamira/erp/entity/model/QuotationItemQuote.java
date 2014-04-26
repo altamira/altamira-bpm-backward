@@ -67,7 +67,7 @@ public class QuotationItemQuote implements Serializable {
     @JoinColumn(name = "QUOTATION_ITEM", referencedColumnName = "ID")
     @ManyToOne(fetch = FetchType.LAZY)
     private QuotationItem quotationItem;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotationItemQuote", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.REFRESH,*/ mappedBy = "quotationItemQuote", fetch = FetchType.LAZY)
     private Set<SupplierInStock> supplierInStockSet;
 
     public QuotationItemQuote() {

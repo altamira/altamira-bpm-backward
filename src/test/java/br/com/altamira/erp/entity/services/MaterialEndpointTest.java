@@ -1,18 +1,37 @@
 package br.com.altamira.erp.entity.services;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
+import javax.annotation.Resource;
+import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
+import javax.transaction.SystemException;
+import javax.transaction.Transactional;
+import javax.transaction.UserTransaction;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OverProtocol;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.arquillian.junit.InSequence;
+import org.jboss.arquillian.test.api.ArquillianResource;
+import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,13 +58,45 @@ import br.com.altamira.erp.entity.model.SupplierStandard;
 import br.com.altamira.erp.entity.model.SupplierStandardPK;
 import br.com.altamira.erp.entity.model.UserPreference;
 
+@Stateless
 @RunWith(Arquillian.class)
 public class MaterialEndpointTest {
 
+    @ArquillianResource  
+    InitialContext ctx;
+    
 	@Inject
 	private MaterialEndpoint materialendpoint;
-
-	@Deployment
+	
+    @PersistenceContext(unitName = "altamira-bpm-PU")
+    private EntityManager em;
+    
+    @Resource
+    private UserTransaction utx;
+	
+	public static Archive<?> deploy() {  
+        return ShrinkWrap.create(WebArchive.class)  
+                .addAsLibraries(  
+                        ShrinkWrap.create(JavaArchive.class, "materialendpointtest.jar")  
+                            .addClasses(MaterialEndpoint.class, Material.class,
+            						Quotation.class, QuotationItem.class, Request.class,
+            						RequestItem.class, Supplier.class,
+            						MaterialStandard.class, PurchaseOrder.class,
+            						PurchaseOrderItem.class, PurchasePlanning.class,
+            						PurchasePlanningItem.class, Quotation.class,
+            						QuotationItem.class, QuotationItemQuote.class,
+            						QuotationRequest.class, Standard.class,
+            						SupplierContact.class, SupplierInStock.class,
+            						SupplierPriceList.class, SupplierStandard.class,
+            						UserPreference.class, SupplierStandardPK.class,
+            						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class))
+    						.addAsManifestResource("META-INF/persistence.xml",
+    								"persistence.xml")
+    						.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml"); 
+	}
+	
+	@OverProtocol("Servlet 3.0") 
+	@Deployment  
 	public static JavaArchive createDeployment() {
 		return ShrinkWrap
 				.create(JavaArchive.class, "altamira-bpm.jar")
@@ -60,62 +111,140 @@ public class MaterialEndpointTest {
 						SupplierContact.class, SupplierInStock.class,
 						SupplierPriceList.class, SupplierStandard.class,
 						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class)
+						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
 				.addAsManifestResource("META-INF/persistence.xml",
 						"persistence.xml")
 				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+				//.addAsResource("log4j.xml");
 	}
 
 	@Test
+	@InSequence(1)
 	public void should_be_deployed() {
 		Assert.assertNotNull(materialendpoint);
 	}
 
-	@PersistenceContext(unitName = "altamira-bpm-PU")
-	private EntityManager em;
-
-	@Inject
-	private Material material;
-
 	@Test
+	@InSequence(2)
 	public void testCreate() {
-
-		material.setLamination("TT");
+		
+		Material material = new Material();
+		
+		material.setLamination("XX");
 		material.setLength(new BigDecimal(1.5));
 		material.setTax(new BigDecimal(3.4));
 		material.setThickness(new BigDecimal(9.8));
-		material.setTreatment("TT");
+		material.setTreatment("XX");
 		material.setWidth(new BigDecimal(9.9));
+		material.setTax(new BigDecimal(0.0));
+		
+		List<Material> materials = em.createNamedQuery("Material.findUnique", Material.class)
+				.setParameter("lamination", material.getLamination())
+                .setParameter("treatment", material.getTreatment())
+                .setParameter("thickness", material.getThickness())
+                .setParameter("width", material.getWidth())
+                .setParameter("length", material.getLength()).getResultList();
+		
+		//Assert.assertFalse(materials.isEmpty());
+		
+		Assert.assertNotNull(em.find(Material.class, 246l));
+		
+		/*if (!materials.isEmpty()) {
+			fail("Not is empty");
+			return;
+		}*/
 
-		Assert.assertEquals(null, material.getId());
-		materialendpoint.create(material);
+		if (!materials.isEmpty()) {
+			em.remove(materials.get(0));
+			em.flush();
+		}
+		
+		Response r = materialendpoint.create(material);
+		
+		List<Material> checkExist = em.createNamedQuery("Material.findUnique", Material.class)
+				.setParameter("lamination", material.getLamination())
+                .setParameter("treatment", material.getTreatment())
+                .setParameter("thickness", material.getThickness())
+                .setParameter("width", material.getWidth())
+                .setParameter("length", material.getLength()).getResultList();
+		
+		assertFalse(checkExist.isEmpty());
+		assertNotNull(em.find(Material.class, material.getId()));
+		
 		Assert.assertNotEquals((Long) 0l, material.getId());
-
-		Material m = em.find(Material.class, material.getId());
-
-		Assert.assertEquals(m.getLamination(), material.getLamination());
-
-		materialendpoint.deleteById(material.getId());
+		Assert.assertNotNull(material.getId());
+		Assert.assertEquals(Status.CREATED.getStatusCode(), r.getStatus());
+		
+		//em.remove(material);
+		//em.flush();
+		
 	}
 
 	@Test
-	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
+	@InSequence(3)
 	public void testFindById() {
-		fail("Not yet implemented"); // TODO
+		
+		TypedQuery<Material> findAllQuery = em.createNamedQuery("Material.findAll", Material.class);
+		findAllQuery.setFirstResult(1);
+		findAllQuery.setMaxResults(1);
+		final List<Material> results = findAllQuery.getResultList();
+		
+		if (results.isEmpty()) {
+			fail("Table have no records to test find by id");
+		} else {
+			Response r = materialendpoint.findById(results.get(0).getId());
+		
+			Assert.assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		}
 	}
 
 	@Test
+	@InSequence(4)
 	public void testListAll() {
-		fail("Not yet implemented"); // TODO
+		Assert.assertFalse(materialendpoint.listAll(1, 1).isEmpty());
 	}
 
 	@Test
+	@InSequence(5)
 	public void testUpdate() {
-		fail("Not yet implemented"); // TODO
+		
+		TypedQuery<Material> findAllQuery = em.createNamedQuery("Material.findAll", Material.class);
+		findAllQuery.setFirstResult(1);
+		findAllQuery.setMaxResults(1);
+		final List<Material> results = findAllQuery.getResultList();
+		
+		if (results.isEmpty()) {
+			fail("Table have no records to test find by id");
+		} else {
+			Response r = materialendpoint.update(results.get(0));
+		
+			Assert.assertEquals(Status.NO_CONTENT.getStatusCode(), r.getStatus());
+		}
+	}
+
+	@Test
+	@InSequence(6)
+	public void testDeleteById() throws NotSupportedException, SystemException, SecurityException, IllegalStateException, RollbackException, HeuristicMixedException, HeuristicRollbackException {
+		
+		Material material = new Material();
+		
+		material.setId(0l);
+		material.setLamination("XX");
+		material.setLength(new BigDecimal(1.5));
+		material.setTax(new BigDecimal(3.4));
+		material.setThickness(new BigDecimal(9.8));
+		material.setTreatment("XX");
+		material.setWidth(new BigDecimal(9.9));
+		material.setTax(new BigDecimal(0.0));
+		
+		em.persist(material);
+		
+		Response r = materialendpoint.deleteById(material.getId());
+		
+		Assert.assertEquals(Status.OK.getStatusCode(), r.getStatus());
+
+		Assert.assertNull(em.find(Material.class, material.getId()));
+
 	}
 
 }
