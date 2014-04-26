@@ -29,7 +29,7 @@
       <property name="hibernate.show_sql" value="true"/>
       <property name="hibernate.format_sql" value="true"/>
       <!--       <property name="hibernate.transaction.flush_before_completion" value="true"/> -->
-      <property name="hibernate.dialect" value="org.hibernate.dialect.Oracle10gDialect"/>
+      <property name="hibernate.dialect" value="br.com.altamira.bpm.AltamiraCustomDialect"/>
     </properties>
   </persistence-unit>
 </persistence>
