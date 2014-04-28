@@ -126,17 +126,17 @@ public class MaterialEndpointTest {
 
 	@Test
 	@InSequence(2)
-	public void testCreate() {
+	public void testCreate() throws Exception {
 		
 		Material material = new Material();
 		
 		material.setLamination("XX");
-		material.setLength(new BigDecimal(1.5));
-		material.setTax(new BigDecimal(3.4));
-		material.setThickness(new BigDecimal(9.8));
+		material.setLength(new BigDecimal("1.5"));
+		//material.setTax(new BigDecimal(3.4));
+		material.setThickness(new BigDecimal("9.8"));
 		material.setTreatment("XX");
-		material.setWidth(new BigDecimal(9.9));
-		material.setTax(new BigDecimal(0.0));
+		material.setWidth(new BigDecimal("9.9"));
+		material.setTax(new BigDecimal("0.0"));
 		
 		List<Material> materials = em.createNamedQuery("Material.findUnique", Material.class)
 				.setParameter("lamination", material.getLamination())
@@ -147,7 +147,7 @@ public class MaterialEndpointTest {
 		
 		//Assert.assertFalse(materials.isEmpty());
 		
-		Assert.assertNotNull(em.find(Material.class, 246l));
+		//Assert.assertNotNull(em.find(Material.class, 246l));
 		
 		/*if (!materials.isEmpty()) {
 			fail("Not is empty");
@@ -155,18 +155,21 @@ public class MaterialEndpointTest {
 		}*/
 
 		if (!materials.isEmpty()) {
-			em.remove(materials.get(0));
+                        utx.begin();
+			em.remove(em.merge(materials.get(0)));
 			em.flush();
+                        utx.commit();
 		}
 		
 		Response r = materialendpoint.create(material);
 		
 		List<Material> checkExist = em.createNamedQuery("Material.findUnique", Material.class)
-				.setParameter("lamination", material.getLamination())
-                .setParameter("treatment", material.getTreatment())
-                .setParameter("thickness", material.getThickness())
-                .setParameter("width", material.getWidth())
-                .setParameter("length", material.getLength()).getResultList();
+				              .setParameter("lamination", material.getLamination())
+                                              .setParameter("treatment", material.getTreatment())
+                                              .setParameter("thickness", material.getThickness())
+                                              .setParameter("width", material.getWidth())
+                                              .setParameter("length", material.getLength())
+                                              .getResultList();
 		
 		assertFalse(checkExist.isEmpty());
 		assertNotNull(em.find(Material.class, material.getId()));
@@ -228,20 +231,22 @@ public class MaterialEndpointTest {
 		
 		Material material = new Material();
 		
-		material.setId(0l);
+		//material.setId(0l);
 		material.setLamination("XX");
-		material.setLength(new BigDecimal(1.5));
-		material.setTax(new BigDecimal(3.4));
-		material.setThickness(new BigDecimal(9.8));
-		material.setTreatment("XX");
-		material.setWidth(new BigDecimal(9.9));
-		material.setTax(new BigDecimal(0.0));
+		material.setLength(new BigDecimal("1.5"));
+		//material.setTax(new BigDecimal(3.4));
+		material.setThickness(new BigDecimal("9.8"));
+		material.setTreatment("XY");
+		material.setWidth(new BigDecimal("9.9"));
+		material.setTax(new BigDecimal("0.0"));
 		
+                utx.begin();
 		em.persist(material);
-		
+		utx.commit();
+                
 		Response r = materialendpoint.deleteById(material.getId());
-		
-		Assert.assertEquals(Status.OK.getStatusCode(), r.getStatus());
+                
+		Assert.assertEquals(Status.NO_CONTENT.getStatusCode(), r.getStatus());
 
 		Assert.assertNull(em.find(Material.class, material.getId()));
 

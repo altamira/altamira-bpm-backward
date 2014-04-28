@@ -71,12 +71,12 @@
             <version>${camunda.version}</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+        <!--<dependency>
             <groupId>org.camunda.bpm</groupId>
             <artifactId>camunda-engine-rest</artifactId>
             <classifier>classes</classifier>
             <version>${camunda.version}</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <!-- client for Java EE application server integration, included in WAR as an alternative to write your own ProcessApplication class -->
             <groupId>org.camunda.bpm.javaee</groupId>
@@ -229,9 +229,10 @@
             <scope>provided</scope>
         </dependency>
         
-		<dependency>
+        <!--<dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-jaxrs</artifactId>
+            <version>3.0.8.Final</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -240,11 +241,11 @@
             </exclusions>
         </dependency>
 		
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.17</version>
-		</dependency>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+	</dependency>-->
 		            
         
     </dependencies>
