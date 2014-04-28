@@ -74,7 +74,8 @@ public class PurchasePlanningDao {
     
     public PurchasePlanning findPurchasePlanningById(Long id)
     {
-        TypedQuery<PurchasePlanning> query = entityManager.createNamedQuery("PurchasePlanning.findById", PurchasePlanning.class);
+        TypedQuery<PurchasePlanning> query = entityManager.createNamedQuery("PurchasePlanning.findById", PurchasePlanning.class)
+                                                          .setParameter("id", id);
         
         List<PurchasePlanning> results = query.getResultList();
         
@@ -83,7 +84,8 @@ public class PurchasePlanningDao {
     
     public PurchasePlanningItem findPurchasePlanningItemById(Long id)
     {
-        TypedQuery<PurchasePlanningItem> query = entityManager.createNamedQuery("PurchasePlanningItem.findById",PurchasePlanningItem.class);
+        TypedQuery<PurchasePlanningItem> query = entityManager.createNamedQuery("PurchasePlanningItem.findById",PurchasePlanningItem.class)
+                                                              .setParameter("id", id);
         
         List<PurchasePlanningItem> results = query.getResultList();
         

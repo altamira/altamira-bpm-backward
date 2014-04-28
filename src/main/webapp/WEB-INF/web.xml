@@ -18,14 +18,44 @@
     <url-pattern>/rest/*</url-pattern>
   </servlet-mapping>
   
+  <!-- Context Parameter for enabling RESTful services -->
   <context-param>
     <param-name>resteasy.servlet.mapping.prefix</param-name>
     <param-value>/rest</param-value>
   </context-param>
   
+  <!-- Start - Security Configuration -->
+  <security-constraint>
+    <web-resource-collection>
+      <web-resource-name>Altamira BPM</web-resource-name>
+      <url-pattern>/rest/*</url-pattern>
+    </web-resource-collection>
+    <auth-constraint>
+       <role-name>user_role</role-name>
+    </auth-constraint>
+  </security-constraint>
+  
   <login-config>
     <auth-method>FORM</auth-method>
     <realm-name>form-auth</realm-name>
+     <form-login-config>
+       <form-login-page>/login.jsp</form-login-page>
+       <form-error-page>/loginerror.jsp</form-error-page>
+    </form-login-config>
   </login-config>
+  
+  <security-role>
+    <role-name>user_role</role-name>
+  </security-role>
+  <!-- End - Security Configuration -->
+  
+  <!--<filter>
+    <filter-name>AltamiraSecurityFilter</filter-name>
+    <filter-class>br.com.altamira.bpm.AltamiraSecurityFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>AltamiraSecurityFilter</filter-name>
+    <url-pattern>/rest/*</url-pattern>
+  </filter-mapping>-->
   
 </web-app>
