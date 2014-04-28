@@ -2,7 +2,11 @@ package br.com.altamira.erp.entity.services;
 
 import static org.junit.Assert.fail;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.UserTransaction;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -38,60 +42,63 @@ import br.com.altamira.erp.entity.model.UserPreference;
 @RunWith(Arquillian.class)
 public class PurchaseOrderEndpointTest {
 
-	@Inject
-	private PurchaseOrderEndpoint purchaseorderendpoint;
-	
-	@Inject
-	private PurchaseOrder purchaseOrder;
+    @Inject
+    private PurchaseOrderEndpoint purchaseorderendpoint;
 
-	@Deployment
-	public static JavaArchive createDeployment() {
-		return ShrinkWrap
-				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(PurchaseOrderEndpoint.class, Material.class,
-						Quotation.class, QuotationItem.class, Request.class,
-						RequestItem.class, Supplier.class,
-						MaterialStandard.class, PurchaseOrder.class,
-						PurchaseOrderItem.class, PurchasePlanning.class,
-						PurchasePlanningItem.class, Quotation.class,
-						QuotationItem.class, QuotationItemQuote.class,
-						QuotationRequest.class, Standard.class,
-						SupplierContact.class, SupplierInStock.class,
-						SupplierPriceList.class, SupplierStandard.class,
-						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
-				.addAsManifestResource("META-INF/persistence.xml",
-						"persistence.xml")
-				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-	}
+    @PersistenceContext(unitName = "altamira-bpm-PU")
+    private EntityManager em;
 
-	@Test
-	public void should_be_deployed() {
-		Assert.assertNotNull(purchaseorderendpoint);
-	}
+    @Resource
+    private UserTransaction utx;
 
-	@Test
-	public void testCreate() {
-		fail("Not yet implemented"); // TODO
-	}
+    @Deployment
+    public static JavaArchive createDeployment() {
+        return ShrinkWrap
+                .create(JavaArchive.class, "altamira-bpm.jar")
+                .addClasses(PurchaseOrderEndpoint.class, Material.class,
+                        Quotation.class, QuotationItem.class, Request.class,
+                        RequestItem.class, Supplier.class,
+                        MaterialStandard.class, PurchaseOrder.class,
+                        PurchaseOrderItem.class, PurchasePlanning.class,
+                        PurchasePlanningItem.class, Quotation.class,
+                        QuotationItem.class, QuotationItemQuote.class,
+                        QuotationRequest.class, Standard.class,
+                        SupplierContact.class, SupplierInStock.class,
+                        SupplierPriceList.class, SupplierStandard.class,
+                        UserPreference.class, SupplierStandardPK.class,
+                        MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
+                .addAsManifestResource("META-INF/persistence.xml",
+                        "persistence.xml")
+                .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    }
 
-	@Test
-	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
-	}
+    @Test
+    public void should_be_deployed() {
+        Assert.assertNotNull(purchaseorderendpoint);
+    }
 
-	@Test
-	public void testFindById() {
-		fail("Not yet implemented"); // TODO
-	}
+    @Test
+    public void testCreate() {
+        fail("Not yet implemented"); // TODO
+    }
 
-	@Test
-	public void testListAll() {
-		Assert.assertFalse(purchaseorderendpoint.listAll(1, 1).isEmpty());
-	}
+    @Test
+    public void testDeleteById() {
+        fail("Not yet implemented"); // TODO
+    }
 
-	@Test
-	public void testUpdate() {
-		fail("Not yet implemented"); // TODO
-	}
+    @Test
+    public void testFindById() {
+        fail("Not yet implemented"); // TODO
+    }
+
+    @Test
+    public void testListAll() {
+        Assert.assertFalse(purchaseorderendpoint.listAll(1, 1).isEmpty());
+    }
+
+    @Test
+    public void testUpdate() {
+        fail("Not yet implemented"); // TODO
+    }
 }

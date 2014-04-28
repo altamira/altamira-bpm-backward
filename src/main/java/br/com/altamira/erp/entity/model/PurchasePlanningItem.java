@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -70,7 +69,7 @@ public class PurchasePlanningItem implements Serializable {
     @JoinColumn(name = "PLANNING", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchasePlanning planning;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "planningItem", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "planningItem", fetch = FetchType.LAZY)
     private Set<PurchaseOrderItem> purchaseOrderItemSet;
 
     public PurchasePlanningItem() {

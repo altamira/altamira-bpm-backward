@@ -35,10 +35,13 @@ public class QuotationItemEndpoint {
     @POST
     @Consumes("application/json")
     public Response create(QuotationItem entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(QuotationItemEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -93,10 +96,13 @@ public class QuotationItemEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(QuotationItem entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(QuotationItemEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 }

@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -55,9 +54,9 @@ public class Standard implements Serializable {
     @Lob
     @Column(name = "DESCRIPTION")
     private String description;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "standard", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "standard", fetch = FetchType.LAZY)
     private Set<MaterialStandard> materialStandardSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "standard", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "standard", fetch = FetchType.LAZY)
     private Set<SupplierStandard> supplierStandardSet;
 
     public Standard() {

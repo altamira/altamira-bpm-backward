@@ -70,7 +70,7 @@ public class QuotationItem implements Serializable {
     @Basic(optional = false)
     @Column(name = "WEIGHT")
     private BigDecimal weight;
-    @OneToMany(mappedBy = "quotationItem", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "quotationItem", fetch = FetchType.EAGER)
     private Set<QuotationItemQuote> quotationItemQuoteSet;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

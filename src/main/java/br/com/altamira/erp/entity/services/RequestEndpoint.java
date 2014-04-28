@@ -1,6 +1,7 @@
 package br.com.altamira.erp.entity.services;
 
 import br.com.altamira.erp.entity.dao.RequestDao;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -23,6 +24,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestReportData;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -33,8 +35,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -50,17 +54,20 @@ public class RequestEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
-    
+
     @Inject
     private RequestDao requestDao;
 
     @POST
     @Consumes("application/json")
     public Response create(Request entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(RequestEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -114,13 +121,16 @@ public class RequestEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Request entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
-    
+
     @GET
     @Path("/{id:[0-9][0-9]*}/report")
     @Produces("application/pdf")
@@ -128,7 +138,7 @@ public class RequestEndpoint {
 
         // generate report
         JasperPrint jasperPrint = null;
-        
+
         try {
             byte[] requestReportJasper = requestDao.getRequestReportJasperFile();
             byte[] requestReportAltamiraimage = requestDao.getRequestReportAltamiraImage();

@@ -35,10 +35,13 @@ public class RequestItemEndpoint {
     @POST
     @Consumes("application/json")
     public Response create(RequestItem entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(RequestItemEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -93,10 +96,13 @@ public class RequestItemEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(RequestItem entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(RequestItemEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 }

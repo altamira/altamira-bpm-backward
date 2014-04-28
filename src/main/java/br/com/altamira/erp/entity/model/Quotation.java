@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -62,11 +61,11 @@ public class Quotation implements Serializable {
     @Column(name = "CLOSED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date closedDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
     private Set<PurchasePlanning> purchasePlanningSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
     private Set<QuotationRequest> quotationRequestSet;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.EAGER)
     private Set<QuotationItem> quotationItemSet;
 
     public Quotation() {

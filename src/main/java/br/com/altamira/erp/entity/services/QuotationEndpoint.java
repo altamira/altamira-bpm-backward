@@ -1,6 +1,7 @@
 package br.com.altamira.erp.entity.services;
 
 import br.com.altamira.erp.entity.dao.QuotationDao;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -22,7 +23,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Quotation;
+
 import org.codehaus.jackson.map.ObjectMapper;
+
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -34,12 +37,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
+
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -57,17 +62,20 @@ public class QuotationEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
-    
+
     @Inject
     private QuotationDao quotationDao;
 
     @POST
     @Consumes("application/json")
     public Response create(Quotation entity) {
+        entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(QuotationEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -121,18 +129,21 @@ public class QuotationEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Quotation entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(QuotationEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
-    
+
     @GET
     @Path("{id:[0-9][0-9]*}/report")
     @Produces("application/pdf")
     public Response getQuotationReportInPdf(@PathParam("id") long quotationId) {
-        
+
         // generate report
         JasperPrint jasperPrint = null;
 
@@ -263,8 +274,8 @@ public class QuotationEndpoint {
             ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
 
             Response.ResponseBuilder response = Response.ok(pdfStream);
-            response.header("Content-Disposition","inline; filename=Quotation Report.pdf");
-            
+            response.header("Content-Disposition", "inline; filename=Quotation Report.pdf");
+
             return response.build();
 
         } catch (Exception e) {
@@ -282,46 +293,5 @@ public class QuotationEndpoint {
             }
         }
     }
-    
-    @GET
-    @Path("/test/priceList")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ReturnMessage getPriceList(@QueryParam("lamination") String lamination,
-                                      @QueryParam("treatment") String treatment,
-                                      @QueryParam("thickness") String thickness) {
-        
-        ReturnMessage message = new ReturnMessage();
-        
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("pricelist", "BL");
 
-        List<Map> materialList = new ArrayList<Map>();
-
-        Map<String, String> material = new HashMap<String, String>();
-        material.put("code", "WBO00233");
-        material.put("description", "AÇO LAMINADO FINA FRIO 2,65mm");
-        material.put("baseprice", "2368");
-        material.put("averageprice", new BigDecimal(thickness).multiply(new BigDecimal(1000)).toString());
-        material.put("tax", "18");
-
-        materialList.add(material);
-        resultMap.put("materials", materialList);
-
-        message.setData(resultMap);
-        return message;
-    }
-    
-    @GET
-    @Path("/test/current")
-    @Produces(MediaType.APPLICATION_JSON)
-    public ReturnMessage getCurrentPriceList() {
-        
-        ReturnMessage message = new ReturnMessage();
-        
-        Map<String, Object> resultMap = new HashMap<String, Object>();
-        resultMap.put("pricelist", "BL");
-
-        message.setData(resultMap);
-        return message;
-    }
 }

@@ -35,10 +35,13 @@ public class SupplierInStockEndpoint {
     @POST
     @Consumes("application/json")
     public Response create(SupplierInStock entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(SupplierInStockEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -93,10 +96,13 @@ public class SupplierInStockEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(SupplierInStock entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(SupplierInStockEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 }

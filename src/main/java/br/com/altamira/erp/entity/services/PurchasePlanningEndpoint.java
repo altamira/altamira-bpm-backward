@@ -1,6 +1,7 @@
 package br.com.altamira.erp.entity.services;
 
 import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
+
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -22,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.PurchasePlanning;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -30,11 +32,14 @@ import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
 
@@ -54,10 +59,13 @@ public class PurchasePlanningEndpoint {
     @POST
     @Consumes("application/json")
     public Response create(PurchasePlanning entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(PurchasePlanningEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -112,11 +120,14 @@ public class PurchasePlanningEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(PurchasePlanning entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
     
     @GET

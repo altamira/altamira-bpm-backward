@@ -33,9 +33,8 @@ public class MaterialDao {
     }
 
     public Material find(String lamination, String treatment, BigDecimal  thickness, BigDecimal width, BigDecimal length) {
-        List<br.com.altamira.erp.entity.model.Material> materials;
         
-        materials = (List<Material>)entityManager.createNamedQuery("Material.find")
+        List<Material> materials = entityManager.createNamedQuery("Material.findUnique", Material.class)
                 .setParameter("lamination", lamination)
                 .setParameter("treatment", treatment)
                 .setParameter("thickness", thickness)

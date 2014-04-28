@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -63,12 +62,12 @@ public class RequestItem implements Serializable {
     @Column(name = "WEIGHT")
     private BigDecimal weight;
     @JoinColumn(name = "REQUEST", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Request request;
     @JoinColumn(name = "MATERIAL", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Material material;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "requestItem", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "requestItem"/*, fetch = FetchType.LAZY*/)
     private Set<PurchasePlanningItem> purchasePlanningItemSet;
 
     public RequestItem() {

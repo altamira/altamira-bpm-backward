@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -64,9 +63,9 @@ public class Request implements Serializable {
     @Column(name = "SEND_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date sendDate;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "request", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "request", fetch = FetchType.EAGER)
     private Set<RequestItem> requestItemSet;
-    @OneToOne(cascade = CascadeType.ALL, mappedBy = "request", fetch = FetchType.LAZY)
+    @OneToOne(/*cascade = CascadeType.ALL,*/mappedBy = "request"/*, fetch = FetchType.LAZY*/)
     private QuotationRequest quotationRequest;
 
     public Request() {
@@ -115,7 +114,7 @@ public class Request implements Serializable {
     }
 
     @XmlTransient
-    @JsonIgnore
+    //@JsonIgnore
     public Set<RequestItem> getRequestItemSet() {
         return requestItemSet;
     }
@@ -124,6 +123,8 @@ public class Request implements Serializable {
         this.requestItemSet = requestItemSet;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public QuotationRequest getQuotationRequest() {
         return quotationRequest;
     }
@@ -141,7 +142,7 @@ public class Request implements Serializable {
 
     @Override
     public boolean equals(Object object) {
-        // TODO: Warning - this method won't work in the case the id fields are
+     // TODO: Warning - this method won't work in the case the id fields are
         // not set
         if (!(object instanceof Request)) {
             return false;

@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -67,7 +66,7 @@ public class PurchaseOrder implements Serializable {
     @JoinColumn(name = "PURCHASE_PLANNING", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchasePlanning purchasePlanning;
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private Set<PurchaseOrderItem> purchaseOrderItemSet;
 
     public PurchaseOrder() {

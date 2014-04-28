@@ -12,7 +12,6 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,8 +31,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
  * @author Alessandro
  */
 @Entity
-@Table(name = "MATERIAL", 
-	uniqueConstraints=@UniqueConstraint(columnNames={"LAMINATION", "TREATMENT", "THICKNESS", "WIDTH", "LENGTH"}))
+@Table(name = "MATERIAL",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"LAMINATION", "TREATMENT", "THICKNESS", "WIDTH", "LENGTH"}))
 @XmlRootElement
 @NamedQueries({
     @NamedQuery(name = "Material.findAll", query = "SELECT m FROM Material m"),
@@ -44,7 +43,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "Material.findByWidth", query = "SELECT m FROM Material m WHERE m.width = :width"),
     @NamedQuery(name = "Material.findByLength", query = "SELECT m FROM Material m WHERE m.length = :length"),
     @NamedQuery(name = "Material.findByTax", query = "SELECT m FROM Material m WHERE m.tax = :tax"),
-	@NamedQuery(name = "Material.findUnique", query = "SELECT m FROM Material m WHERE m.lamination = :lamination AND m.treatment = :treatment AND m.thickness = :thickness AND m.width = :width AND m.length = :length")})
+    @NamedQuery(name = "Material.findUnique", query = "SELECT m FROM Material m WHERE m.lamination = :lamination AND m.treatment = :treatment AND m.thickness = :thickness AND m.width = :width AND m.length = :length")})
 public class Material implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -72,11 +71,11 @@ public class Material implements Serializable {
     private BigDecimal length;
     @Column(name = "TAX")
     private BigDecimal tax;
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "material", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
     private Set<MaterialStandard> materialStandardSet;
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "material", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
     private Set<SupplierPriceList> supplierPriceListSet;
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "material", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
     private Set<RequestItem> requestItemSet;
 
     public Material() {

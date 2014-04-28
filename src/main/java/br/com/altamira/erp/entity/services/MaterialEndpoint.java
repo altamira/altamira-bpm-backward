@@ -3,6 +3,7 @@ package br.com.altamira.erp.entity.services;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.dao.MaterialDao;
 import br.com.altamira.erp.entity.model.Material;
 
 /**
@@ -31,14 +33,34 @@ public class MaterialEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject 
+    private MaterialDao materialDao;
 
     @POST
     @Consumes("application/json")
     public Response create(Material entity) {
-        em.persist(entity);
-        return Response.created(
+    	
+    	Material material = materialDao.find(entity);
+    	
+    	if (material == null) {
+	    	entity.setId(null);
+	
+	        em.persist(entity);
+
+	        return Response.created(
+	                UriBuilder.fromResource(MaterialEndpoint.class)
+	                .path(String.valueOf(entity.getId())).build())
+	                .entity(entity)
+	                .build();
+    	}
+    	
+        return Response.ok(
                 UriBuilder.fromResource(MaterialEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(material).build();
+
+        
     }
 
     @DELETE
@@ -76,7 +98,8 @@ public class MaterialEndpoint {
 
     @GET
     @Produces("application/json")
-    public List<Material> listAll(@QueryParam("start") Integer startPosition,
+    public List<Material> listAll(
+    		@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
         TypedQuery<Material> findAllQuery = em
                 .createQuery(
@@ -93,10 +116,13 @@ public class MaterialEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Material entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(MaterialEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 }

@@ -35,10 +35,13 @@ public class SupplierEndpoint {
     @POST
     @Consumes("application/json")
     public Response create(Supplier entity) {
+    	entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(SupplierEndpoint.class)
-                .path(String.valueOf(entity.getId())).build()).build();
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 
     @DELETE
@@ -96,6 +99,9 @@ public class SupplierEndpoint {
     @Consumes("application/json")
     public Response update(Supplier entity) {
         entity = em.merge(entity);
-        return Response.noContent().build();
+        return Response.ok(UriBuilder.fromResource(SupplierEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
     }
 }

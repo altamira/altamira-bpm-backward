@@ -10,7 +10,6 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -40,10 +39,10 @@ public class QuotationRequest implements Serializable {
     @Column(name = "ID")
     private Long id;
     @JoinColumn(name = "REQUEST", referencedColumnName = "ID")
-    @OneToOne(optional = false, fetch = FetchType.LAZY)
+    @OneToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Request request;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Quotation quotation;
 
     public QuotationRequest() {
