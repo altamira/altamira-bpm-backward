@@ -7,6 +7,13 @@
         <title>Altamira BPM - Login</title>
     </head>
     <body>
+        <%
+            if (session.isNew()) 
+            {
+                response.sendRedirect(request.getContextPath()+"/index.jsp");
+                return;
+            }
+        %>
         <h1>Login Page</h1>
         
         <form name='f' action="<c:url value='${request.contextPath}/j_security_check' />" method="POST">

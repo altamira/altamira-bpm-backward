@@ -6,7 +6,6 @@
 
 package br.com.altamira.bpm;
 
-import br.com.altamira.erp.entity.services.ReturnMessage;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.security.Principal;
@@ -49,13 +48,8 @@ public class AltamiraSecurityFilter implements Filter {
             // send json response
             httpRes.setContentType("application/json");
             PrintWriter printout = httpRes.getWriter();
-            
-            ReturnMessage message = new ReturnMessage();
-            message.setError(9999);
-            message.setMessage("Access Denied: Authorization required");
-            message.setData(null);
 
-            JSONObject jobj = new JSONObject(message);
+            JSONObject jobj = new JSONObject("Access Denied: Authorization required");
             
             printout.write(jobj.toString());
         }
