@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.Quotation;
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestReportData;
 
@@ -131,6 +132,17 @@ public class RequestEndpoint {
                 .build();
     }
 
+    @GET
+    @Path("/current")
+    @Produces("application/json")
+    public Response getCurrent() {
+    	Request entity = requestDao.getCurrent();
+    	return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }
+    
     @GET
     @Path("/{id:[0-9][0-9]*}/report")
     @Produces("application/pdf")

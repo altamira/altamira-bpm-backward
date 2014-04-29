@@ -7,6 +7,7 @@ package br.com.altamira.erp.entity.dao;
 import br.com.altamira.erp.entity.model.PlanningReportLog;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
 import br.com.altamira.erp.entity.model.PurchasePlanningItem;
+
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Blob;
@@ -15,6 +16,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
+
 import net.sf.jasperreports.engine.JasperPrint;
 
 /**
@@ -25,6 +27,31 @@ public class PurchasePlanningDao {
 
     @PersistenceContext(name = "persistence/altamira-bpm", unitName = "altamira-bpm-PU")
     private EntityManager entityManager;
+
+    public PurchasePlanning getCurrent() {
+
+        long quotation_id = 0l;
+        long pplanning_id = 0l;
+
+        entityManager.createNativeQuery("BEGIN CREATE_QUOTATION(?); END;")
+                .setParameter(1, quotation_id)
+                .executeUpdate();
+
+        entityManager.createNativeQuery("BEGIN CREATE_PURCHASE_PLANNING(?, ?); END;")
+                .setParameter(1, pplanning_id)
+                .setParameter(2, quotation_id)
+                .executeUpdate();
+
+        List<PurchasePlanning> planning = entityManager.createQuery("SELECT p FROM PurchasePlanning p WHERE p.id = (SELECT MAX(pp.id) FROM PurchasePlanning pp WHERE pp.approveDate IS NULL)", PurchasePlanning.class)
+                .getResultList();
+
+        if (planning.isEmpty()) {
+
+            return null;
+        }
+
+        return planning.get(0);
+    }
 
     public byte[] getPlanningReportJasperFile() throws SQLException {
         Blob tempBlob = (Blob) entityManager.createNativeQuery("SELECT JASPER_FILE FROM PLANNING_REPORT WHERE REPORT = (SELECT MAX(REPORT) FROM PLANNING_REPORT)")
@@ -71,24 +98,22 @@ public class PurchasePlanningDao {
 
         return true;
     }
-    
-    public PurchasePlanning findPurchasePlanningById(Long id)
-    {
+
+    public PurchasePlanning findPurchasePlanningById(Long id) {
         TypedQuery<PurchasePlanning> query = entityManager.createNamedQuery("PurchasePlanning.findById", PurchasePlanning.class)
-                                                          .setParameter("id", id);
-        
+                .setParameter("id", id);
+
         List<PurchasePlanning> results = query.getResultList();
-        
+
         return results.get(0);
     }
-    
-    public PurchasePlanningItem findPurchasePlanningItemById(Long id)
-    {
-        TypedQuery<PurchasePlanningItem> query = entityManager.createNamedQuery("PurchasePlanningItem.findById",PurchasePlanningItem.class)
-                                                              .setParameter("id", id);
-        
+
+    public PurchasePlanningItem findPurchasePlanningItemById(Long id) {
+        TypedQuery<PurchasePlanningItem> query = entityManager.createNamedQuery("PurchasePlanningItem.findById", PurchasePlanningItem.class)
+                .setParameter("id", id);
+
         List<PurchasePlanningItem> results = query.getResultList();
-        
+
         return results.get(0);
     }
 

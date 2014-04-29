@@ -52,14 +52,14 @@ public class PurchasePlanningEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
-    
+
     @Inject
     private PurchasePlanningDao planningDao;
 
     @POST
     @Consumes("application/json")
     public Response create(PurchasePlanning entity) {
-    	entity.setId(null);
+        entity.setId(null);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(PurchasePlanningEndpoint.class)
@@ -129,7 +129,18 @@ public class PurchasePlanningEndpoint {
                 .entity(entity)
                 .build();
     }
-    
+
+    @GET
+    @Path("/current")
+    @Produces("application/json")
+    public Response getCurrent() {
+        PurchasePlanning entity = planningDao.getCurrent();
+        return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }
+
     @GET
     @Path("{id:[0-9][0-9]*}/report")
     @Produces("application/pdf")
@@ -184,8 +195,8 @@ public class PurchasePlanningEndpoint {
             ByteArrayInputStream pdfStream = new ByteArrayInputStream(pdf);
 
             Response.ResponseBuilder response = Response.ok(pdfStream);
-            response.header("Content-Disposition","inline; filename=Planning Report.pdf");
-            
+            response.header("Content-Disposition", "inline; filename=Planning Report.pdf");
+
             return response.build();
 
         } catch (Exception e) {

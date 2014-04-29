@@ -140,6 +140,17 @@ public class QuotationEndpoint {
     }
 
     @GET
+    @Path("/current")
+    @Produces("application/json")
+    public Response getCurrent() {
+    	Quotation entity = quotationDao.getCurrent();
+    	return Response.ok(UriBuilder.fromResource(QuotationEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }
+    
+    @GET
     @Path("{id:[0-9][0-9]*}/report")
     @Produces("application/pdf")
     public Response getQuotationReportInPdf(@PathParam("id") long quotationId) {
