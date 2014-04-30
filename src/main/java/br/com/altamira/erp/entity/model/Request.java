@@ -37,12 +37,12 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 @Table(name = "REQUEST")
 @XmlRootElement
 @NamedQueries({
-    //@NamedQuery(name = "Request.getCurrent", query = "SELECT r FROM Request r WHERE r.id = (SELECT MAX(rr.id) FROM Request rr WHERE rr.sendDate IS NULL)"),
     @NamedQuery(name = "Request.findAll", query = "SELECT r FROM Request r"),
     @NamedQuery(name = "Request.findById", query = "SELECT r FROM Request r WHERE r.id = :id"),
     @NamedQuery(name = "Request.findByCreatedDate", query = "SELECT r FROM Request r WHERE r.createdDate = :createdDate"),
     @NamedQuery(name = "Request.findByCreatorName", query = "SELECT r FROM Request r WHERE r.creatorName = :creatorName"),
-    @NamedQuery(name = "Request.findBySendDate", query = "SELECT r FROM Request r WHERE r.sendDate = :sendDate")})
+    @NamedQuery(name = "Request.findBySendDate", query = "SELECT r FROM Request r WHERE r.sendDate = :sendDate"),
+	@NamedQuery(name = "Request.getCurrent", query = "SELECT r FROM Request r WHERE r.id = (SELECT MAX(rr.id) FROM Request rr WHERE rr.sendDate IS NULL)")})
 public class Request implements Serializable {
 
     private static final long serialVersionUID = 1L;

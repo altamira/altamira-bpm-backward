@@ -40,7 +40,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "Quotation.findById", query = "SELECT q FROM Quotation q WHERE q.id = :id"),
     @NamedQuery(name = "Quotation.findByCreatedDate", query = "SELECT q FROM Quotation q WHERE q.createdDate = :createdDate"),
     @NamedQuery(name = "Quotation.findByCreatorName", query = "SELECT q FROM Quotation q WHERE q.creatorName = :creatorName"),
-    @NamedQuery(name = "Quotation.findByClosedDate", query = "SELECT q FROM Quotation q WHERE q.closedDate = :closedDate")})
+    @NamedQuery(name = "Quotation.findByClosedDate", query = "SELECT q FROM Quotation q WHERE q.closedDate = :closedDate"),
+    @NamedQuery(name = "Quotation.getCurrent", query = "SELECT q FROM Quotation q WHERE q.id = (SELECT MAX(qq.id) FROM Quotation qq WHERE qq.closedDate IS NULL)")})
 public class Quotation implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -134,7 +135,7 @@ public class Quotation implements Serializable {
     }
 
     @XmlTransient
-    @JsonIgnore
+    //@JsonIgnore
     public Set<QuotationItem> getQuotationItemSet() {
         return quotationItemSet;
     }

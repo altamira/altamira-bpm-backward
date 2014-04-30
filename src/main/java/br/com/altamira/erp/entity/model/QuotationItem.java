@@ -142,7 +142,7 @@ public class QuotationItem implements Serializable {
     }
 
     @XmlTransient
-    @JsonIgnore
+    //@JsonIgnore
     public Set<QuotationItemQuote> getQuotationItemQuoteSet() {
         return quotationItemQuoteSet;
     }
@@ -152,6 +152,8 @@ public class QuotationItem implements Serializable {
         this.quotationItemQuoteSet = quotationItemQuoteSet;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public Quotation getQuotation() {
         return quotation;
     }

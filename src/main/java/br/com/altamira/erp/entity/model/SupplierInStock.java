@@ -22,6 +22,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -106,6 +109,8 @@ public class SupplierInStock implements Serializable {
         this.weight = weight;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public QuotationItemQuote getQuotationItemQuote() {
         return quotationItemQuote;
     }

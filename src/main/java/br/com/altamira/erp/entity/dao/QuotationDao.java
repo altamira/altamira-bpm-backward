@@ -50,7 +50,7 @@ public class QuotationDao {
 //      return quotation;
         List<br.com.altamira.erp.entity.model.Quotation> quotations;
 
-        quotations = (List<br.com.altamira.erp.entity.model.Quotation>) entityManager.createQuery("SELECT q FROM Quotation q WHERE q.id = (SELECT MAX(qq.id) FROM Quotation qq WHERE qq.closed_date IS NULL)", Quotation.class)
+        quotations = (List<br.com.altamira.erp.entity.model.Quotation>) entityManager.createNamedQuery("Quotation.getCurrent", Quotation.class)
                 .getResultList();
 
         if (quotations.isEmpty()) {

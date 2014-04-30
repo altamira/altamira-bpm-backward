@@ -7,12 +7,15 @@ package br.com.altamira.erp.entity.dao;
 import br.com.altamira.erp.entity.model.PlanningReportLog;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
 import br.com.altamira.erp.entity.model.PurchasePlanningItem;
+import br.com.altamira.erp.entity.model.Quotation;
 
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 import java.util.List;
+
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -27,22 +30,22 @@ public class PurchasePlanningDao {
 
     @PersistenceContext(name = "persistence/altamira-bpm", unitName = "altamira-bpm-PU")
     private EntityManager entityManager;
+    
+    @Inject
+    private QuotationDao quotationDao;
 
     public PurchasePlanning getCurrent() {
 
-        long quotation_id = 0l;
         long pplanning_id = 0l;
 
-        entityManager.createNativeQuery("BEGIN CREATE_QUOTATION(?); END;")
-                .setParameter(1, quotation_id)
-                .executeUpdate();
+        Quotation quotation = quotationDao.getCurrent();
 
         entityManager.createNativeQuery("BEGIN CREATE_PURCHASE_PLANNING(?, ?); END;")
                 .setParameter(1, pplanning_id)
-                .setParameter(2, quotation_id)
+                .setParameter(2, quotation.getId())
                 .executeUpdate();
 
-        List<PurchasePlanning> planning = entityManager.createQuery("SELECT p FROM PurchasePlanning p WHERE p.id = (SELECT MAX(pp.id) FROM PurchasePlanning pp WHERE pp.approveDate IS NULL)", PurchasePlanning.class)
+        List<PurchasePlanning> planning = entityManager.createNamedQuery("PurchasePlanning.getCurrent", PurchasePlanning.class)
                 .getResultList();
 
         if (planning.isEmpty()) {

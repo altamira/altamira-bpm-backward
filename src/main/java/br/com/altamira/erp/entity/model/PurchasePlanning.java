@@ -43,7 +43,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "PurchasePlanning.findByCreatedDate", query = "SELECT p FROM PurchasePlanning p WHERE p.createdDate = :createdDate"),
     @NamedQuery(name = "PurchasePlanning.findByCreatorName", query = "SELECT p FROM PurchasePlanning p WHERE p.creatorName = :creatorName"),
     @NamedQuery(name = "PurchasePlanning.findByApproveDate", query = "SELECT p FROM PurchasePlanning p WHERE p.approveDate = :approveDate"),
-    @NamedQuery(name = "PurchasePlanning.findByApproveUser", query = "SELECT p FROM PurchasePlanning p WHERE p.approveUser = :approveUser")})
+    @NamedQuery(name = "PurchasePlanning.findByApproveUser", query = "SELECT p FROM PurchasePlanning p WHERE p.approveUser = :approveUser"),
+    @NamedQuery(name = "PurchasePlanning.getCurrent", query = "SELECT p FROM PurchasePlanning p WHERE p.id = (SELECT MAX(pp.id) FROM PurchasePlanning pp WHERE pp.approveDate IS NULL)")})
 public class PurchasePlanning implements Serializable {
 
     private static final long serialVersionUID = 1L;
