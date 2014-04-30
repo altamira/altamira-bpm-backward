@@ -79,11 +79,8 @@ public class MaterialEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<Material> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT m FROM Material m LEFT JOIN FETCH m.materialStandardSet LEFT JOIN FETCH m.supplierPriceListSet LEFT JOIN FETCH m.requestItemSet WHERE m.id = :entityId ORDER BY m.id",
-                        Material.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<Material> findByIdQuery = em.createNamedQuery("Material.findById", Material.class);
+        findByIdQuery.setParameter("id", id);
         Material entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -101,10 +98,7 @@ public class MaterialEndpoint {
     public List<Material> listAll(
     		@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<Material> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT m FROM Material m LEFT JOIN FETCH m.materialStandardSet LEFT JOIN FETCH m.supplierPriceListSet LEFT JOIN FETCH m.requestItemSet ORDER BY m.id",
-                        Material.class);
+        TypedQuery<Material> findAllQuery = em.createNamedQuery("Material.findAll", Material.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

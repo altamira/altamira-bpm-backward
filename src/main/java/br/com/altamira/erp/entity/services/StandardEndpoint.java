@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.RequestItem;
 import br.com.altamira.erp.entity.model.Standard;
 
 /**
@@ -59,11 +60,8 @@ public class StandardEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<Standard> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet WHERE s.id = :entityId ORDER BY s.id",
-                        Standard.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<Standard> findByIdQuery = em.createNamedQuery("Standard.findById", Standard.class);
+        findByIdQuery.setParameter("id", id);
         Standard entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -80,10 +78,7 @@ public class StandardEndpoint {
     @Produces("application/json")
     public List<Standard> listAll(@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<Standard> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM Standard s LEFT JOIN FETCH s.materialStandardSet LEFT JOIN FETCH s.supplierStandardSet ORDER BY s.id",
-                        Standard.class);
+        TypedQuery<Standard> findAllQuery = em.createNamedQuery("Standard.findAll", Standard.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

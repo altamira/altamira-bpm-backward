@@ -63,11 +63,11 @@ public class Quotation implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date closedDate;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
-    private Set<PurchasePlanning> purchasePlanningSet;
+    private Set<PurchasePlanning> purchasePlanning;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
-    private Set<QuotationRequest> quotationRequestSet;
+    private Set<QuotationRequest> quotationRequest;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.EAGER)
-    private Set<QuotationItem> quotationItemSet;
+    private Set<QuotationItem> quotationItem;
 
     public Quotation() {
     }
@@ -116,32 +116,32 @@ public class Quotation implements Serializable {
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchasePlanning> getPurchasePlanningSet() {
-        return purchasePlanningSet;
+    public Set<PurchasePlanning> getPurchasePlanning() {
+        return purchasePlanning;
     }
 
-    public void setPurchasePlanningSet(Set<PurchasePlanning> purchasePlanningSet) {
-        this.purchasePlanningSet = purchasePlanningSet;
+    public void setPurchasePlanningSet(Set<PurchasePlanning> purchasePlanning) {
+        this.purchasePlanning = purchasePlanning;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<QuotationRequest> getQuotationRequestSet() {
-        return quotationRequestSet;
+    public Set<QuotationRequest> getQuotationRequest() {
+        return quotationRequest;
     }
 
-    public void setQuotationRequestSet(Set<QuotationRequest> quotationRequestSet) {
-        this.quotationRequestSet = quotationRequestSet;
+    public void setQuotationRequest(Set<QuotationRequest> quotationRequest) {
+        this.quotationRequest = quotationRequest;
     }
 
     @XmlTransient
     //@JsonIgnore
-    public Set<QuotationItem> getQuotationItemSet() {
-        return quotationItemSet;
+    public Set<QuotationItem> getQuotationItem() {
+        return quotationItem;
     }
 
-    public void setQuotationItemSet(Set<QuotationItem> quotationItemSet) {
-        this.quotationItemSet = quotationItemSet;
+    public void setQuotationItem(Set<QuotationItem> quotationItem) {
+        this.quotationItem = quotationItem;
     }
 
     @Override

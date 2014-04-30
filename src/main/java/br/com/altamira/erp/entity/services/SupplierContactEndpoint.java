@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.Standard;
 import br.com.altamira.erp.entity.model.SupplierContact;
 
 /**
@@ -59,11 +60,8 @@ public class SupplierContactEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<SupplierContact> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierContact s LEFT JOIN FETCH s.supplier WHERE s.id = :entityId ORDER BY s.id",
-                        SupplierContact.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<SupplierContact> findByIdQuery = em.createNamedQuery("SupplierContact.findById", SupplierContact.class);
+        findByIdQuery.setParameter("id", id);
         SupplierContact entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -81,10 +79,7 @@ public class SupplierContactEndpoint {
     public List<SupplierContact> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<SupplierContact> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierContact s LEFT JOIN FETCH s.supplier ORDER BY s.id",
-                        SupplierContact.class);
+        TypedQuery<SupplierContact> findAllQuery = em.createNamedQuery("SupplierContact.findAll", SupplierContact.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

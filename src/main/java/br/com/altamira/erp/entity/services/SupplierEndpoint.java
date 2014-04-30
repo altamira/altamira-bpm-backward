@@ -21,6 +21,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Supplier;
+import br.com.altamira.erp.entity.model.SupplierContact;
 
 /**
  *
@@ -59,11 +60,8 @@ public class SupplierEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<Supplier> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM Supplier s LEFT JOIN FETCH s.quotationItemQuoteSet LEFT JOIN FETCH s.supplierPriceListSet LEFT JOIN FETCH s.supplierContactSet LEFT JOIN FETCH s.purchaseOrderSet LEFT JOIN FETCH s.supplierStandardSet LEFT JOIN FETCH s.purchasePlanningItemSet WHERE s.id = :entityId ORDER BY s.id",
-                        Supplier.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<Supplier> findByIdQuery = em.createNamedQuery("Supplier.findById", Supplier.class);
+        findByIdQuery.setParameter("id", id);
         Supplier entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -80,10 +78,7 @@ public class SupplierEndpoint {
     @Produces("application/json")
     public List<Supplier> listAll(@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<Supplier> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM Supplier s LEFT JOIN FETCH s.quotationItemQuoteSet LEFT JOIN FETCH s.supplierPriceListSet LEFT JOIN FETCH s.supplierContactSet LEFT JOIN FETCH s.purchaseOrderSet LEFT JOIN FETCH s.supplierStandardSet LEFT JOIN FETCH s.purchasePlanningItemSet ORDER BY s.id",
-                        Supplier.class);
+        TypedQuery<Supplier> findAllQuery = em.createNamedQuery("Supplier.findAll", Supplier.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

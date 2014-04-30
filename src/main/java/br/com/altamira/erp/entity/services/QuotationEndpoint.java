@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Quotation;
+import br.com.altamira.erp.entity.model.Request;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -52,6 +53,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.codehaus.jackson.type.TypeReference;
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -68,14 +70,32 @@ public class QuotationEndpoint {
 
     @POST
     @Consumes("application/json")
-    public Response create(Quotation entity) {
-        entity.setId(null);
-        em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(QuotationEndpoint.class)
-                .path(String.valueOf(entity.getId())).build())
-                .entity(entity)
-                .build();
+    public Response create() {
+    	Quotation quotation;
+
+    	List<Quotation> quotations = (List<Quotation>) em
+                .createNamedQuery("Quotation.getCurrent", Quotation.class)
+                .getResultList();
+
+        if (!quotations.isEmpty()) {
+
+        	quotation = quotations.get(0);
+        	quotation.setClosedDate(DateTime.now().toDate());
+            
+            em.merge(quotation);
+            em.flush();
+
+            /*
+            Map<String, Object> variables = new HashMap<String, Object>();
+
+            variables.put("requestId", request.getId());
+
+            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+            */
+            
+        }
+
+        return getCurrent();
     }
 
     @DELETE
@@ -93,11 +113,8 @@ public class QuotationEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<Quotation> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT q FROM Quotation q LEFT JOIN FETCH q.purchasePlanningSet LEFT JOIN FETCH q.quotationRequestSet LEFT JOIN FETCH q.quotationItemSet WHERE q.id = :entityId ORDER BY q.id",
-                        Quotation.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<Quotation> findByIdQuery = em.createNamedQuery("Quotation.findById", Quotation.class);
+        findByIdQuery.setParameter("id", id);
         Quotation entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -114,10 +131,7 @@ public class QuotationEndpoint {
     @Produces("application/json")
     public List<Quotation> listAll(@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<Quotation> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT q FROM Quotation q LEFT JOIN FETCH q.purchasePlanningSet LEFT JOIN FETCH q.quotationRequestSet LEFT JOIN FETCH q.quotationItemSet ORDER BY q.id",
-                        Quotation.class);
+        TypedQuery<Quotation> findAllQuery = em.createNamedQuery("Quotation.findAll", Quotation.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

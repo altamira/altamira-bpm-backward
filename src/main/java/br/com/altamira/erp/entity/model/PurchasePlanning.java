@@ -71,9 +71,9 @@ public class PurchasePlanning implements Serializable {
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Quotation quotation;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
-    private Set<PurchaseOrder> purchaseOrderSet;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "planning", fetch = FetchType.LAZY)
-    private Set<PurchasePlanningItem> purchasePlanningItemSet;
+    private Set<PurchaseOrder> purchaseOrder;
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
+    private Set<PurchasePlanningItem> purchasePlanningItem;
 
     public PurchasePlanning() {
     }
@@ -138,23 +138,23 @@ public class PurchasePlanning implements Serializable {
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchaseOrder> getPurchaseOrderSet() {
-        return purchaseOrderSet;
+    public Set<PurchaseOrder> getPurchaseOrder() {
+        return purchaseOrder;
     }
 
-    public void setPurchaseOrderSet(Set<PurchaseOrder> purchaseOrderSet) {
-        this.purchaseOrderSet = purchaseOrderSet;
+    public void setPurchaseOrderSet(Set<PurchaseOrder> purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
-        return purchasePlanningItemSet;
+    public Set<PurchasePlanningItem> getPurchasePlanningItem() {
+        return purchasePlanningItem;
     }
 
-    public void setPurchasePlanningItemSet(
-            Set<PurchasePlanningItem> purchasePlanningItemSet) {
-        this.purchasePlanningItemSet = purchasePlanningItemSet;
+    public void setPurchasePlanningItem(
+            Set<PurchasePlanningItem> purchasePlanningItem) {
+        this.purchasePlanningItem = purchasePlanningItem;
     }
 
     @Override

@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.QuotationItem;
 import br.com.altamira.erp.entity.model.QuotationItemQuote;
 
 /**
@@ -59,11 +60,8 @@ public class QuotationItemQuoteEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<QuotationItemQuote> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT q FROM QuotationItemQuote q LEFT JOIN FETCH q.supplier LEFT JOIN FETCH q.quotationItem LEFT JOIN FETCH q.supplierInStockSet WHERE q.id = :entityId ORDER BY q.id",
-                        QuotationItemQuote.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<QuotationItemQuote> findByIdQuery = em.createNamedQuery("QuotationItemQuote.findById", QuotationItemQuote.class);
+        findByIdQuery.setParameter("id", id);
         QuotationItemQuote entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -81,10 +79,7 @@ public class QuotationItemQuoteEndpoint {
     public List<QuotationItemQuote> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<QuotationItemQuote> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT q FROM QuotationItemQuote q LEFT JOIN FETCH q.supplier LEFT JOIN FETCH q.quotationItem LEFT JOIN FETCH q.supplierInStockSet ORDER BY q.id",
-                        QuotationItemQuote.class);
+        TypedQuery<QuotationItemQuote> findAllQuery = em.createNamedQuery("QuotationItemQuote.findAll", QuotationItemQuote.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

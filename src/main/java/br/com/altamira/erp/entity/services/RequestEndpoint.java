@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Quotation;
+import br.com.altamira.erp.entity.model.QuotationRequest;
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestReportData;
 
@@ -39,6 +40,9 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+
+import org.camunda.bpm.engine.RuntimeService;
+import org.joda.time.DateTime;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -57,18 +61,40 @@ public class RequestEndpoint {
     private EntityManager em;
 
     @Inject
+    private RuntimeService runtimeService;
+    
+    @Inject
     private RequestDao requestDao;
 
     @POST
+    @Produces("application/json")
     @Consumes("application/json")
-    public Response create(Request entity) {
-    	entity.setId(null);
-        em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(RequestEndpoint.class)
-                .path(String.valueOf(entity.getId())).build())
-                .entity(entity)
-                .build();
+    public Response create() {
+    	Request request;
+
+    	List<Request> requests = (List<Request>) em
+                .createNamedQuery("Request.getCurrent", Request.class)
+                .getResultList();
+
+        if (!requests.isEmpty()) {
+
+        	request = requests.get(0);
+        	request.setSendDate(DateTime.now().toDate());
+            
+            em.merge(request);
+            em.flush();
+
+            /*
+            Map<String, Object> variables = new HashMap<String, Object>();
+
+            variables.put("requestId", request.getId());
+
+            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+            */
+            
+        }
+
+        return getCurrent();
     }
 
     @DELETE
@@ -86,11 +112,8 @@ public class RequestEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<Request> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT r FROM Request r LEFT JOIN FETCH r.requestItemSet LEFT JOIN FETCH r.quotationRequest WHERE r.id = :entityId ORDER BY r.id",
-                        Request.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<Request> findByIdQuery = em.createNamedQuery("Request.findById", Request.class);
+        findByIdQuery.setParameter("id", id);
         Request entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -107,10 +130,7 @@ public class RequestEndpoint {
     @Produces("application/json")
     public List<Request> listAll(@QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<Request> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT r FROM Request r LEFT JOIN FETCH r.requestItemSet LEFT JOIN FETCH r.quotationRequest ORDER BY r.id",
-                        Request.class);
+        TypedQuery<Request> findAllQuery = em.createNamedQuery("Request.findAll", Request.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

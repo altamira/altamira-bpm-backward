@@ -71,7 +71,7 @@ public class QuotationItem implements Serializable {
     @Column(name = "WEIGHT")
     private BigDecimal weight;
     @OneToMany(mappedBy = "quotationItem", fetch = FetchType.EAGER)
-    private Set<QuotationItemQuote> quotationItemQuoteSet;
+    private Set<QuotationItemQuote> quotationItemQuote;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Quotation quotation;
@@ -143,13 +143,13 @@ public class QuotationItem implements Serializable {
 
     @XmlTransient
     //@JsonIgnore
-    public Set<QuotationItemQuote> getQuotationItemQuoteSet() {
-        return quotationItemQuoteSet;
+    public Set<QuotationItemQuote> getQuotationItemQuote() {
+        return quotationItemQuote;
     }
 
-    public void setQuotationItemQuoteSet(
-            Set<QuotationItemQuote> quotationItemQuoteSet) {
-        this.quotationItemQuoteSet = quotationItemQuoteSet;
+    public void setQuotationItemQuote(
+            Set<QuotationItemQuote> quotationItemQuote) {
+        this.quotationItemQuote = quotationItemQuote;
     }
 
     @XmlTransient

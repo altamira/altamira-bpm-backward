@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
 
 /**
@@ -59,11 +60,8 @@ public class PurchaseOrderItemEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<PurchaseOrderItem> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT p FROM PurchaseOrderItem p LEFT JOIN FETCH p.planningItem LEFT JOIN FETCH p.purchaseOrder WHERE p.id = :entityId ORDER BY p.id",
-                        PurchaseOrderItem.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<PurchaseOrderItem> findByIdQuery = em.createNamedQuery("PurchaseOrderItem.findById", PurchaseOrderItem.class);
+        findByIdQuery.setParameter("id", id);
         PurchaseOrderItem entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -81,10 +79,7 @@ public class PurchaseOrderItemEndpoint {
     public List<PurchaseOrderItem> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<PurchaseOrderItem> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT p FROM PurchaseOrderItem p LEFT JOIN FETCH p.planningItem LEFT JOIN FETCH p.purchaseOrder ORDER BY p.id",
-                        PurchaseOrderItem.class);
+        TypedQuery<PurchaseOrderItem> findAllQuery = em.createNamedQuery("PurchaseOrderItem.findAll", PurchaseOrderItem.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

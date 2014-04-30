@@ -64,7 +64,7 @@ public class RequestDao {
 
         if (requests.isEmpty()) {
 
-            return create(new Request((long)0l, DateTime.now().toDate(), "system"));
+            return create(new Request(null, DateTime.now().toDate(), "system"));
 
         }
 

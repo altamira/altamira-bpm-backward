@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.SupplierInStock;
 import br.com.altamira.erp.entity.model.SupplierPriceList;
 
 /**
@@ -59,10 +60,7 @@ public class SupplierPriceListEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<SupplierPriceList> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierPriceList s LEFT JOIN FETCH s.supplier LEFT JOIN FETCH s.material WHERE s.id = :entityId ORDER BY s.id",
-                        SupplierPriceList.class);
+        TypedQuery<SupplierPriceList> findByIdQuery = em.createNamedQuery("SupplierPriceList.findById", SupplierPriceList.class);
         findByIdQuery.setParameter("entityId", id);
         SupplierPriceList entity;
         try {
@@ -81,10 +79,7 @@ public class SupplierPriceListEndpoint {
     public List<SupplierPriceList> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<SupplierPriceList> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierPriceList s LEFT JOIN FETCH s.supplier LEFT JOIN FETCH s.material ORDER BY s.id",
-                        SupplierPriceList.class);
+        TypedQuery<SupplierPriceList> findAllQuery = em.createNamedQuery("SupplierPriceList.findAll", SupplierPriceList.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

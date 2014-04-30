@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.SupplierPriceList;
 import br.com.altamira.erp.entity.model.UserPreference;
 
 /**
@@ -55,14 +56,11 @@ public class UserPreferenceEndpoint {
     }
 
     @GET
-    @Path("/{id:[0-9][0-9]*}")
+    @Path("/{name:[a-z][A-Z]*}")
     @Produces("application/json")
-    public Response findById(@PathParam("id") String id) {
-        TypedQuery<UserPreference> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT u FROM UserPreference u WHERE u.name = :entityId ORDER BY u.name",
-                        UserPreference.class);
-        findByIdQuery.setParameter("entityId", id);
+    public Response findByName(@PathParam("name") String name) {
+        TypedQuery<UserPreference> findByIdQuery = em.createNamedQuery("UserPreference.findByName", UserPreference.class);
+        findByIdQuery.setParameter("name", name);
         UserPreference entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -80,9 +78,7 @@ public class UserPreferenceEndpoint {
     public List<UserPreference> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<UserPreference> findAllQuery = em.createQuery(
-                "SELECT DISTINCT u FROM UserPreference u ORDER BY u.name",
-                UserPreference.class);
+        TypedQuery<UserPreference> findAllQuery = em.createNamedQuery("UserPreference.findAll", UserPreference.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

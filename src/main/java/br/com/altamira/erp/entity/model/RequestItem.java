@@ -69,7 +69,7 @@ public class RequestItem implements Serializable {
     @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Material material;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "requestItem"/*, fetch = FetchType.LAZY*/)
-    private Set<PurchasePlanningItem> purchasePlanningItemSet;
+    private Set<PurchasePlanningItem> purchasePlanningItem;
 
     public RequestItem() {
     }
@@ -130,13 +130,13 @@ public class RequestItem implements Serializable {
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
-        return purchasePlanningItemSet;
+    public Set<PurchasePlanningItem> getPurchasePlanningItem() {
+        return purchasePlanningItem;
     }
 
-    public void setPurchasePlanningItemSet(
-            Set<PurchasePlanningItem> purchasePlanningItemSet) {
-        this.purchasePlanningItemSet = purchasePlanningItemSet;
+    public void setPurchasePlanningItem(
+            Set<PurchasePlanningItem> purchasePlanningItem) {
+        this.purchasePlanningItem = purchasePlanningItem;
     }
 
     @Override

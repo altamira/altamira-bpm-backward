@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.Supplier;
 import br.com.altamira.erp.entity.model.SupplierInStock;
 
 /**
@@ -59,11 +60,8 @@ public class SupplierInStockEndpoint {
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
-        TypedQuery<SupplierInStock> findByIdQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierInStock s LEFT JOIN FETCH s.quotationItemQuote WHERE s.id = :entityId ORDER BY s.id",
-                        SupplierInStock.class);
-        findByIdQuery.setParameter("entityId", id);
+        TypedQuery<SupplierInStock> findByIdQuery = em.createNamedQuery("SupplierInStock.findById", SupplierInStock.class);
+        findByIdQuery.setParameter("id", id);
         SupplierInStock entity;
         try {
             entity = findByIdQuery.getSingleResult();
@@ -81,10 +79,7 @@ public class SupplierInStockEndpoint {
     public List<SupplierInStock> listAll(
             @QueryParam("start") Integer startPosition,
             @QueryParam("max") Integer maxResult) {
-        TypedQuery<SupplierInStock> findAllQuery = em
-                .createQuery(
-                        "SELECT DISTINCT s FROM SupplierInStock s LEFT JOIN FETCH s.quotationItemQuote ORDER BY s.id",
-                        SupplierInStock.class);
+        TypedQuery<SupplierInStock> findAllQuery = em.createNamedQuery("SupplierInStock.findAll", SupplierInStock.class);
         if (startPosition != null) {
             findAllQuery.setFirstResult(startPosition);
         }

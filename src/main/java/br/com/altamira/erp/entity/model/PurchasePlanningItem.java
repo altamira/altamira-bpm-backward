@@ -68,9 +68,9 @@ public class PurchasePlanningItem implements Serializable {
     private RequestItem requestItem;
     @JoinColumn(name = "PLANNING", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    private PurchasePlanning planning;
+    private PurchasePlanning purchasePlanning;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "planningItem", fetch = FetchType.LAZY)
-    private Set<PurchaseOrderItem> purchaseOrderItemSet;
+    private Set<PurchaseOrderItem> purchaseOrderItem;
 
     public PurchasePlanningItem() {
     }
@@ -125,23 +125,23 @@ public class PurchasePlanningItem implements Serializable {
         this.requestItem = requestItem;
     }
 
-    public PurchasePlanning getPlanning() {
-        return planning;
+    public PurchasePlanning getpurchasePlanning() {
+        return purchasePlanning;
     }
 
-    public void setPlanning(PurchasePlanning planning) {
-        this.planning = planning;
+    public void setPlanning(PurchasePlanning purchasePlanning) {
+        this.purchasePlanning = purchasePlanning;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchaseOrderItem> getPurchaseOrderItemSet() {
-        return purchaseOrderItemSet;
+    public Set<PurchaseOrderItem> getPurchaseOrderItem() {
+        return purchaseOrderItem;
     }
 
-    public void setPurchaseOrderItemSet(
-            Set<PurchaseOrderItem> purchaseOrderItemSet) {
-        this.purchaseOrderItemSet = purchaseOrderItemSet;
+    public void setPurchaseOrderItem(
+            Set<PurchaseOrderItem> purchaseOrderItem) {
+        this.purchaseOrderItem = purchaseOrderItem;
     }
 
     @Override

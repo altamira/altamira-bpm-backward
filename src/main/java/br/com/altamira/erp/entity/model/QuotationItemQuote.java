@@ -68,7 +68,7 @@ public class QuotationItemQuote implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private QuotationItem quotationItem;
     @OneToMany(/*cascade = CascadeType.REFRESH,*/ mappedBy = "quotationItemQuote", fetch = FetchType.EAGER)
-    private Set<SupplierInStock> supplierInStockSet;
+    private Set<SupplierInStock> supplierInStock;
 
     public QuotationItemQuote() {
     }
@@ -143,12 +143,12 @@ public class QuotationItemQuote implements Serializable {
 
     @XmlTransient
     //@JsonIgnore
-    public Set<SupplierInStock> getSupplierInStockSet() {
-        return supplierInStockSet;
+    public Set<SupplierInStock> getSupplierInStock() {
+        return supplierInStock;
     }
 
-    public void setSupplierInStockSet(Set<SupplierInStock> supplierInStockSet) {
-        this.supplierInStockSet = supplierInStockSet;
+    public void setSupplierInStockSet(Set<SupplierInStock> supplierInStock) {
+        this.supplierInStock = supplierInStock;
     }
 
     @Override
