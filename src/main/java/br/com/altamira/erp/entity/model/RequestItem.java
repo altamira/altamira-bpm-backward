@@ -118,8 +118,8 @@ public class RequestItem implements Serializable {
         this.request = request;
     }
 
-    @XmlTransient
-    @JsonIgnore
+    //@XmlTransient
+    //@JsonIgnore
     public Material getMaterial() {
         return material;
     }

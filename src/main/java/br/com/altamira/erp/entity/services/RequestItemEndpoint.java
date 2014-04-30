@@ -3,6 +3,7 @@ package br.com.altamira.erp.entity.services;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -20,6 +21,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.dao.RequestDao;
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
 
@@ -27,16 +29,24 @@ import br.com.altamira.erp.entity.model.RequestItem;
  *
  */
 @Stateless
-@Path("/requestitems")
+@Path("/requests/current/items")
 public class RequestItemEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    private RequestDao requestDao;
 
     @POST
     @Consumes("application/json")
     public Response create(RequestItem entity) {
     	entity.setId(null);
+    	//if (entity.getRequest() == null) {
+    		Request request = requestDao.getCurrent();
+    		request.getRequestItem().add(entity);
+    		entity.setRequest(request);
+    	//}
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(RequestItemEndpoint.class)
@@ -94,6 +104,11 @@ public class RequestItemEndpoint {
     //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(RequestItem entity) {
+    	//if (entity.getRequest() == null) {
+    		Request request = requestDao.getCurrent();
+    		request.getRequestItem().add(entity);
+    		entity.setRequest(request);
+    	//}
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(RequestItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.QuotationDao;
 import br.com.altamira.erp.entity.dao.RequestDao;
 
 import java.util.List;
@@ -65,14 +66,18 @@ public class RequestEndpoint {
     
     @Inject
     private RequestDao requestDao;
+    
+    @Inject
+    private QuotationDao quotationDao;
 
     @POST
+    @Path("/current")
     @Produces("application/json")
     @Consumes("application/json")
     public Response create() {
     	Request request;
 
-    	List<Request> requests = (List<Request>) em
+    	List<Request> requests = em
                 .createNamedQuery("Request.getCurrent", Request.class)
                 .getResultList();
 
@@ -94,6 +99,8 @@ public class RequestEndpoint {
             
         }
 
+        quotationDao.getCurrent();
+        
         return getCurrent();
     }
 
@@ -142,7 +149,6 @@ public class RequestEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Request entity) {
         entity = em.merge(entity);

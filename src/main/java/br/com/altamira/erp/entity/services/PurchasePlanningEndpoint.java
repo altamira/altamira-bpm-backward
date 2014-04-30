@@ -24,6 +24,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
+import br.com.altamira.erp.entity.model.Quotation;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
@@ -43,6 +44,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -58,15 +60,34 @@ public class PurchasePlanningEndpoint {
     private PurchasePlanningDao planningDao;
 
     @POST
+    @Path("/current")
     @Consumes("application/json")
     public Response create(PurchasePlanning entity) {
-        entity.setId(null);
-        em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(PurchasePlanningEndpoint.class)
-                .path(String.valueOf(entity.getId())).build())
-                .entity(entity)
-                .build();
+    	PurchasePlanning purchasePlanning;
+
+    	List<PurchasePlanning> purchasePlannings = em
+                .createNamedQuery("PurchasePlanning.getCurrent", PurchasePlanning.class)
+                .getResultList();
+
+        if (!purchasePlannings.isEmpty()) {
+
+        	purchasePlanning = purchasePlannings.get(0);
+        	purchasePlanning.setApproveDate(DateTime.now().toDate());
+            
+            em.merge(purchasePlanning);
+            em.flush();
+
+            /*
+            Map<String, Object> variables = new HashMap<String, Object>();
+
+            variables.put("requestId", request.getId());
+
+            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+            */
+            
+        }
+
+        return getCurrent();
     }
 
     @DELETE
@@ -115,7 +136,7 @@ public class PurchasePlanningEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/current")
     @Consumes("application/json")
     public Response update(PurchasePlanning entity) {
         entity = em.merge(entity);

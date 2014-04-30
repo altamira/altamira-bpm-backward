@@ -27,7 +27,7 @@ import br.com.altamira.erp.entity.model.QuotationRequest;
  *
  */
 @Stateless
-@Path("/quotationrequests")
+@Path("/quotations/current/requests")
 public class QuotationRequestEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")

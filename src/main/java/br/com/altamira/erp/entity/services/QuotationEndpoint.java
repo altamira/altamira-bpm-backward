@@ -69,11 +69,12 @@ public class QuotationEndpoint {
     private QuotationDao quotationDao;
 
     @POST
+    @Path("/current")
     @Consumes("application/json")
     public Response create() {
     	Quotation quotation;
 
-    	List<Quotation> quotations = (List<Quotation>) em
+    	List<Quotation> quotations = em
                 .createNamedQuery("Quotation.getCurrent", Quotation.class)
                 .getResultList();
 
@@ -143,7 +144,6 @@ public class QuotationEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
     public Response update(Quotation entity) {
         entity = em.merge(entity);
