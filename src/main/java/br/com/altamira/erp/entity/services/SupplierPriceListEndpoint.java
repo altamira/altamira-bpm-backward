@@ -91,9 +91,9 @@ public class SupplierPriceListEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(SupplierPriceList entity) {
+    public Response update(@PathParam("id") long id, SupplierPriceList entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(SupplierPriceListEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

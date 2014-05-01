@@ -72,7 +72,7 @@ public class PurchasePlanning implements Serializable {
     private Quotation quotation;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
     private Set<PurchaseOrder> purchaseOrder;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.EAGER)
     private Set<PurchasePlanningItem> purchasePlanningItem;
 
     public PurchasePlanning() {
@@ -128,6 +128,8 @@ public class PurchasePlanning implements Serializable {
         this.approveUser = approveUser;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public Quotation getQuotation() {
         return quotation;
     }
@@ -147,7 +149,7 @@ public class PurchasePlanning implements Serializable {
     }
 
     @XmlTransient
-    @JsonIgnore
+    //@JsonIgnore
     public Set<PurchasePlanningItem> getPurchasePlanningItem() {
         return purchasePlanningItem;
     }

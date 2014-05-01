@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import java.net.URI;
 import java.util.List;
 
 import javax.ejb.Stateless;
@@ -20,14 +21,16 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.model.Quotation;
 import br.com.altamira.erp.entity.model.QuotationItem;
 import br.com.altamira.erp.entity.model.QuotationItemQuote;
+import br.com.altamira.erp.entity.model.Supplier;
 
 /**
  *
  */
 @Stateless
-@Path("/quotations/current/items/quotes")
+@Path("/quotations/{quotation:[0-9][0-9]*}/items/{item:[0-9][0-9]*}/quotes")
 public class QuotationItemQuoteEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
@@ -35,14 +38,30 @@ public class QuotationItemQuoteEndpoint {
 
     @POST
     @Consumes("application/json")
-    public Response create(QuotationItemQuote entity) {
+    public Response create(@PathParam("quotation") long quotationId, @PathParam("item") long quotationItemId, QuotationItemQuote entity) {
+    	TypedQuery<QuotationItem> findByIdQuery = em.createQuery("SELECT qi FROM QuotationItem qi JOIN FETCH qi.quotation WHERE qi.id = :id", QuotationItem.class);
+        findByIdQuery.setParameter("id", quotationItemId);
+        QuotationItem quotationItem;
+        try {
+        	quotationItem = findByIdQuery.getSingleResult();
+        } catch (NoResultException nre) {
+        	quotationItem = null;
+        }
+        if (quotationItem == null || quotationItem.getQuotation().getId() != quotationId) {
+            return Response.status(Status.NOT_FOUND).build();
+        }        
     	entity.setId(null);
+    	entity.setQuotationItem(quotationItem);
+    	quotationItem.getQuotationItemQuote().add(entity);
         em.persist(entity);
-        return Response.created(
+        /*return Response.created(
                 UriBuilder.fromResource(QuotationItemQuoteEndpoint.class)
+                .resolveTemplate("quotation", quotationId)
+                .resolveTemplate("item", quotationItemId)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 
     @DELETE
@@ -91,9 +110,10 @@ public class QuotationItemQuoteEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(QuotationItemQuote entity) {
+    public Response update(@PathParam("id") long id, QuotationItemQuote entity) {
+    	entity.setId(id);
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(QuotationItemQuoteEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

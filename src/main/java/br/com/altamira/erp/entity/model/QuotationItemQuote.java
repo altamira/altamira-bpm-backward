@@ -62,7 +62,7 @@ public class QuotationItemQuote implements Serializable {
     @Column(name = "STANDARD")
     private String standard;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Supplier supplier;
     @JoinColumn(name = "QUOTATION_ITEM", referencedColumnName = "ID")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -119,8 +119,8 @@ public class QuotationItemQuote implements Serializable {
         this.standard = standard;
     }
 
-    @XmlTransient
-    @JsonIgnore
+    //@XmlTransient
+    //@JsonIgnore
     public Supplier getSupplier() {
         return supplier;
     }
@@ -141,7 +141,7 @@ public class QuotationItemQuote implements Serializable {
         this.quotationItem = quotationItem;
     }
 
-    @XmlTransient
+    //@XmlTransient
     //@JsonIgnore
     public Set<SupplierInStock> getSupplierInStock() {
         return supplierInStock;

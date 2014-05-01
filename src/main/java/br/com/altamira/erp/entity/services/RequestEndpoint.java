@@ -66,43 +66,19 @@ public class RequestEndpoint {
     
     @Inject
     private RequestDao requestDao;
-    
-    @Inject
-    private QuotationDao quotationDao;
 
-    @POST
-    @Path("/current")
+    /*@POST
     @Produces("application/json")
     @Consumes("application/json")
-    public Response create() {
-    	Request request;
-
-    	List<Request> requests = em
-                .createNamedQuery("Request.getCurrent", Request.class)
-                .getResultList();
-
-        if (!requests.isEmpty()) {
-
-        	request = requests.get(0);
-        	request.setSendDate(DateTime.now().toDate());
-            
-            em.merge(request);
-            em.flush();
-
-            /*
-            Map<String, Object> variables = new HashMap<String, Object>();
-
-            variables.put("requestId", request.getId());
-
-            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-            */
-            
-        }
-
-        quotationDao.getCurrent();
-        
-        return getCurrent();
-    }
+    public Response create(Request entity) {
+    	entity.setId(null);
+        em.persist(entity);
+        return Response.created(
+                UriBuilder.fromResource(Request.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }*/
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
@@ -149,9 +125,25 @@ public class RequestEndpoint {
     }
 
     @PUT
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(Request entity) {
-        entity = em.merge(entity);
+    public Response update(@PathParam("id") long id/*, Request entity*/) {
+    	
+    	Request request = requestDao.getCurrent();
+    	
+    	request.setSendDate(DateTime.now().toDate());
+        
+    	Request entity = em.merge(request);
+        em.flush();
+
+        /*
+        Map<String, Object> variables = new HashMap<String, Object>();
+
+        variables.put("requestId", request.getId());
+
+        runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+        */
+        
         return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)

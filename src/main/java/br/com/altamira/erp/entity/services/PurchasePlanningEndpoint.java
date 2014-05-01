@@ -57,38 +57,20 @@ public class PurchasePlanningEndpoint {
     private EntityManager em;
 
     @Inject
-    private PurchasePlanningDao planningDao;
+    private PurchasePlanningDao purchasePlanningDao;
 
-    @POST
+    /*@POST
     @Path("/current")
     @Consumes("application/json")
     public Response create(PurchasePlanning entity) {
-    	PurchasePlanning purchasePlanning;
-
-    	List<PurchasePlanning> purchasePlannings = em
-                .createNamedQuery("PurchasePlanning.getCurrent", PurchasePlanning.class)
-                .getResultList();
-
-        if (!purchasePlannings.isEmpty()) {
-
-        	purchasePlanning = purchasePlannings.get(0);
-        	purchasePlanning.setApproveDate(DateTime.now().toDate());
-            
-            em.merge(purchasePlanning);
-            em.flush();
-
-            /*
-            Map<String, Object> variables = new HashMap<String, Object>();
-
-            variables.put("requestId", request.getId());
-
-            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-            */
-            
-        }
-
-        return getCurrent();
-    }
+        entity.setId(null);
+        em.persist(entity);
+        return Response.created(
+                UriBuilder.fromResource(PurchasePlanning.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }*/
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
@@ -136,10 +118,25 @@ public class PurchasePlanningEndpoint {
     }
 
     @PUT
-    @Path("/current")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(PurchasePlanning entity) {
-        entity = em.merge(entity);
+    public Response update(@PathParam("id") long id/*, PurchasePlanning entity*/) {
+    	
+    	PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+    	
+    	purchasePlanning.setApproveDate(DateTime.now().toDate());
+        
+    	PurchasePlanning entity = em.merge(purchasePlanning);
+        em.flush();
+
+        /*
+        Map<String, Object> variables = new HashMap<String, Object>();
+
+        variables.put("requestId", request.getId());
+
+        runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+        */
+
         return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
@@ -150,7 +147,7 @@ public class PurchasePlanningEndpoint {
     @Path("/current")
     @Produces("application/json")
     public Response getCurrent() {
-        PurchasePlanning entity = planningDao.getCurrent();
+        PurchasePlanning entity = purchasePlanningDao.getCurrent();
         return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
@@ -166,8 +163,8 @@ public class PurchasePlanningEndpoint {
         JasperPrint jasperPrint = null;
 
         try {
-            byte[] planningReportJasper = planningDao.getPlanningReportJasperFile();
-            byte[] planningReportAltamiraimage = planningDao.getPlanningReportAltamiraImage();
+            byte[] planningReportJasper = purchasePlanningDao.getPlanningReportJasperFile();
+            byte[] planningReportAltamiraimage = purchasePlanningDao.getPlanningReportAltamiraImage();
             byte[] pdf = null;
 
             final ByteArrayInputStream reportStream = new ByteArrayInputStream(planningReportJasper);
@@ -222,7 +219,7 @@ public class PurchasePlanningEndpoint {
             try {
                 if (jasperPrint != null) {
                     // store generated report in database
-                    planningDao.insertGeneratedPlanningReport(jasperPrint);
+                	purchasePlanningDao.insertGeneratedPlanningReport(jasperPrint);
                 }
             } catch (Exception e) {
                 e.printStackTrace();

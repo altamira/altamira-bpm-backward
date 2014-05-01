@@ -22,12 +22,13 @@ import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
+import br.com.altamira.erp.entity.model.PurchasePlanning;
 
 /**
  *
  */
 @Stateless
-@Path("/purchaseorderitems")
+@Path("/purchaseorders/{purchaseOrder:[0-9][0-9]*}/items")
 public class PurchaseOrderItemEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
@@ -35,14 +36,18 @@ public class PurchaseOrderItemEndpoint {
 
     @POST
     @Consumes("application/json")
-    public Response create(PurchaseOrderItem entity) {
+    public Response create(@PathParam("purchaseOrder") long purchaseOrderId, PurchaseOrderItem entity) {
     	entity.setId(null);
+    	PurchaseOrder purchaseOrder = em.find(PurchaseOrder.class, purchaseOrderId);
+    	purchaseOrder.getPurchaseOrderItem().add(entity);
+		entity.setPurchaseOrder(purchaseOrder);
         em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(PurchaseOrderItemEndpoint.class)
+        /*return Response.created(
+                UriBuilder.fromResource(RequestItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 
     @DELETE
@@ -91,9 +96,9 @@ public class PurchaseOrderItemEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(PurchaseOrderItem entity) {
+    public Response update(@PathParam("id") long id, PurchaseOrderItem entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(PurchaseOrderItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

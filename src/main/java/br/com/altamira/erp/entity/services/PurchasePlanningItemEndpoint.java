@@ -3,6 +3,7 @@ package br.com.altamira.erp.entity.services;
 import java.util.List;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -20,29 +21,39 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
+import br.com.altamira.erp.entity.dao.RequestDao;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
 import br.com.altamira.erp.entity.model.PurchasePlanningItem;
+import br.com.altamira.erp.entity.model.Request;
 
 /**
  *
  */
 @Stateless
-@Path("/purchaseplanningitems")
+@Path("/purchaseplannings/{purchasePlanning:[0-9][0-9]*}/items")
 public class PurchasePlanningItemEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
 
+    @Inject
+    private PurchasePlanningDao purchasePlanningDao;
+    
     @POST
     @Consumes("application/json")
-    public Response create(PurchasePlanningItem entity) {
+    public Response create(@PathParam("purchasePlanning") long purchasePlanningId, PurchasePlanningItem entity) {
     	entity.setId(null);
+    	PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+    	purchasePlanning.getPurchasePlanningItem().add(entity);
+		entity.setPurchasePlanning(purchasePlanning);
         em.persist(entity);
-        return Response.created(
-                UriBuilder.fromResource(PurchasePlanningItemEndpoint.class)
+        /*return Response.created(
+                UriBuilder.fromResource(RequestItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 
     @DELETE
@@ -91,9 +102,9 @@ public class PurchasePlanningItemEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(PurchasePlanningItem entity) {
+    public Response update(@PathParam("id") long id, PurchasePlanningItem entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(PurchasePlanningItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

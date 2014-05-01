@@ -29,7 +29,7 @@ import br.com.altamira.erp.entity.model.RequestItem;
  *
  */
 @Stateless
-@Path("/requests/current/items")
+@Path("/requests/{request:[0-9][0-9]*}/items")
 public class RequestItemEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
@@ -40,19 +40,18 @@ public class RequestItemEndpoint {
 
     @POST
     @Consumes("application/json")
-    public Response create(RequestItem entity) {
+    public Response create(@PathParam("request") long requestId, RequestItem entity) {
     	entity.setId(null);
-    	//if (entity.getRequest() == null) {
-    		Request request = requestDao.getCurrent();
-    		request.getRequestItem().add(entity);
-    		entity.setRequest(request);
-    	//}
+		Request request = requestDao.getCurrent();
+		request.getRequestItem().add(entity);
+		entity.setRequest(request);
         em.persist(entity);
-        return Response.created(
+        /*return Response.created(
                 UriBuilder.fromResource(RequestItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 
     @DELETE
@@ -101,9 +100,9 @@ public class RequestItemEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(RequestItem entity) {
+    public Response update(@PathParam("id") long id, RequestItem entity) {
     	//if (entity.getRequest() == null) {
     		Request request = requestDao.getCurrent();
     		request.getRequestItem().add(entity);

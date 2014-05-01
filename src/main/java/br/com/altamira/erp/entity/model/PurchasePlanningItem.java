@@ -61,10 +61,10 @@ public class PurchasePlanningItem implements Serializable {
     @Column(name = "WEIGHT")
     private BigDecimal weight;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Supplier supplier;
     @JoinColumn(name = "REQUEST_ITEM", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private RequestItem requestItem;
     @JoinColumn(name = "PLANNING", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -125,11 +125,13 @@ public class PurchasePlanningItem implements Serializable {
         this.requestItem = requestItem;
     }
 
-    public PurchasePlanning getpurchasePlanning() {
+    @XmlTransient
+    @JsonIgnore
+    public PurchasePlanning getPurchasePlanning() {
         return purchasePlanning;
     }
 
-    public void setPlanning(PurchasePlanning purchasePlanning) {
+    public void setPurchasePlanning(PurchasePlanning purchasePlanning) {
         this.purchasePlanning = purchasePlanning;
     }
 

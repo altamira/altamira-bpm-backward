@@ -24,6 +24,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Quotation;
 import br.com.altamira.erp.entity.model.Request;
+import br.com.altamira.erp.entity.model.Standard;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -68,36 +69,18 @@ public class QuotationEndpoint {
     @Inject
     private QuotationDao quotationDao;
 
-    @POST
+    /*@POST
     @Path("/current")
     @Consumes("application/json")
-    public Response create() {
-    	Quotation quotation;
-
-    	List<Quotation> quotations = em
-                .createNamedQuery("Quotation.getCurrent", Quotation.class)
-                .getResultList();
-
-        if (!quotations.isEmpty()) {
-
-        	quotation = quotations.get(0);
-        	quotation.setClosedDate(DateTime.now().toDate());
-            
-            em.merge(quotation);
-            em.flush();
-
-            /*
-            Map<String, Object> variables = new HashMap<String, Object>();
-
-            variables.put("requestId", request.getId());
-
-            runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-            */
-            
-        }
-
-        return getCurrent();
-    }
+    public Response create(Quotation entity) {
+        entity.setId(null);
+        em.persist(entity);
+        return Response.created(
+                UriBuilder.fromResource(QuotationEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+    }*/
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
@@ -144,9 +127,25 @@ public class QuotationEndpoint {
     }
 
     @PUT
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(Quotation entity) {
-        entity = em.merge(entity);
+    public Response update(@PathParam("id") long id/*, Quotation entity*/) {
+    	
+    	Quotation quotation = quotationDao.getCurrent();
+    	
+    	quotation.setClosedDate(DateTime.now().toDate());
+        
+        Quotation entity = em.merge(quotation);
+        em.flush();
+
+        /*
+        Map<String, Object> variables = new HashMap<String, Object>();
+
+        variables.put("requestId", request.getId());
+
+        runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+        */
+        
         return Response.ok(UriBuilder.fromResource(QuotationEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)

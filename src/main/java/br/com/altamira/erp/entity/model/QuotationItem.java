@@ -152,7 +152,7 @@ public class QuotationItem implements Serializable {
         this.quotationItemQuote = quotationItemQuote;
     }
 
-    @XmlTransient
+    //@XmlTransient
     @JsonIgnore
     public Quotation getQuotation() {
         return quotation;

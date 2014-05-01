@@ -34,6 +34,7 @@ public class StandardEndpoint {
     private EntityManager em;
 
     @POST
+    @Produces("application/json")
     @Consumes("application/json")
     public Response create(Standard entity) {
     	entity.setId(null);
@@ -90,9 +91,9 @@ public class StandardEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(Standard entity) {
+    public Response update(@PathParam("id") long id, Standard entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(StandardEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

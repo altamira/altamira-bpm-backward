@@ -52,17 +52,17 @@ public class Supplier implements Serializable {
     @Column(name = "NAME", columnDefinition = "nvarchar2(50)")
     private String name;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<QuotationItemQuote> quotationItemQuoteSet;
+    private Set<QuotationItemQuote> quotationItemQuote;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<SupplierPriceList> supplierPriceListSet;
+    private Set<SupplierPriceList> supplierPriceList;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<SupplierContact> supplierContactSet;
+    private Set<SupplierContact> supplierContact;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<PurchaseOrder> purchaseOrderSet;
+    private Set<PurchaseOrder> purchaseOrder;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<SupplierStandard> supplierStandardSet;
+    private Set<SupplierStandard> supplierStandard;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<PurchasePlanningItem> purchasePlanningItemSet;
+    private Set<PurchasePlanningItem> purchasePlanningItem;
 
     public Supplier() {
     }
@@ -94,65 +94,65 @@ public class Supplier implements Serializable {
 
     @XmlTransient
     @JsonIgnore
-    public Set<QuotationItemQuote> getQuotationItemQuoteSet() {
-        return quotationItemQuoteSet;
+    public Set<QuotationItemQuote> getQuotationItemQuote() {
+        return quotationItemQuote;
     }
 
-    public void setQuotationItemQuoteSet(
-            Set<QuotationItemQuote> quotationItemQuoteSet) {
-        this.quotationItemQuoteSet = quotationItemQuoteSet;
+    public void setQuotationItemQuote(
+            Set<QuotationItemQuote> quotationItemQuote) {
+        this.quotationItemQuote = quotationItemQuote;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<SupplierPriceList> getSupplierPriceListSet() {
-        return supplierPriceListSet;
+    public Set<SupplierPriceList> getSupplierPriceList() {
+        return supplierPriceList;
     }
 
     public void setSupplierPriceListSet(
-            Set<SupplierPriceList> supplierPriceListSet) {
-        this.supplierPriceListSet = supplierPriceListSet;
+            Set<SupplierPriceList> supplierPriceList) {
+        this.supplierPriceList = supplierPriceList;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<SupplierContact> getSupplierContactSet() {
-        return supplierContactSet;
+    public Set<SupplierContact> getSupplierContact() {
+        return supplierContact;
     }
 
-    public void setSupplierContactSet(Set<SupplierContact> supplierContactSet) {
-        this.supplierContactSet = supplierContactSet;
-    }
-
-    @XmlTransient
-    @JsonIgnore
-    public Set<PurchaseOrder> getPurchaseOrderSet() {
-        return purchaseOrderSet;
-    }
-
-    public void setPurchaseOrderSet(Set<PurchaseOrder> purchaseOrderSet) {
-        this.purchaseOrderSet = purchaseOrderSet;
+    public void setSupplierContactSet(Set<SupplierContact> supplierContact) {
+        this.supplierContact = supplierContact;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<SupplierStandard> getSupplierStandardSet() {
-        return supplierStandardSet;
+    public Set<PurchaseOrder> getPurchaseOrder() {
+        return purchaseOrder;
     }
 
-    public void setSupplierStandardSet(Set<SupplierStandard> supplierStandardSet) {
-        this.supplierStandardSet = supplierStandardSet;
+    public void setPurchaseOrder(Set<PurchaseOrder> purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
 
     @XmlTransient
     @JsonIgnore
-    public Set<PurchasePlanningItem> getPurchasePlanningItemSet() {
-        return purchasePlanningItemSet;
+    public Set<SupplierStandard> getSupplierStandard() {
+        return supplierStandard;
     }
 
-    public void setPurchasePlanningItemSet(
-            Set<PurchasePlanningItem> purchasePlanningItemSet) {
-        this.purchasePlanningItemSet = purchasePlanningItemSet;
+    public void setSupplierStandard(Set<SupplierStandard> supplierStandard) {
+        this.supplierStandard = supplierStandard;
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Set<PurchasePlanningItem> getPurchasePlanningItem() {
+        return purchasePlanningItem;
+    }
+
+    public void setPurchasePlanningItem(
+            Set<PurchasePlanningItem> purchasePlanningItem) {
+        this.purchasePlanningItem = purchasePlanningItem;
     }
 
     @Override

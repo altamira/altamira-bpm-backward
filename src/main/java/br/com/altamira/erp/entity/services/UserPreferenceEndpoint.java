@@ -90,9 +90,9 @@ public class UserPreferenceEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(UserPreference entity) {
+    public Response update(@PathParam("id") long id, UserPreference entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(UserPreferenceEndpoint.class)
                 .path(String.valueOf(entity.getName())).build())

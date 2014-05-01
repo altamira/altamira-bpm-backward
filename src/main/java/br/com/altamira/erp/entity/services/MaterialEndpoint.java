@@ -110,9 +110,9 @@ public class MaterialEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(Material entity) {
+    public Response update(@PathParam("id") long id, Material entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(MaterialEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

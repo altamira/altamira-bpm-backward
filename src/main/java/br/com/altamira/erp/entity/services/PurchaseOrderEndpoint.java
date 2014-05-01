@@ -116,9 +116,9 @@ public class PurchaseOrderEndpoint {
     }
 
     @PUT
-    //@Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(PurchaseOrder entity) {
+    public Response update(@PathParam("id") long id, PurchaseOrder entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(PurchaseOrderEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
