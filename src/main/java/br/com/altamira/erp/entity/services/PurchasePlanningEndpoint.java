@@ -1,5 +1,6 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.bpm.services.MailService;
 import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 
 import java.util.List;
@@ -37,6 +38,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -58,6 +61,12 @@ public class PurchasePlanningEndpoint {
 
     @Inject
     private PurchasePlanningDao planningDao;
+    
+    @Inject
+    private MailService mailService;
+    
+    @Context
+    private HttpServletRequest httpRequest;
 
     @POST
     @Path("/current")
@@ -73,9 +82,29 @@ public class PurchasePlanningEndpoint {
 
         	purchasePlanning = purchasePlannings.get(0);
         	purchasePlanning.setApproveDate(DateTime.now().toDate());
+                purchasePlanning.setClosedDate(DateTime.now().toDate());
             
             em.merge(purchasePlanning);
             em.flush();
+            
+            // TO-DO send mail for notification for purchase planning approval
+            String to = "alessandro.holanda@altamira.com.br";
+            String cc = null;
+            String bcc = null;
+            String subject = "Approve Purchase Plan:"+purchasePlanning.getId();
+            
+            StringBuffer text = new StringBuffer();
+            text.append("Please click on below link to approve Purchase Plan:\n")
+                .append("http://localhost:8080/"+httpRequest.getContextPath()+"/forms/aprove-request.xhtml")
+                .append("\n\n"+"Below is the link for Purchase Planning Report:\n")
+                .append("http://localhost:8080/"+httpRequest.getContextPath()+"/rest/purchaseplannings/"+purchasePlanning.getId()+"/report");
+            
+            try {
+                mailService.sendMail(to, cc, bcc, subject, text.toString(), null);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            
 
             /*
             Map<String, Object> variables = new HashMap<String, Object>();

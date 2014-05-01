@@ -41,6 +41,7 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
 
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -50,6 +51,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.codehaus.jackson.type.TypeReference;
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
@@ -191,7 +193,7 @@ public class QuotationEndpoint {
 
                 String str = "http://localhost:8080/altamira-bpm/rest/quotations/test/priceList?lamination=" + materialLamination + "&treatment=" + materialTreatment + "&thickness=" + materialThickness;
 
-                HttpClient httpClient = new DefaultHttpClient();
+                HttpClient httpClient = HttpClientBuilder.create().build();
                 HttpGet get = new HttpGet(str);
                 get.addHeader("accept", "application/json");
 
@@ -217,7 +219,7 @@ public class QuotationEndpoint {
                     e.printStackTrace();
                 }
 
-                List<Map> materialList = (List<Map>) ((Map<String, Object>) quotationItem.get("data")).get("materials");
+                List<Map> materialList = (List<Map>) quotationItem.get("materials");
 
                 Map<String, String> map = materialList.get(0);
                 String avgPrice = map.get("averageprice");
@@ -230,7 +232,7 @@ public class QuotationEndpoint {
             parameters.put("PRICELIST", priceList);
 
             // set current pricelist code
-            HttpClient httpClient = new DefaultHttpClient();
+            HttpClient httpClient = HttpClientBuilder.create().build();
             HttpGet get = new HttpGet("http://localhost:8080/altamira-bpm/rest/quotations/test/current");
             get.addHeader("accept", "application/json");
 
@@ -249,14 +251,14 @@ public class QuotationEndpoint {
             httpClient.getConnectionManager().shutdown();
 
             // parse json response
-            Map<String, Object> currentPriceList = new HashMap<String, Object>();
+            Map<String, String> currentPriceList = new HashMap<String, String>();
             try {
-                currentPriceList = new ObjectMapper().readValue(jsonObject.toString(), new TypeReference<HashMap<String, Object>>() {
+                currentPriceList = new ObjectMapper().readValue(jsonObject.toString(), new TypeReference<HashMap<String, String>>() {
                 });
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            parameters.put("PRICELIST_CODE", ((Map<String, Object>) currentPriceList.get("data")).get("pricelist"));
+            parameters.put("PRICELIST_CODE", currentPriceList.get("pricelist"));
 
             // set quotation Date
             Quotation quotation = quotationDao.getQuotationDetailsById(quotationId);
@@ -318,5 +320,50 @@ public class QuotationEndpoint {
             }
         }
     }
+    
+    @GET
+    @Path("/test/priceList")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Object getPriceList(@QueryParam("lamination") String lamination,
+            @QueryParam("treatment") String treatment,
+            @QueryParam("thickness") String thickness) {
+
+
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+        
+        resultMap.put("pricelist", "BL");
+        
+        List<Map> materialList = new ArrayList<Map>();
+        
+        Map<String, String> material = new HashMap<String, String>();
+        material.put("code", "WBO00233");
+        material.put("description", "AÇO LAMINADO FINA FRIO 2,65mm");
+        material.put("baseprice", "2368");
+        material.put("averageprice", new BigDecimal(thickness).multiply(new BigDecimal(1000)).toString());
+        material.put("tax", "18");
+
+        materialList.add(material);
+
+        resultMap.put("materials", materialList);
+
+        return resultMap;
+
+    }
+
+    @GET
+
+    @Path("/test/current")
+
+    @Produces(MediaType.APPLICATION_JSON)
+
+    public Object getCurrentPriceList() {
+
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        resultMap.put("pricelist", "BL");
+
+        return resultMap;
+    }
+
 
 }

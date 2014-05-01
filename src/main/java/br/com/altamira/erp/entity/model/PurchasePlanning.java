@@ -67,6 +67,9 @@ public class PurchasePlanning implements Serializable {
     private Date approveDate;
     @Column(name = "APPROVE_USER", columnDefinition = "nvarchar2(255)")
     private String approveUser;
+    @Column(name = "CLOSED_DATE")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date closedDate;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Quotation quotation;
@@ -126,6 +129,14 @@ public class PurchasePlanning implements Serializable {
 
     public void setApproveUser(String approveUser) {
         this.approveUser = approveUser;
+    }
+    
+    public Date getClosedDate() {
+        return closedDate;
+    }
+
+    public void setClosedDate(Date closedDate) {
+        this.closedDate = closedDate;
     }
 
     public Quotation getQuotation() {

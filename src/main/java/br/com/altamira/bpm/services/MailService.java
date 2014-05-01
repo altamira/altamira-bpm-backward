@@ -105,17 +105,19 @@ public class MailService {
         email.setSubject(StringUtils.defaultIfEmpty(subject, ""));
 
         // Add attachments
-        for (String key : emailAttachmentList.keySet()) {
-            InputStream is = emailAttachmentList.get(key);
-            DataSource source = null;
+        if (emailAttachmentList != null) {
+            for (String key : emailAttachmentList.keySet()) {
+                InputStream is = emailAttachmentList.get(key);
+                DataSource source = null;
 
-            try {
-                source = new ByteArrayDataSource(is, "application/pdf");
-            } catch (IOException e) {
-                e.printStackTrace();
+                try {
+                    source = new ByteArrayDataSource(is, "application/pdf");
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                email.attach(source, key, "");
             }
-
-            email.attach(source, key, "");
         }
 
         // Set mail server properties
