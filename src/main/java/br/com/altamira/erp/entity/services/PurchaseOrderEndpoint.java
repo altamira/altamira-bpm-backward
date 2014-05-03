@@ -37,6 +37,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -57,6 +59,9 @@ public class PurchaseOrderEndpoint {
     
     @Inject
     OrderDao orderDao;
+    
+    @Context
+    private HttpServletRequest httpRequest;
 
     @POST
     @Consumes("application/json")
@@ -146,7 +151,7 @@ public class PurchaseOrderEndpoint {
             Date purchaseOrderDate = orderDao.getPurchaseOrderCreatedDateById(orderId);
 
             parameters.put("PURCHASE_ORDER_DATE", purchaseOrderDate);
-            parameters.put("USERNAME", "Parth");
+            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
 
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);

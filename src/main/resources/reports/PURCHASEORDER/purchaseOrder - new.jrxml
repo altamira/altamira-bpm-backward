@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="purchaseOrder" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isFloatColumnFooter="true" uuid="76524c99-dab0-4afb-9cde-69ae493a1626">
-	<property name="ireport.zoom" value="1.771561000000005"/>
+	<property name="ireport.zoom" value="1.771561000000007"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="730"/>
+	<property name="ireport.y" value="336"/>
 	<subDataset name="productsDataset" uuid="b0114484-5912-402a-bb48-bbbaf3e417a6">
 		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
 			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
@@ -58,6 +58,150 @@ FROM
 		<field name="UNIT_PRICE" class="java.math.BigDecimal"/>
 		<field name="ITEM_PRICE" class="java.math.BigDecimal"/>
 	</subDataset>
+	<subDataset name="fornecedorDataset" uuid="e7407bf8-f649-4486-b969-08bf2812f78c">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select s.alias,
+       s.name,
+       la.address,
+       la.district,
+       la.city,
+       la.state,
+       s.federal_tax_id,
+       s.state_tax_id,
+       la.postal_code,
+       po.shipping_terms
+from purchase_order po,
+     supplier s,
+     location_address la
+where po.id = $P{PURCHASE_ORDER_ID}
+and po.supplier = s.id
+and s.location_address = la.id]]>
+		</queryString>
+		<field name="ALIAS" class="java.lang.String"/>
+		<field name="NAME" class="java.lang.String"/>
+		<field name="ADDRESS" class="java.lang.String"/>
+		<field name="DISTRICT" class="java.lang.String"/>
+		<field name="CITY" class="java.lang.String"/>
+		<field name="STATE" class="java.lang.String"/>
+		<field name="FEDERAL_TAX_ID" class="java.lang.String"/>
+		<field name="STATE_TAX_ID" class="java.lang.String"/>
+		<field name="POSTAL_CODE" class="java.lang.String"/>
+		<field name="SHIPPING_TERMS" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="PagamentoDataset" uuid="16b27956-efcd-401f-a9aa-76c4c9bfb1fe">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<parameter name="TOTAL_DO_PEDIDO" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{TOTAL_DO_PEDIDO}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select poy.period,
+       poy.percentage
+from purchase_order po,
+     purchase_order_payment poy
+where po.id = $P{PURCHASE_ORDER_ID}
+and poy.purchase_order = po.id]]>
+		</queryString>
+		<field name="PERIOD" class="java.math.BigDecimal"/>
+		<field name="PERCENTAGE" class="java.math.BigDecimal"/>
+	</subDataset>
+	<subDataset name="faturamentoDataset" uuid="4795d4ec-71df-4abd-ad52-fcd98a46bde6">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select c.federal_tax_id,
+       c.state_tax_id,
+       la.postal_code
+from company c,
+     location_address la
+where c.id = (select company_invoice from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
+and c.location_address = la.id]]>
+		</queryString>
+		<field name="FEDERAL_TAX_ID" class="java.lang.String"/>
+		<field name="STATE_TAX_ID" class="java.lang.String"/>
+		<field name="POSTAL_CODE" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="CobrancaDataset" uuid="299f7612-47bf-4c27-bb24-cf67fb5f8d7e">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select c.federal_tax_id,
+       c.state_tax_id,
+       la.postal_code
+from company c,
+     location_address la
+where c.id = (select po.company_billing from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
+and c.location_address = la.id]]>
+		</queryString>
+		<field name="FEDERAL_TAX_ID" class="java.lang.String"/>
+		<field name="STATE_TAX_ID" class="java.lang.String"/>
+		<field name="POSTAL_CODE" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="EntregaDataset" uuid="50414ca4-1b2f-407c-abba-783566e09e1c">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select c.federal_tax_id,
+       c.state_tax_id,
+       la.postal_code
+from company c,
+     location_address la
+where c.id = (select po.company_shipping from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
+and c.location_address = la.id]]>
+		</queryString>
+		<field name="FEDERAL_TAX_ID" class="java.lang.String"/>
+		<field name="STATE_TAX_ID" class="java.lang.String"/>
+		<field name="POSTAL_CODE" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="contactDataset" uuid="a18e01bf-e500-4d52-9382-e7a1f2701982">
+		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
+			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select cp.id as contact_person_id,
+       cp.first_name,
+       cp.last_name,
+       cpm.address as email
+from supplier s,
+     supplier_contact_person scp,
+     contact_person cp,
+     contact_person_mail cpm
+where s.id = (select po.supplier from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
+and scp.supplier = s.id
+and scp.contact_person = cp.id
+and cpm.contact_person = cp.id]]>
+		</queryString>
+		<field name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
+		<field name="FIRST_NAME" class="java.lang.String"/>
+		<field name="LAST_NAME" class="java.lang.String"/>
+		<field name="EMAIL" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="foneDataset" uuid="7682aa6f-9d35-4583-9789-624e66fce1f9">
+		<parameter name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
+		<queryString>
+			<![CDATA[select cpf.type,
+       cpf.country_code,
+       cpf.area_code,
+       cpf.prefix,
+       cpf.number_,
+       cpf.extension
+from contact_person_fone cpf
+where cpf.contact_person = $P{CONTACT_PERSON_ID}]]>
+		</queryString>
+		<field name="TYPE" class="java.lang.String"/>
+		<field name="COUNTRY_CODE" class="java.math.BigDecimal"/>
+		<field name="AREA_CODE" class="java.math.BigDecimal"/>
+		<field name="PREFIX" class="java.math.BigDecimal"/>
+		<field name="NUMBER_" class="java.math.BigDecimal"/>
+		<field name="EXTENSION" class="java.lang.String"/>
+	</subDataset>
 	<parameter name="altamira_logo" class="java.lang.Object"/>
 	<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal"/>
 	<parameter name="PURCHASE_ORDER_DATE" class="java.util.Date"/>
@@ -95,8 +239,8 @@ FROM
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="102" splitType="Stretch">
+	<pageHeader>
+		<band height="102">
 			<frame>
 				<reportElement uuid="d5e2a1e4-76f3-4dd9-afdf-588d7da8bbd3" mode="Opaque" x="0" y="72" width="555" height="28" backcolor="#E0E0E0"/>
 				<box>
@@ -218,11 +362,390 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</textField>
 			</frame>
 		</band>
-	</title>
-	<pageHeader>
-		<band height="248" splitType="Stretch">
+	</pageHeader>
+	<columnHeader>
+		<band height="301">
+			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}==1]]></printWhenExpression>
 			<frame>
-				<reportElement uuid="584d0332-3775-41ee-aa88-d6d3ddfa7842" mode="Opaque" x="0" y="3" width="555" height="18" backcolor="#E0E0E0"/>
+				<reportElement uuid="10d3945e-972f-43af-a2b9-95b37373e89e" mode="Transparent" x="0" y="20" width="555" height="112"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<componentElement>
+					<reportElement uuid="cb467200-7325-408b-a1c9-590fc253adff" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="2" y="78" width="551" height="33"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="contactDataset" uuid="94dad8ad-147d-4f3b-a608-bf679c761467">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="33" width="551">
+							<staticText>
+								<reportElement uuid="77345330-87ab-4b7b-84da-87c4ce25ceaa" x="1" y="2" width="62" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Contato]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="4524509d-1e7d-4e31-a1f7-675254471ed6" x="66" y="2" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{FIRST_NAME}+" "+$F{LAST_NAME}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="e1a0fc99-d29d-4e22-a14d-83e1e7356143" x="229" y="2" width="25" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[E-mail]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e9ee626e-e071-4e84-bc1e-c256b02af8c7" x="258" y="2" width="289" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
+							</textField>
+							<componentElement>
+								<reportElement uuid="3d3279a0-128f-4c4c-8df6-7cdb28f2c753" positionType="Float" stretchType="RelativeToBandHeight" x="2" y="17" width="545" height="14"/>
+								<jr:list printOrder="Horizontal" ignoreWidth="false">
+									<datasetRun subDataset="foneDataset" uuid="0560bc8a-949f-4e56-bff4-b8b0f44d890b">
+										<datasetParameter name="CONTACT_PERSON_ID">
+											<datasetParameterExpression><![CDATA[$F{CONTACT_PERSON_ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:listContents height="14" width="272">
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="83a853fa-9fcc-49ad-a111-eaa9912eedf3" x="2" y="0" width="25" height="12"/>
+											<box leftPadding="0">
+												<pen lineWidth="0.0"/>
+												<topPen lineWidth="0.0"/>
+												<leftPen lineWidth="0.0"/>
+												<bottomPen lineWidth="0.0"/>
+												<rightPen lineWidth="0.0"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{TYPE}]]></textFieldExpression>
+										</textField>
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="4c7f1c48-5661-43b7-b9af-7a8579cddee0" x="35" y="0" width="20" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{COUNTRY_CODE}]]></textFieldExpression>
+										</textField>
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="445fbb02-6dd0-4785-a8a1-b196c0a5e5b2" x="60" y="0" width="25" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{AREA_CODE}]]></textFieldExpression>
+										</textField>
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="edc4577b-a9ca-4969-a11b-c1a789a13997" x="90" y="0" width="50" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{PREFIX}+"-"+$F{NUMBER_}]]></textFieldExpression>
+										</textField>
+										<staticText>
+											<reportElement uuid="63a214ce-1dde-4e05-a600-bc1d01b4b92f" x="145" y="0" width="25" height="12"/>
+											<textElement verticalAlignment="Middle" markup="none">
+												<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+											</textElement>
+											<text><![CDATA[Ramal]]></text>
+										</staticText>
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="6e14d6dd-0e28-4dd1-8c44-d53d1084bc72" x="175" y="0" width="50" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{EXTENSION}]]></textFieldExpression>
+										</textField>
+									</jr:listContents>
+								</jr:list>
+							</componentElement>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<componentElement>
+					<reportElement uuid="f395476c-bac1-4491-987f-a29756db162e" mode="Opaque" x="4" y="3" width="549" height="73"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical" ignoreWidth="true">
+						<datasetRun subDataset="fornecedorDataset" uuid="29e33b0d-d1d6-4de3-962d-a1433ec25753">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="73" width="549">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="702fa4eb-242a-442e-965a-74fa940dda71" x="66" y="0" width="320" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{ALIAS}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="34e4f4a3-3047-4917-8160-01a8547ea11b" x="0" y="0" width="63" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Fornecedor]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="a4c3110a-0e31-4fce-96f7-c88ded4f3083" x="0" y="14" width="63" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Razão Social]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="ef9be885-6e05-443e-9fd2-7e49c9d5b4ce" x="66" y="14" width="320" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{NAME}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="99ed57d8-310c-48a7-a3af-7869f9eaf53b" x="0" y="28" width="63" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Endereço]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="60e6c09c-2612-40a7-ab72-aba03c3a05ec" x="66" y="28" width="367" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="7175cbe7-7021-42f4-8204-4d22189c6daa" x="0" y="42" width="63" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Bairro]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="312b0a6a-bc53-4ed1-9421-c9de7538b7d1" x="66" y="42" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{DISTRICT}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="303f7cfa-0a55-4468-85bc-8e4c2bf108ac" x="228" y="42" width="27" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Cidade]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="9559070e-05b7-4d51-987a-70fcf687dfaf" x="258" y="42" width="245" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{CITY}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="d3389c63-10f5-46b0-bfe8-350f8406d444" x="511" y="42" width="12" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[UF]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="14962b82-c93b-496a-86db-ab873942d2c5" x="526" y="42" width="21" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{STATE}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="96ef5921-7db1-48fd-8bf5-e9a6b3797080" x="401" y="0" width="41" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CPNJ/CPF]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="e851905d-2d84-4d1b-88e1-ce26f900a589" x="446" y="0" width="101" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{FEDERAL_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="d608f3e1-208d-4c93-b9ce-8e82b1fd18d3" x="401" y="14" width="41" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[IE]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="2a88364d-b7aa-4f61-b776-b9b5107816d6" x="446" y="14" width="101" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{STATE_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="d2219379-ca94-409e-9c2c-baf0168af9da" x="442" y="28" width="20" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CEP]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="a521ae53-089a-4d74-acc0-0fbd19eaced0" x="465" y="28" width="82" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{POSTAL_CODE}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="56167d01-f2d2-40e5-9bbb-21df0dd2aaad" x="460" y="57" width="56" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[Frete por conta]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="2e3657e1-8c4a-4133-ad6d-0ade723cffca" x="518" y="57" width="29" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{SHIPPING_TERMS}]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+			<frame>
+				<reportElement uuid="584d0332-3775-41ee-aa88-d6d3ddfa7842" positionType="Float" mode="Opaque" x="0" y="135" width="555" height="18" backcolor="#E0E0E0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -239,7 +762,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="fcded87a-6b62-410f-a5dd-d779bda2175d" x="0" y="21" width="555" height="48"/>
+				<reportElement uuid="fcded87a-6b62-410f-a5dd-d779bda2175d" positionType="Float" mode="Transparent" x="0" y="153" width="555" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -247,9 +770,85 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
+				<componentElement>
+					<reportElement uuid="0f77accd-5e82-488e-b18b-b7b50b3605a0" positionType="Float" stretchType="RelativeToBandHeight" x="5" y="1" width="548" height="17"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="faturamentoDataset" uuid="5208453d-ae2a-4a8d-81b3-6e7c713286cd">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="17" width="548">
+							<staticText>
+								<reportElement uuid="e8fadbb9-926d-4c82-b742-b1121dec73c3" x="1" y="2" width="61" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CPNJ/CPF]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="892612c7-b483-4150-97ac-4bde993ee04e" x="65" y="2" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{FEDERAL_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="c4117dfd-d088-487d-beed-a69d94f07e07" x="443" y="2" width="20" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CEP]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="f46ed300-2c2d-45b7-a06f-3ca4b27329a1" x="465" y="2" width="81" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{POSTAL_CODE}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="0dca70f8-0ebe-40a8-80fa-ba5621dfca12" x="236" y="2" width="196" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{STATE_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="d6ad90c5-7915-495b-8f61-a92e19c879f8" x="222" y="2" width="11" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[IE]]></text>
+							</staticText>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
 			</frame>
 			<frame>
-				<reportElement uuid="553e0f5d-73c8-4f6e-bd02-8b6f71299150" mode="Opaque" x="0" y="72" width="555" height="18" backcolor="#E0E0E0"/>
+				<reportElement uuid="553e0f5d-73c8-4f6e-bd02-8b6f71299150" positionType="Float" mode="Opaque" x="0" y="176" width="555" height="18" backcolor="#E0E0E0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -266,7 +865,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="be279168-ff47-4bcd-8989-7520b7bf5a9a" x="0" y="90" width="555" height="18"/>
+				<reportElement uuid="be279168-ff47-4bcd-8989-7520b7bf5a9a" positionType="Float" x="0" y="194" width="555" height="23"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -274,9 +873,48 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
+				<componentElement>
+					<reportElement uuid="3b6ece89-0a55-4e3f-92ce-df0cc090e4ea" positionType="Float" stretchType="RelativeToBandHeight" x="68" y="3" width="159" height="16"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="PagamentoDataset" uuid="5b75a8a1-4639-43fb-8790-c8a773e77d81">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<datasetParameter name="TOTAL_DO_PEDIDO">
+								<datasetParameterExpression><![CDATA[$F{TOTAL_DOS_PRODUTOS}+$F{TOTAL_DO_IPI}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="16" width="159">
+							<textField>
+								<reportElement uuid="5a9effe7-65be-4db2-9ae6-aae823f950d3" x="2" y="2" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{PERIOD} + " dia(s), "+
+$F{PERCENTAGE} + "%, "+
+$P{TOTAL_DO_PEDIDO}*($F{PERCENTAGE}/100)]]></textFieldExpression>
+							</textField>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+				<staticText>
+					<reportElement uuid="47d70f35-6ce5-4231-b783-30e54ddcd487" positionType="Float" x="4" y="5" width="59" height="12"/>
+					<textElement textAlignment="Left" verticalAlignment="Middle">
+						<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[Cond. Pagto.]]></text>
+				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="3c1b0555-55c8-4b7a-b793-0c3f53ff6861" mode="Opaque" x="0" y="111" width="555" height="18" backcolor="#E0E0E0"/>
+				<reportElement uuid="3c1b0555-55c8-4b7a-b793-0c3f53ff6861" positionType="Float" mode="Opaque" x="0" y="220" width="555" height="18" backcolor="#E0E0E0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -293,7 +931,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="7f460316-9b9a-4036-a04b-d211bb431a75" x="0" y="129" width="555" height="45"/>
+				<reportElement uuid="7f460316-9b9a-4036-a04b-d211bb431a75" positionType="Float" x="0" y="238" width="555" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -301,9 +939,85 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
+				<componentElement>
+					<reportElement uuid="e71287fd-6464-414c-9965-73895c7b387c" positionType="Float" stretchType="RelativeToBandHeight" x="5" y="1" width="548" height="17"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="CobrancaDataset" uuid="5d6fedc6-6a3c-4575-a49d-006833e3c8c6">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="17" width="548">
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="63d151ea-9ce3-4178-91f0-12fc5b2fb1f7" x="465" y="2" width="81" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{POSTAL_CODE}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="19b6fa64-fc70-4ac4-808c-22fd3c66c23f" x="443" y="2" width="20" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CEP]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="62a30406-ca61-45c8-b594-e490be8c3ab1" x="65" y="2" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{FEDERAL_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="159e29fd-33b9-415d-8cc5-95c12d72aec6" x="1" y="2" width="61" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CPNJ/CPF]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="22d57a8a-f343-444d-a302-5ba033445117" x="236" y="2" width="196" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{STATE_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="9b387006-6a73-4c5d-9130-6fa14eefdca5" x="222" y="2" width="11" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[IE]]></text>
+							</staticText>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
 			</frame>
 			<frame>
-				<reportElement uuid="5b3b9a80-5f7e-4935-9500-4d945bffe5f2" mode="Opaque" x="0" y="177" width="555" height="18" backcolor="#E0E0E0"/>
+				<reportElement uuid="5b3b9a80-5f7e-4935-9500-4d945bffe5f2" positionType="Float" mode="Opaque" x="0" y="261" width="555" height="18" backcolor="#E0E0E0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -320,7 +1034,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</staticText>
 			</frame>
 			<frame>
-				<reportElement uuid="f235f322-9821-431b-b6e8-de5fa7d7add3" x="0" y="195" width="555" height="50"/>
+				<reportElement uuid="f235f322-9821-431b-b6e8-de5fa7d7add3" positionType="Float" x="0" y="279" width="555" height="20"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -328,13 +1042,106 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 					<bottomPen lineWidth="1.0"/>
 					<rightPen lineWidth="1.0"/>
 				</box>
+				<componentElement>
+					<reportElement uuid="3e581739-2f23-4ba8-b41d-671b0afc39d6" positionType="Float" stretchType="RelativeToBandHeight" x="5" y="1" width="548" height="17"/>
+					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+						<datasetRun subDataset="EntregaDataset" uuid="d7656db7-4611-4f0b-a170-b776458db718">
+							<datasetParameter name="PURCHASE_ORDER_ID">
+								<datasetParameterExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></datasetParameterExpression>
+							</datasetParameter>
+							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+						</datasetRun>
+						<jr:listContents height="17" width="548">
+							<staticText>
+								<reportElement uuid="bb7fe3c3-a2d9-4650-97d3-791b07eec9ff" x="1" y="2" width="61" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CPNJ/CPF]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="f2d2ddfb-20ff-407f-920b-9fcc1ae29923" x="65" y="2" width="148" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{FEDERAL_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="631c0b32-db3a-47d7-8d21-deea40715ff2" x="236" y="2" width="196" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{STATE_TAX_ID}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="7aaf9a66-cc49-4eb3-8ce3-9413868953df" x="222" y="2" width="11" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[IE]]></text>
+							</staticText>
+							<textField isBlankWhenNull="true">
+								<reportElement uuid="4917ce92-3f5a-4341-aea9-b24aa7ff42b0" x="465" y="2" width="81" height="12"/>
+								<box leftPadding="2">
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{POSTAL_CODE}]]></textFieldExpression>
+							</textField>
+							<staticText>
+								<reportElement uuid="319b655a-5c91-4023-8708-9bda303f0d18" x="443" y="2" width="20" height="12"/>
+								<textElement textAlignment="Left" verticalAlignment="Middle">
+									<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+								</textElement>
+								<text><![CDATA[CEP]]></text>
+							</staticText>
+						</jr:listContents>
+					</jr:list>
+				</componentElement>
+			</frame>
+			<frame>
+				<reportElement uuid="35e8d620-89cb-4982-af9c-9d7c5bcfe1e3" mode="Opaque" x="0" y="2" width="555" height="18" backcolor="#E0E0E0"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<staticText>
+					<reportElement uuid="c53c3c20-24ad-45fc-ac54-f00792961a27" x="5" y="3" width="545" height="13"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[Fornecedor]]></text>
+				</staticText>
 			</frame>
 		</band>
-	</pageHeader>
+	</columnHeader>
 	<detail>
 		<band height="48">
 			<staticText>
-				<reportElement uuid="351f53c9-9e4f-4144-8d1d-91759cf1d747" x="0" y="20" width="63" height="14"/>
+				<reportElement uuid="351f53c9-9e4f-4144-8d1d-91759cf1d747" x="0" y="20" width="63" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -348,7 +1155,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Entrega]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a9018fd4-6c4e-45a7-98ed-97cab907b0a9" x="63" y="20" width="50" height="14"/>
+				<reportElement uuid="a9018fd4-6c4e-45a7-98ed-97cab907b0a9" x="63" y="20" width="50" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -362,7 +1169,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Espessura]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="47b35504-8ce1-48c2-b21f-205b38c70615" x="113" y="20" width="50" height="14"/>
+				<reportElement uuid="47b35504-8ce1-48c2-b21f-205b38c70615" x="113" y="20" width="50" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -376,7 +1183,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Largura]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="88433282-49df-4c48-aae1-ee17706eb160" x="163" y="20" width="55" height="14"/>
+				<reportElement uuid="88433282-49df-4c48-aae1-ee17706eb160" x="163" y="20" width="55" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -390,7 +1197,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Comprimento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ffb1c50e-f7f8-44c9-a555-d4e7245d8b03" x="218" y="20" width="57" height="14"/>
+				<reportElement uuid="ffb1c50e-f7f8-44c9-a555-d4e7245d8b03" x="218" y="20" width="57" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -404,7 +1211,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Laminação]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="704a11be-24ab-4196-bdd5-85d9b516e380" x="275" y="20" width="54" height="14"/>
+				<reportElement uuid="704a11be-24ab-4196-bdd5-85d9b516e380" x="275" y="20" width="54" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -418,7 +1225,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Tratamento]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="96b402c8-06c9-4edd-8eec-123e65ef563d" x="375" y="20" width="40" height="14"/>
+				<reportElement uuid="96b402c8-06c9-4edd-8eec-123e65ef563d" x="375" y="20" width="40" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -432,7 +1239,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Peso(T)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="93080637-9479-4857-8e1b-8115b653ee22" x="456" y="20" width="46" height="14"/>
+				<reportElement uuid="93080637-9479-4857-8e1b-8115b653ee22" x="456" y="20" width="46" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -446,7 +1253,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Unitario]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="670a62f2-ca23-4527-a74c-1e1bae238f59" x="502" y="20" width="53" height="14"/>
+				<reportElement uuid="670a62f2-ca23-4527-a74c-1e1bae238f59" x="502" y="20" width="53" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -460,7 +1267,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<frame>
-				<reportElement uuid="26aee795-8655-4caa-9d0f-571eb2f36d7c" mode="Opaque" x="0" y="2" width="555" height="18" backcolor="#E0E0E0"/>
+				<reportElement uuid="26aee795-8655-4caa-9d0f-571eb2f36d7c" mode="Opaque" x="0" y="2" width="555" height="18" isPrintWhenDetailOverflows="true" backcolor="#E0E0E0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -477,7 +1284,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</staticText>
 			</frame>
 			<componentElement>
-				<reportElement uuid="88f64765-ca8e-4a1c-a901-2d9f87fc2d0d" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="34" width="555" height="12"/>
+				<reportElement uuid="88f64765-ca8e-4a1c-a901-2d9f87fc2d0d" x="0" y="34" width="555" height="12"/>
 				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 					<datasetRun subDataset="productsDataset" uuid="75956b64-af9d-4b8b-8bac-471046d70c41">
 						<datasetParameter name="PURCHASE_ORDER_ID">
@@ -487,7 +1294,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 					</datasetRun>
 					<jr:listContents height="12" width="555">
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="3ea7e3d9-1836-4d54-8c64-153d6ca6e520" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="63" height="12"/>
+							<reportElement uuid="3ea7e3d9-1836-4d54-8c64-153d6ca6e520" x="0" y="0" width="63" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -501,7 +1308,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[(new SimpleDateFormat("dd/MM/yyyy")).format($F{DATE})]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement uuid="bf4cd6cc-1573-49ca-afb0-b67dc435e706" positionType="Float" stretchType="RelativeToBandHeight" x="63" y="0" width="50" height="12"/>
+							<reportElement uuid="bf4cd6cc-1573-49ca-afb0-b67dc435e706" x="63" y="0" width="50" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -515,7 +1322,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{THICKNESS}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="7e064ac2-9472-4014-aa52-601939147798" positionType="Float" stretchType="RelativeToBandHeight" x="113" y="0" width="50" height="12"/>
+							<reportElement uuid="7e064ac2-9472-4014-aa52-601939147798" x="113" y="0" width="50" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -529,7 +1336,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{WIDTH}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="5ee87976-cd27-4bbf-8444-e129a1c21a53" positionType="Float" stretchType="RelativeToBandHeight" x="163" y="0" width="55" height="12"/>
+							<reportElement uuid="5ee87976-cd27-4bbf-8444-e129a1c21a53" x="163" y="0" width="55" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -543,7 +1350,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{LENGTH}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="0d3e9748-f140-4f46-9606-d4739a181015" positionType="Float" stretchType="RelativeToBandHeight" x="218" y="0" width="57" height="12"/>
+							<reportElement uuid="0d3e9748-f140-4f46-9606-d4739a181015" x="218" y="0" width="57" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -557,7 +1364,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{LAMINATION}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="1109667e-f6a7-4412-b617-4845c3a68f09" positionType="Float" stretchType="RelativeToBandHeight" x="275" y="0" width="54" height="12"/>
+							<reportElement uuid="1109667e-f6a7-4412-b617-4845c3a68f09" x="275" y="0" width="54" height="12"/>
 							<box>
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -571,7 +1378,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{TREATMENT}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement uuid="06a1c03c-53fc-4bd0-aadb-c20ea1b9c1ff" positionType="Float" stretchType="RelativeToBandHeight" x="375" y="0" width="40" height="12"/>
+							<reportElement uuid="06a1c03c-53fc-4bd0-aadb-c20ea1b9c1ff" x="375" y="0" width="40" height="12"/>
 							<box rightPadding="2">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -585,7 +1392,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{WEIGHT}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement uuid="aec61e2b-dc81-47b8-a472-f8b6073244aa" positionType="Float" stretchType="RelativeToBandHeight" x="456" y="0" width="46" height="12"/>
+							<reportElement uuid="aec61e2b-dc81-47b8-a472-f8b6073244aa" x="456" y="0" width="46" height="12"/>
 							<box rightPadding="2">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -599,7 +1406,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{UNIT_PRICE}]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement uuid="e9008dbb-6fba-46bb-9fb1-0611a285faa9" positionType="Float" stretchType="RelativeToBandHeight" x="502" y="0" width="53" height="12"/>
+							<reportElement uuid="e9008dbb-6fba-46bb-9fb1-0611a285faa9" x="502" y="0" width="53" height="12"/>
 							<box rightPadding="2">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -613,7 +1420,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[$F{ITEM_PRICE}]]></textFieldExpression>
 						</textField>
 						<textField isBlankWhenNull="true">
-							<reportElement uuid="dc2ca911-0952-4c87-a5b6-913efc91f1ee" positionType="Float" stretchType="RelativeToBandHeight" x="329" y="0" width="46" height="12"/>
+							<reportElement uuid="dc2ca911-0952-4c87-a5b6-913efc91f1ee" x="329" y="0" width="46" height="12"/>
 							<box rightPadding="2">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -627,7 +1434,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 							<textFieldExpression><![CDATA[""]]></textFieldExpression>
 						</textField>
 						<textField pattern="#,##0.00" isBlankWhenNull="true">
-							<reportElement uuid="a6ed4444-5a8b-439b-bad9-8cf26a8510bd" positionType="Float" stretchType="RelativeToBandHeight" x="415" y="0" width="41" height="12"/>
+							<reportElement uuid="a6ed4444-5a8b-439b-bad9-8cf26a8510bd" x="415" y="0" width="41" height="12"/>
 							<box rightPadding="2">
 								<pen lineWidth="0.5"/>
 								<topPen lineWidth="0.5"/>
@@ -644,7 +1451,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</jr:list>
 			</componentElement>
 			<staticText>
-				<reportElement uuid="50de4f63-fd56-4d6a-9c8d-2bb08f1cc131" x="329" y="20" width="46" height="14"/>
+				<reportElement uuid="50de4f63-fd56-4d6a-9c8d-2bb08f1cc131" x="329" y="20" width="46" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>
@@ -658,7 +1465,7 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				<text><![CDATA[Norma]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4a79c7f3-0a89-4d27-90a8-2c315297ba30" x="415" y="20" width="41" height="14"/>
+				<reportElement uuid="4a79c7f3-0a89-4d27-90a8-2c315297ba30" x="415" y="20" width="41" height="14" isPrintWhenDetailOverflows="true"/>
 				<box>
 					<pen lineWidth="0.75"/>
 					<topPen lineWidth="0.75"/>

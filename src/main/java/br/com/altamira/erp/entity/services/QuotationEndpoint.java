@@ -42,6 +42,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
 import net.sf.jasperreports.engine.JasperExportManager;
@@ -70,6 +72,9 @@ public class QuotationEndpoint {
 
     @Inject
     private QuotationDao quotationDao;
+    
+    @Context
+    private HttpServletRequest httpRequest;
 
     /*@POST
     @Path("/current")
@@ -266,7 +271,7 @@ public class QuotationEndpoint {
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
 
-            parameters.put("USERNAME", "Parth");
+            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
 
             BufferedImage imfg = null;
             try {
