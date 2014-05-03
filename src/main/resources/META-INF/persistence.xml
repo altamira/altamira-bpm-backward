@@ -12,7 +12,6 @@
     <class>br.com.altamira.erp.entity.model.SupplierStandard</class>
     <class>br.com.altamira.erp.entity.model.UserPreference</class>
     <class>br.com.altamira.erp.entity.model.PurchaseOrder</class>
-    <class>br.com.altamira.erp.entity.model.SupplierContact</class>
     <class>br.com.altamira.erp.entity.model.QuotationRequest</class>
     <class>br.com.altamira.erp.entity.model.Material</class>
     <class>br.com.altamira.erp.entity.model.Standard</class>

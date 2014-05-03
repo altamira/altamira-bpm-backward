@@ -25,6 +25,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+
+import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
  *
@@ -51,7 +54,7 @@ public class PurchaseOrderItem implements Serializable {
     @Column(name = "ID")
     private Long id;
     @Basic(optional = false)
-    @Column(name = "DATE")
+    @Column(name = "\"DATE\"")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     @Basic(optional = false)
@@ -121,6 +124,8 @@ public class PurchaseOrderItem implements Serializable {
         this.tax = tax;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public PurchasePlanningItem getPlanningItem() {
         return planningItem;
     }
@@ -129,6 +134,8 @@ public class PurchaseOrderItem implements Serializable {
         this.planningItem = planningItem;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
     }

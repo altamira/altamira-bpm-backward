@@ -15,7 +15,6 @@ import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
 import br.com.altamira.erp.entity.model.Standard;
 import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierContact;
 import br.com.altamira.erp.entity.model.SupplierInStock;
 import br.com.altamira.erp.entity.model.SupplierPriceList;
 import br.com.altamira.erp.entity.model.SupplierStandard;
@@ -94,7 +93,6 @@ public class MaterialEndpointTest {
                                 QuotationItemQuote.class,
                                 QuotationRequest.class,
                                 Standard.class,
-                                SupplierContact.class,
                                 SupplierInStock.class,
                                 SupplierPriceList.class,
                                 SupplierStandard.class,
@@ -120,7 +118,7 @@ public class MaterialEndpointTest {
                         PurchasePlanningItem.class, Quotation.class,
                         QuotationItem.class, QuotationItemQuote.class,
                         QuotationRequest.class, Standard.class,
-                        SupplierContact.class, SupplierInStock.class,
+                        SupplierInStock.class,
                         SupplierPriceList.class, SupplierStandard.class,
                         UserPreference.class, SupplierStandardPK.class,
                         MaterialStandardPK.class,
@@ -350,7 +348,7 @@ public class MaterialEndpointTest {
         materialUpdate.setWidth(materialChanged.getWidth());
 
         // Do the update test
-        Response r = materialendpoint.update(materialUpdate);
+        Response r = materialendpoint.update(materialUpdate.getId(), materialUpdate);
 
         // Check results
         Assert.assertEquals(Status.NO_CONTENT.getStatusCode(), r.getStatus());

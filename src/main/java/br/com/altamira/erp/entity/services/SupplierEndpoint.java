@@ -21,7 +21,6 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierContact;
 
 /**
  *
