@@ -6,10 +6,13 @@
 package br.com.altamira.erp.entity.model;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,6 +29,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -68,7 +72,22 @@ public class PurchaseOrder implements Serializable {
     private PurchasePlanning purchasePlanning;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private Set<PurchaseOrderItem> purchaseOrderItem;
-
+    @Column(name = "COMPANY_INVOICE")
+    private BigInteger companyInvoice;
+    @Column(name = "COMPANY_BILLING")
+    private BigInteger companyBilling;
+    @Column(name = "COMPANY_SHIPPING")
+    private BigInteger companyShipping;
+    @Column(name = "SHIPPING_TAX")
+    private BigInteger shippingTax;
+    // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
+    @Column(name = "DISCOUNT")
+    private BigDecimal discount;
+    @Size(max = 3)
+    @Column(name = "SHIPPING_TERMS", columnDefinition = "char(3)")
+    private String shippingTerms;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
+    private Set<PurchaseOrderPayment> purchaseOrderPayment;
     public PurchaseOrder() {
     }
 
@@ -132,6 +151,64 @@ public class PurchaseOrder implements Serializable {
         this.purchaseOrderItem = purchaseOrderItem;
     }
 
+    public BigInteger getCompanyInvoice() {
+        return companyInvoice;
+    }
+
+    public void setCompanyInvoice(BigInteger companyInvoice) {
+        this.companyInvoice = companyInvoice;
+    }
+
+    public BigInteger getCompanyBilling() {
+        return companyBilling;
+    }
+
+    public void setCompanyBilling(BigInteger companyBilling) {
+        this.companyBilling = companyBilling;
+    }
+
+    public BigInteger getCompanyShipping() {
+        return companyShipping;
+    }
+
+    public void setCompanyShipping(BigInteger companyShipping) {
+        this.companyShipping = companyShipping;
+    }
+
+    public BigInteger getShippingTax() {
+        return shippingTax;
+    }
+
+    public void setShippingTax(BigInteger shippingTax) {
+        this.shippingTax = shippingTax;
+    }
+
+    public BigDecimal getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(BigDecimal discount) {
+        this.discount = discount;
+    }
+
+    public String getShippingTerms() {
+        return shippingTerms;
+    }
+
+    public void setShippingTerms(String shippingTerms) {
+        this.shippingTerms = shippingTerms;
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Set<PurchaseOrderPayment> getPurchaseOrderPayment() {
+        return purchaseOrderPayment;
+    }
+
+    public void setPurchaseOrderPayment(Set<PurchaseOrderPayment> purchaseOrderPayment) {
+        this.purchaseOrderPayment = purchaseOrderPayment;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -153,7 +230,7 @@ public class PurchaseOrder implements Serializable {
         }
         return true;
     }
-
+    
     @Override
     public String toString() {
         return "br.com.altamira.erp.entity.model.PurchaseOrder[ id=" + id

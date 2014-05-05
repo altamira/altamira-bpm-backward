@@ -16,12 +16,15 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -51,12 +54,30 @@ public class Supplier implements Serializable {
     @Basic(optional = false)
     @Column(name = "NAME", columnDefinition = "nvarchar2(50)")
     private String name;
+    @Size(max = 20)
+    @Column(name = "ALIAS", columnDefinition = "nvarchar2(20)")
+    private String alias;
+    @Size(max = 20)
+    @Column(name = "FEDERAL_TAX_ID", columnDefinition = "nvarchar2(20)")
+    private String federalTaxId;
+    @Size(max = 20)
+    @Column(name = "STATE_TAX_ID", columnDefinition = "nvarchar2(20)")
+    private String stateTaxId;
+    @Size(max = 20)
+    @Column(name = "CITY_TAX_ID", columnDefinition = "nvarchar2(20)")
+    private String cityTaxId;
+    @JoinColumn(name = "PAYMENT_CONDITION", referencedColumnName = "ID")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private PaymentCondition paymentCondition;
+    @JoinColumn(name = "LOCATION_ADDRESS", referencedColumnName = "ID")
+    @ManyToOne(fetch = FetchType.EAGER)
+    private LocationAddress locationAddress;
+    @OneToMany(mappedBy = "supplier", fetch = FetchType.EAGER)
+    private Set<SupplierContactPerson> supplierContactPerson;    
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<QuotationItemQuote> quotationItemQuote;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierPriceList> supplierPriceList;
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<SupplierContact> supplierContact;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<PurchaseOrder> purchaseOrder;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
@@ -116,16 +137,6 @@ public class Supplier implements Serializable {
 
     @XmlTransient
     @JsonIgnore
-    public Set<SupplierContact> getSupplierContact() {
-        return supplierContact;
-    }
-
-    public void setSupplierContactSet(Set<SupplierContact> supplierContact) {
-        this.supplierContact = supplierContact;
-    }
-
-    @XmlTransient
-    @JsonIgnore
     public Set<PurchaseOrder> getPurchaseOrder() {
         return purchaseOrder;
     }
@@ -155,6 +166,64 @@ public class Supplier implements Serializable {
         this.purchasePlanningItem = purchasePlanningItem;
     }
 
+    public String getAlias() {
+        return alias;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
+    public String getFederalTaxId() {
+        return federalTaxId;
+    }
+
+    public void setFederalTaxId(String federalTaxId) {
+        this.federalTaxId = federalTaxId;
+    }
+
+    public String getStateTaxId() {
+        return stateTaxId;
+    }
+
+    public void setStateTaxId(String stateTaxId) {
+        this.stateTaxId = stateTaxId;
+    }
+
+    public String getCityTaxId() {
+        return cityTaxId;
+    }
+
+    public void setCityTaxId(String cityTaxId) {
+        this.cityTaxId = cityTaxId;
+    }
+
+    public PaymentCondition getPaymentCondition() {
+        return paymentCondition;
+    }
+
+    public void setPaymentCondition(PaymentCondition paymentCondition) {
+        this.paymentCondition = paymentCondition;
+    }
+
+    public LocationAddress getLocationAddress() {
+        return locationAddress;
+    }
+
+    public void setLocationAddress(LocationAddress locationAddress) {
+        this.locationAddress = locationAddress;
+    }
+
+    @XmlTransient
+    @JsonIgnore
+    public Set<SupplierContactPerson> getSupplierContactPerson() {
+        return supplierContactPerson;
+    }
+
+    public void setSupplierContactPerson(Set<SupplierContactPerson> supplierContactPerson) {
+        this.supplierContactPerson = supplierContactPerson;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -181,5 +250,5 @@ public class Supplier implements Serializable {
     public String toString() {
         return "br.com.altamira.erp.entity.model.Supplier[ id=" + id + " ]";
     }
-
+    
 }
