@@ -151,7 +151,7 @@ public class PurchaseOrderEndpoint {
             Date purchaseOrderDate = orderDao.getPurchaseOrderCreatedDateById(orderId);
 
             parameters.put("PURCHASE_ORDER_DATE", purchaseOrderDate);
-            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
+            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
 
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
