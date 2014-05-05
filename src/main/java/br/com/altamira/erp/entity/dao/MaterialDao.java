@@ -53,11 +53,20 @@ public class MaterialDao {
     }
 
     public Material create(Material material) {
-        entityManager.persist(material);
+
+    	Material entity = find(material);
+    	
+    	if (entity == null) {
+    		material.setId(null);
+	
+	    	entityManager.persist(material);
         
-        entityManager.flush();
+	    	entityManager.flush();
+	    	
+	    	return material;
+    	}
         
-        return material;
+        return entity;
     }
 
     public Material update(Material material) {

@@ -23,9 +23,9 @@
     <class>br.com.altamira.erp.entity.model.PurchasePlanningItem</class>
     <class>br.com.altamira.erp.entity.model.PurchasePlanning</class>
     <class>br.com.altamira.erp.entity.model.Company</class>
-    <class>br.com.altamira.erp.entity.model.SupplierContactPerson</class>
-    <class>br.com.altamira.erp.entity.model.SupplierContactPersonFone</class>
-    <class>br.com.altamira.erp.entity.model.SupplierContactPersonMail</class>
+    <class>br.com.altamira.erp.entity.model.ContactPerson</class>
+    <class>br.com.altamira.erp.entity.model.ContactPersonFone</class>
+    <class>br.com.altamira.erp.entity.model.ContactPersonMail</class>
     <class>br.com.altamira.erp.entity.model.LocationAddress</class>
     <class>br.com.altamira.erp.entity.model.PaymentCondition</class>
     <class>br.com.altamira.erp.entity.model.PaymentConditionItem</class>

@@ -21,7 +21,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import br.com.altamira.erp.entity.dao.MaterialDao;
 import br.com.altamira.erp.entity.dao.RequestDao;
+import br.com.altamira.erp.entity.model.Material;
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
 
@@ -37,11 +39,16 @@ public class RequestItemEndpoint {
     
     @Inject
     private RequestDao requestDao;
+    
+    @Inject
+    private MaterialDao materialDao;
 
     @POST
     @Consumes("application/json")
     public Response create(@PathParam("request") long requestId, RequestItem entity) {
     	entity.setId(null);
+    	Material material = materialDao.create(entity.getMaterial());
+    	entity.setMaterial(material);
 		Request request = requestDao.getCurrent();
 		request.getRequestItem().add(entity);
 		entity.setRequest(request);

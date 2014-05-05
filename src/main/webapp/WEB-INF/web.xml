@@ -30,7 +30,7 @@
    </filter>
    <filter-mapping>
      <filter-name>JBossCorsFilter</filter-name>
-     <url-pattern>*</url-pattern>
+     <url-pattern>/*</url-pattern>
    </filter-mapping>
    
   <!-- Start - Security Configuration -->
@@ -50,6 +50,7 @@
           <web-resource-name>Test URL</web-resource-name>
           <url-pattern>/rest/quotations/test/*</url-pattern>
           <url-pattern>/rest/purchaseplannings/approval</url-pattern>
+          <url-pattern>/rest/*</url-pattern>
       </web-resource-collection>
   </security-constraint>
   
