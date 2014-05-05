@@ -56,8 +56,6 @@ public class Supplier implements Serializable {
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierPriceList> supplierPriceList;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
-    private Set<SupplierContact> supplierContact;
-    @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<PurchaseOrder> purchaseOrder;
     @OneToMany(/*cascade = CascadeType.ALL,*/ mappedBy = "supplier", fetch = FetchType.LAZY)
     private Set<SupplierStandard> supplierStandard;
@@ -112,16 +110,6 @@ public class Supplier implements Serializable {
     public void setSupplierPriceListSet(
             Set<SupplierPriceList> supplierPriceList) {
         this.supplierPriceList = supplierPriceList;
-    }
-
-    @XmlTransient
-    @JsonIgnore
-    public Set<SupplierContact> getSupplierContact() {
-        return supplierContact;
-    }
-
-    public void setSupplierContactSet(Set<SupplierContact> supplierContact) {
-        this.supplierContact = supplierContact;
     }
 
     @XmlTransient

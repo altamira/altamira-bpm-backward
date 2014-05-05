@@ -29,7 +29,6 @@ import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
 import br.com.altamira.erp.entity.model.Standard;
 import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierContact;
 import br.com.altamira.erp.entity.model.SupplierInStock;
 import br.com.altamira.erp.entity.model.SupplierPriceList;
 import br.com.altamira.erp.entity.model.SupplierStandard;
@@ -56,7 +55,7 @@ public class SupplierEndpointTest {
 						QuotationItem.class, QuotationItemQuote.class,
 						QuotationRequest.class, Request.class,
 						RequestItem.class, Standard.class, Supplier.class,
-						SupplierContact.class, SupplierInStock.class,
+						SupplierInStock.class,
 						SupplierPriceList.class, SupplierStandard.class,
 						SupplierStandardPK.class, UserPreference.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
 				.addAsResource("META-INF/persistence.xml")

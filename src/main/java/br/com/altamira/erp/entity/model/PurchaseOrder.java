@@ -61,12 +61,12 @@ public class PurchaseOrder implements Serializable {
     @Column(name = "COMMENTS")
     private String comments;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Supplier supplier;
     @JoinColumn(name = "PURCHASE_PLANNING", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchasePlanning purchasePlanning;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchaseOrder", fetch = FetchType.EAGER)
     private Set<PurchaseOrderItem> purchaseOrderItem;
 
     public PurchaseOrder() {
@@ -113,6 +113,8 @@ public class PurchaseOrder implements Serializable {
         this.supplier = supplier;
     }
 
+    @XmlTransient
+    @JsonIgnore
     public PurchasePlanning getPurchasePlanning() {
         return purchasePlanning;
     }
@@ -122,7 +124,7 @@ public class PurchaseOrder implements Serializable {
     }
 
     @XmlTransient
-    @JsonIgnore
+    //@JsonIgnore
     public Set<PurchaseOrderItem> getPurchaseOrderItem() {
         return purchaseOrderItem;
     }
