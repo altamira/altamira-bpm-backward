@@ -41,6 +41,8 @@ import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.joda.time.DateTime;
@@ -66,6 +68,9 @@ public class RequestEndpoint {
     
     @Inject
     private RequestDao requestDao;
+    
+    @Context
+    private HttpServletRequest httpRequest;
 
     /*@POST
     @Produces("application/json")
@@ -272,7 +277,7 @@ public class RequestEndpoint {
             parameters.put("REQUEST_ID", requestId);
             parameters.put("TOTAL_WEIGHT", totalWeight);
             parameters.put("altamira_logo", imfg);
-            parameters.put("USERNAME", "Parth");
+            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
 
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);

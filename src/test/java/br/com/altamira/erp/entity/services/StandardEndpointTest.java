@@ -28,7 +28,6 @@ import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
 import br.com.altamira.erp.entity.model.Standard;
 import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierContact;
 import br.com.altamira.erp.entity.model.SupplierInStock;
 import br.com.altamira.erp.entity.model.SupplierPriceList;
 import br.com.altamira.erp.entity.model.SupplierStandard;
@@ -56,7 +55,7 @@ public class StandardEndpointTest {
 						PurchasePlanningItem.class, Quotation.class,
 						QuotationItem.class, QuotationItemQuote.class,
 						QuotationRequest.class, Standard.class,
-						SupplierContact.class, SupplierInStock.class,
+						SupplierInStock.class,
 						SupplierPriceList.class, SupplierStandard.class,
 						UserPreference.class, SupplierStandardPK.class,
 						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
