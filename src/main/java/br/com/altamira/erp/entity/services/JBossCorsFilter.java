@@ -34,6 +34,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 public class JBossCorsFilter implements Filter {
@@ -51,11 +52,19 @@ public class JBossCorsFilter implements Filter {
           FilterChain chain) throws IOException, ServletException {
 
     HttpServletResponse r = (HttpServletResponse) response;
+
+    r.addHeader("Access-Control-Allow-Credentials", "true");
     r.addHeader("Access-Control-Allow-Origin", "*");
     r.addHeader("Access-Control-Allow-Headers",
-            "Accept,Accept-Encoding,Accept-Language,Cache-Control,Connection,Content-Length,Content-Type," +
-            "Cookie,Host,Pragma,Referer,RemoteQueueID,User-Agent");
-    r.addHeader("Access-Control-Allow-Credentials", "true");
-    chain.doFilter(request, response);
+            "Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Content-Length, Content-Type," +
+            "Cookie, Host, Pragma, Referer, RemoteQueueID, User-Agent, X-Requested-With");
+	r.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	r.setHeader("Access-Control-Max-Age", "86400");
+
+	r.setHeader("Allow", "GET, HEAD, POST, TRACE, OPTIONS");
+
+    if (!"OPTIONS".equals(((HttpServletRequest)request).getMethod())) {
+    	chain.doFilter(request, response);
+    }
   }
 }
