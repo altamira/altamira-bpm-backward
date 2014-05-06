@@ -12,9 +12,12 @@ import java.util.Set;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -71,6 +74,10 @@ public class Material implements Serializable {
     private BigDecimal length;
     @Column(name = "TAX")
     private BigDecimal tax;
+    @JoinColumn(name = "COMPANY", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Company company;
+
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
     private Set<MaterialStandard> materialStandardSet;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
@@ -151,6 +158,16 @@ public class Material implements Serializable {
         this.tax = tax;
     }
 
+    //@XmlTransient
+    //@JsonIgnore
+    public Company getCompany() {
+        return company;
+    }
+
+    public void setCompany(Company company) {
+        this.company = company;
+    }
+    
     @XmlTransient
     @JsonIgnore
     public Set<MaterialStandard> getMaterialStandardSet() {

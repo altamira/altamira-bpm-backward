@@ -6,10 +6,13 @@
 
 package br.com.altamira.erp.entity.dao;
 
+import br.com.altamira.erp.entity.model.Company;
 import br.com.altamira.erp.entity.model.Material;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
@@ -59,6 +62,8 @@ public class MaterialDao {
     	if (entity == null) {
     		material.setId(null);
 	
+    		material.setCompany(entityManager.find(Company.class, 1));
+    		
 	    	entityManager.persist(material);
         
 	    	entityManager.flush();

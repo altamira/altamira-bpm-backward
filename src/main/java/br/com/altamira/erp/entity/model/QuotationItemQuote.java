@@ -59,8 +59,9 @@ public class QuotationItemQuote implements Serializable {
     @Column(name = "PRICE")
     private BigDecimal price;
     @Basic(optional = false)
-    @Column(name = "STANDARD")
-    private String standard;
+    @JoinColumn(name = "STANDARD", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    private Standard standard;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Supplier supplier;
@@ -78,7 +79,7 @@ public class QuotationItemQuote implements Serializable {
     }
 
     public QuotationItemQuote(Long id, BigDecimal weight, BigDecimal price,
-            String standard) {
+            Standard standard) {
         this.id = id;
         this.weight = weight;
         this.price = price;
@@ -109,13 +110,13 @@ public class QuotationItemQuote implements Serializable {
         this.price = price;
     }
 
-    @XmlTransient
-    @JsonIgnore
-    public String getStandard() {
+    //@XmlTransient
+    //@JsonIgnore
+    public Standard getStandard() {
         return standard;
     }
 
-    public void setStandard(String standard) {
+    public void setStandard(Standard standard) {
         this.standard = standard;
     }
 
