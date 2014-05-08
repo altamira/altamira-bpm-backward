@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="purchaseOrder" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="76524c99-dab0-4afb-9cde-69ae493a1626">
 	<property name="ireport.zoom" value="1.9487171000000099"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="240"/>
+	<property name="ireport.y" value="1157"/>
 	<subDataset name="productsDataset" uuid="b0114484-5912-402a-bb48-bbbaf3e417a6">
 		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
 			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
@@ -329,6 +329,33 @@ and cic.contact_person = cp.id]]>
 		<field name="LAST_NAME" class="java.lang.String"/>
 		<field name="EMAIL" class="java.lang.String"/>
 	</subDataset>
+	<subDataset name="personDetailsDataset" uuid="b5c7b1c3-755a-49e9-aad1-e4f9ad6449da">
+		<parameter name="USERNAME" class="java.lang.String">
+			<defaultValueExpression><![CDATA[$P{USERNAME}]]></defaultValueExpression>
+		</parameter>
+		<queryString>
+			<![CDATA[select name || '<br/>' || email || '<br/>' || fone as details
+from
+(select case when p.last_name is null then p.first_name else p.first_name || ' ' || p.last_name end as name,
+       (select listagg(cm.address,'<br/>') within group (order by cm.address) as email
+        from person_contact_mail pcm,
+             contact_mail cm
+        where pcm.person = p.id and
+              pcm.contact_mail = cm.id
+       ) as email,
+       (select listagg( cf.type || ' +' || cf.country_code || '(' || cf.area_code || ')' || cf.prefix || '-' || cf.number_ || ' Ramal ' || cf.extension, '<br/>') within group (order by cf.type) as fone
+        from person_contact_fone pcf,
+             contact_fone cf
+        where pcf.person = p.id and
+              pcf.contact_fone = cf.id
+       ) as fone
+from user_preference u,
+     person p
+where upper(u.name) = upper($P{USERNAME})
+and p.id(+) = u.person)]]>
+		</queryString>
+		<field name="DETAILS" class="java.lang.String"/>
+	</subDataset>
 	<parameter name="altamira_logo" class="java.lang.Object"/>
 	<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal"/>
 	<parameter name="PURCHASE_ORDER_DATE" class="java.util.Date"/>
@@ -479,7 +506,7 @@ FROM
 					</textElement>
 					<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 				</textField>
-				<textField>
+				<textField isBlankWhenNull="true">
 					<reportElement uuid="f335aab5-8130-4c66-894c-f263ee25591a" x="503" y="42" width="49" height="13"/>
 					<textElement textAlignment="Left" verticalAlignment="Middle">
 						<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
@@ -1294,7 +1321,7 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 					<text><![CDATA[Cond. Pagto.]]></text>
 				</staticText>
 				<componentElement>
-					<reportElement uuid="b8b87b31-796b-4328-a0ce-ae857ccc0728" positionType="Float" x="5" y="20" width="547" height="15"/>
+					<reportElement uuid="b8b87b31-796b-4328-a0ce-ae857ccc0728" positionType="Float" x="5" y="20" width="548" height="15"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal">
 						<datasetRun subDataset="paymentDatesDataset" uuid="15610b16-aba8-479f-a5c5-aef29c3295fb">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1302,7 +1329,7 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 							</datasetParameter>
 							<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 						</datasetRun>
-						<jr:listContents height="15" width="547">
+						<jr:listContents height="15" width="548">
 							<staticText>
 								<reportElement uuid="56d116d0-8bb4-4fbc-bf8e-a9fe2ccdb130" x="0" y="1" width="58" height="12"/>
 								<textElement verticalAlignment="Middle">
@@ -1325,7 +1352,7 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 								<textFieldExpression><![CDATA[(new SimpleDateFormat("dd/MM/yyyy")).format($F{DATE})]]></textFieldExpression>
 							</textField>
 							<componentElement>
-								<reportElement uuid="f51a6a27-0f30-47d8-ba3d-f4af63391d53" x="186" y="0" width="350" height="15"/>
+								<reportElement uuid="f51a6a27-0f30-47d8-ba3d-f4af63391d53" x="188" y="0" width="360" height="15"/>
 								<jr:list printOrder="Horizontal" ignoreWidth="false">
 									<datasetRun subDataset="paymentVencimentosDataset" uuid="3c16f276-1ab5-4e91-9b63-3fbddad0e993">
 										<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1336,9 +1363,9 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 										</datasetParameter>
 										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 									</datasetRun>
-									<jr:listContents height="15" width="87">
+									<jr:listContents height="15" width="90">
 										<textField>
-											<reportElement uuid="3d4b8ac1-c044-46c0-84be-844427b04d37" x="5" y="1" width="80" height="12"/>
+											<reportElement uuid="3d4b8ac1-c044-46c0-84be-844427b04d37" x="3" y="1" width="85" height="12"/>
 											<box leftPadding="2">
 												<pen lineWidth="0.5"/>
 												<topPen lineWidth="0.5"/>
@@ -1351,7 +1378,7 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 											</textElement>
 											<textFieldExpression><![CDATA[(new SimpleDateFormat("dd/MM/yyyy")).format($F{PAYMENT_DATE})
 +"  R\$ "
-+new DecimalFormat("#,##0.0", new DecimalFormatSymbols(new Locale("pt","BR"))).format(new BigDecimal($F{PAYMENT}))]]></textFieldExpression>
++new DecimalFormat("#,##0.00", new DecimalFormatSymbols(new Locale("pt","BR"))).format(new BigDecimal($F{PAYMENT}))]]></textFieldExpression>
 										</textField>
 									</jr:listContents>
 								</jr:list>
@@ -2522,7 +2549,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 				<text><![CDATA[%IPI]]></text>
 			</staticText>
 		</band>
-		<band height="275">
+		<band height="279">
 			<frame>
 				<reportElement uuid="b5d6f705-52e7-4660-ba58-20e115a6344b" positionType="Float" x="0" y="1" width="555" height="62"/>
 				<staticText>
@@ -2837,7 +2864,7 @@ Enviar arquivo(s) XML de Nota Fiscal Eletrônica para nfe@altamira.com.br]]></te
 				</frame>
 			</frame>
 			<frame>
-				<reportElement uuid="239d1608-de6b-48fb-b554-7dae459c93af" x="0" y="201" width="555" height="73"/>
+				<reportElement uuid="239d1608-de6b-48fb-b554-7dae459c93af" x="0" y="201" width="555" height="75"/>
 				<frame>
 					<reportElement uuid="a4eec17c-3809-406d-b31b-67a07e3d9850" positionType="Float" mode="Opaque" x="0" y="1" width="555" height="15" backcolor="#E0E0E0"/>
 					<box>
@@ -2856,7 +2883,7 @@ Enviar arquivo(s) XML de Nota Fiscal Eletrônica para nfe@altamira.com.br]]></te
 					</staticText>
 				</frame>
 				<frame>
-					<reportElement uuid="2e47d3f8-3ed5-4924-9512-42ffa9426133" positionType="Float" x="0" y="16" width="555" height="56"/>
+					<reportElement uuid="2e47d3f8-3ed5-4924-9512-42ffa9426133" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="16" width="555" height="57"/>
 					<box>
 						<pen lineWidth="1.0"/>
 						<topPen lineWidth="1.0"/>
@@ -2865,13 +2892,15 @@ Enviar arquivo(s) XML de Nota Fiscal Eletrônica para nfe@altamira.com.br]]></te
 						<rightPen lineWidth="1.0"/>
 					</box>
 					<line>
-						<reportElement uuid="d8bfc22d-0415-4f12-9000-246e25f696a1" x="27" y="39" width="196" height="1"/>
+						<reportElement uuid="d8bfc22d-0415-4f12-9000-246e25f696a1" x="27" y="37" width="196" height="1"/>
 						<graphicElement>
 							<pen lineWidth="0.5" lineStyle="Dashed"/>
 						</graphicElement>
 					</line>
 					<staticText>
-						<reportElement uuid="6522ed4b-3818-4afa-8863-b12a583908ec" x="63" y="40" width="118" height="12"/>
+						<reportElement uuid="6522ed4b-3818-4afa-8863-b12a583908ec" x="63" y="40" width="118" height="12">
+							<printWhenExpression><![CDATA[$P{USERNAME}.isEmpty()]]></printWhenExpression>
+						</reportElement>
 						<textElement textAlignment="Center" verticalAlignment="Middle">
 							<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 						</textElement>
@@ -2890,6 +2919,28 @@ Enviar arquivo(s) XML de Nota Fiscal Eletrônica para nfe@altamira.com.br]]></te
 						</textElement>
 						<text><![CDATA[(Aprovado Por)]]></text>
 					</staticText>
+					<componentElement>
+						<reportElement uuid="1eab3940-24ee-4c01-8dac-455adbab7921" x="26" y="39" width="196" height="15" isRemoveLineWhenBlank="true">
+							<printWhenExpression><![CDATA[$P{USERNAME}!=null]]></printWhenExpression>
+						</reportElement>
+						<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+							<datasetRun subDataset="personDetailsDataset" uuid="570d4935-8573-46fc-9c98-8c22759bddec">
+								<datasetParameter name="USERNAME">
+									<datasetParameterExpression><![CDATA[$P{USERNAME}]]></datasetParameterExpression>
+								</datasetParameter>
+								<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+							</datasetRun>
+							<jr:listContents height="15" width="196">
+								<textField isStretchWithOverflow="true">
+									<reportElement uuid="48992876-72f3-4e50-81a0-2ec9ab2f3bd3" positionType="Float" x="0" y="1" width="196" height="14" isRemoveLineWhenBlank="true"/>
+									<textElement textAlignment="Center" verticalAlignment="Middle" markup="html">
+										<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+									</textElement>
+									<textFieldExpression><![CDATA[$F{DETAILS}]]></textFieldExpression>
+								</textField>
+							</jr:listContents>
+						</jr:list>
+					</componentElement>
 				</frame>
 			</frame>
 		</band>

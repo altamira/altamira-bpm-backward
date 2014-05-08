@@ -64,6 +64,8 @@ public class PurchaseOrderItem implements Serializable {
     private BigDecimal price;
     @Column(name = "TAX")
     private BigDecimal tax;
+    @Column(name = "STANDARD")
+    private BigDecimal standard;
     @JoinColumn(name = "PLANNING_ITEM", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchasePlanningItem planningItem;
@@ -122,6 +124,14 @@ public class PurchaseOrderItem implements Serializable {
 
     public void setTax(BigDecimal tax) {
         this.tax = tax;
+    }
+    
+    public BigDecimal getStandard() {
+        return standard;
+    }
+
+    public void setStandard(BigDecimal standard) {
+        this.standard = standard;
     }
 
     @XmlTransient

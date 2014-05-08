@@ -13,9 +13,12 @@ import br.com.altamira.erp.entity.model.PurchasePlanning;
 import br.com.altamira.erp.entity.model.PurchasePlanningItem;
 import br.com.altamira.erp.entity.model.Supplier;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
@@ -54,48 +57,80 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
 
             for (BigDecimal supplierId : supplierList) {
 
-                PurchaseOrder purchaseOrder = new PurchaseOrder();
-                
                 PurchasePlanning planning = planningDao.findPurchasePlanningById(planningId.longValue());
-                purchaseOrder.setPurchasePlanning(planning);
-                
                 Supplier supplier = supplierDao.find(supplierId.longValue());
-                purchaseOrder.setSupplier(supplier);
-                
-                purchaseOrder.setCreatedDate(new Date());
-                purchaseOrder.setComments(null);
 
                 List<Object[]> list = orderDao.selectOrderItemDetailsBySupplierId(planningId.longValue(), supplierId.longValue());
 
-                Long purchaseOrderId = orderDao.insertPurchaseOrder(purchaseOrder);
-                purchaseOrderIdList.add(purchaseOrderId.toString());
-                List<Long> purchaseOrderItemList = new ArrayList<Long>();
-
+                // seperate orderItems based on company
+                Map<BigDecimal, List<Object[]>> seperatedOrderItemsMap = new HashMap<BigDecimal, List<Object[]>>();
                 for (Object[] rs : list) {
-
-                    BigDecimal planningItemId = (BigDecimal) rs[0];
-                    Date date = (Date) rs[1];
-                    BigDecimal weight = ((BigDecimal) rs[2]);
-                    BigDecimal price = (BigDecimal) rs[3];
-                    BigDecimal tax = (BigDecimal) rs[4];
-
-                    PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
                     
-                    PurchasePlanningItem planningItem = planningDao.findPurchasePlanningItemById(planningItemId.longValue());
-                    purchaseOrderItem.setPlanningItem(planningItem);
+                    BigDecimal company = (BigDecimal) rs[6];
+
+                    if (seperatedOrderItemsMap.containsKey(company)) {
+                        List<Object[]> tempList = seperatedOrderItemsMap.get(company);
+                        tempList.add(rs);
+                    } else {
+                        List<Object[]> tempList = new ArrayList<Object[]>();
+                        tempList.add(rs);
+                        seperatedOrderItemsMap.put(company, tempList);
+                    }
+                }
+
+                // use seperate orderItems list to generate purchase ordres
+                for (Map.Entry<BigDecimal, List<Object[]>> entry : seperatedOrderItemsMap.entrySet()) {
                     
-                    purchaseOrderItem.setDate(date);
-                    purchaseOrderItem.setWeight(weight);
-                    purchaseOrderItem.setPrice(price);
-                    purchaseOrderItem.setTax(tax);
+                    BigDecimal company = entry.getKey();
+                    List<Object[]> orderItemList = entry.getValue();
+                    
+                    PurchaseOrder purchaseOrder = new PurchaseOrder();
+                    purchaseOrder.setPurchasePlanning(planning);
+                    purchaseOrder.setSupplier(supplier);
+                    purchaseOrder.setCreatedDate(new Date());
+                    purchaseOrder.setCompanyShipping(company.toBigInteger());
+                    purchaseOrder.setCompanyInvoice(BigInteger.ONE);
+                    purchaseOrder.setCompanyBilling(BigInteger.ONE);
+                    if(!company.toBigInteger().equals(BigInteger.ONE))
+                    {
+                        purchaseOrder.setComments("ATENÇÃO: Entrega através de operação triangular.");
+                    }
+                    else
+                    {
+                        purchaseOrder.setComments(" ");
+                    }
 
-                    Long purchaseOrderItemId = orderDao.insertPurchaseOrderItem(purchaseOrderItem);
+                    Long purchaseOrderId = orderDao.insertPurchaseOrder(purchaseOrder);
+                    purchaseOrderIdList.add(purchaseOrderId.toString());
+                    List<Long> purchaseOrderItemList = new ArrayList<Long>();
 
-                    purchaseOrderItemList.add(purchaseOrderItemId);
+                    for (Object[] rs : orderItemList) {
+
+                        BigDecimal planningItemId = (BigDecimal) rs[0];
+                        Date date = (Date) rs[1];
+                        BigDecimal weight = ((BigDecimal) rs[2]);
+                        BigDecimal price = (BigDecimal) rs[3];
+                        BigDecimal tax = (BigDecimal) rs[4];
+                        BigDecimal standard = (BigDecimal) rs[5];
+
+                        PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+                        purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+
+                        PurchasePlanningItem planningItem = planningDao.findPurchasePlanningItemById(planningItemId.longValue());
+                        purchaseOrderItem.setPlanningItem(planningItem);
+
+                        purchaseOrderItem.setDate(date);
+                        purchaseOrderItem.setWeight(weight);
+                        purchaseOrderItem.setPrice(price);
+                        purchaseOrderItem.setTax(tax);
+                        purchaseOrderItem.setStandard(standard);
+
+                        Long purchaseOrderItemId = orderDao.insertPurchaseOrderItem(purchaseOrderItem);
+
+                        purchaseOrderItemList.add(purchaseOrderItemId);
+                    }
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -86,6 +86,10 @@ public class PurchaseOrder implements Serializable {
     @Size(max = 3)
     @Column(name = "SHIPPING_TERMS", columnDefinition = "char(3)")
     private String shippingTerms;
+    @Column(name = "CARRIER", length = 30)
+    private String carrier;
+    @Column(name="FREIGHT")
+    private BigDecimal freight;
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "purchaseOrder", fetch = FetchType.LAZY)
     private Set<PurchaseOrderPayment> purchaseOrderPayment;
     public PurchaseOrder() {
@@ -199,6 +203,22 @@ public class PurchaseOrder implements Serializable {
 
     public void setShippingTerms(String shippingTerms) {
         this.shippingTerms = shippingTerms;
+    }
+    
+    public String getCarrier() {
+        return carrier;
+    }
+
+    public void setCarrier(String carrier) {
+        this.carrier = carrier;
+    }
+
+    public BigDecimal getFreight() {
+        return freight;
+    }
+
+    public void setFreight(BigDecimal freight) {
+        this.freight = freight;
     }
 
     @XmlTransient
