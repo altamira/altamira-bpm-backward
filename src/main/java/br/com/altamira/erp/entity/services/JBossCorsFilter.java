@@ -48,23 +48,31 @@ public class JBossCorsFilter implements Filter {
   public void destroy() {
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response,
+  public void doFilter(ServletRequest  request, ServletResponse  response,
           FilterChain chain) throws IOException, ServletException {
 
-    HttpServletResponse r = (HttpServletResponse) response;
+      HttpServletRequest req = (HttpServletRequest)request;                                   
+      HttpServletResponse res = (HttpServletResponse)response;  
 
-    r.addHeader("Access-Control-Allow-Credentials", "true");
-    r.addHeader("Access-Control-Allow-Origin", "*");
-    r.addHeader("Access-Control-Allow-Headers",
-            "Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Content-Length, Content-Type," +
-            "Cookie, Host, Pragma, Referer, RemoteQueueID, User-Agent, X-Requested-With");
-	r.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-	r.setHeader("Access-Control-Max-Age", "86400");
+      r.addHeader("Access-Control-Allow-Credentials", "true");
+      res.addHeader("Access-Control-Allow-Headers",
+              "Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Content-Length, Content-Type," +
+              "Cookie, Host, Pragma, Referer, RemoteQueueID, User-Agent, X-Requested-With");
 
-	r.setHeader("Allow", "GET, HEAD, POST, TRACE, OPTIONS");
+      if(req.getHeader("Origin") != null){
+          res.addHeader("Access-Control-Allow-Origin", "*");
+          res.addHeader("Access-Control-Expose-Headers", "X-Cache-Date");
+      }
 
-    if (!"OPTIONS".equals(((HttpServletRequest)request).getMethod())) {
-    	chain.doFilter(request, response);
-    }
+      if("OPTIONS".equals(req.getMethod())){
+          res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
+          res.addHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Cache-Date");
+          res.addHeader("Access-Control-Max-Age", "-1");
+      } else {
+      
+    	  chain.doFilter(req, res);
+    	  
+      }
+
   }
 }
