@@ -211,7 +211,7 @@ public class PurchasePlanningEndpoint {
             }
 
             parameters.put("altamira_logo", imfg);
-            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
+            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
 
             Session session = em.unwrap(Session.class);
 
