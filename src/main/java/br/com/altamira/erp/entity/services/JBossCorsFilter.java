@@ -48,26 +48,29 @@ public class JBossCorsFilter implements Filter {
   public void destroy() {
   }
 
-  public void doFilter(ServletRequest  request, ServletResponse  response,
-          FilterChain chain) throws IOException, ServletException {
+  public void doFilter(ServletRequest  request, ServletResponse  response, FilterChain chain) throws IOException, ServletException {
 
       HttpServletRequest req = (HttpServletRequest)request;                                   
       HttpServletResponse res = (HttpServletResponse)response;  
 
-      r.addHeader("Access-Control-Allow-Credentials", "true");
-      res.addHeader("Access-Control-Allow-Headers",
-              "Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Content-Length, Content-Type," +
-              "Cookie, Host, Pragma, Referer, RemoteQueueID, User-Agent, X-Requested-With");
-
-      if(req.getHeader("Origin") != null){
+      if (req.getHeader("Origin") != null) {
+    	  
           res.addHeader("Access-Control-Allow-Origin", "*");
           res.addHeader("Access-Control-Expose-Headers", "X-Cache-Date");
+          
       }
 
-      if("OPTIONS".equals(req.getMethod())){
+      if ("OPTIONS".equals(req.getMethod())) {
+    	  
+          res.addHeader("Access-Control-Allow-Credentials", "true");
+          res.addHeader("Access-Control-Allow-Headers",
+                  "Accept, Accept-Encoding, Accept-Language, Cache-Control, Connection, Content-Length, Content-Type," +
+                  "Cookie, Host, Pragma, Referer, RemoteQueueID, User-Agent, X-Requested-With");
+          
           res.addHeader("Access-Control-Allow-Methods", "OPTIONS, GET, POST, PUT, DELETE");
-          res.addHeader("Access-Control-Allow-Headers", "Origin, Content-Type, X-Cache-Date");
+
           res.addHeader("Access-Control-Max-Age", "-1");
+          
       } else {
       
     	  chain.doFilter(req, res);
