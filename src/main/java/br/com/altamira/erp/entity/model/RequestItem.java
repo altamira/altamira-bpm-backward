@@ -43,7 +43,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 @NamedQueries({
     @NamedQuery(name = "RequestItem.findAll", query = "SELECT r FROM RequestItem r"),
     @NamedQuery(name = "RequestItem.findById", query = "SELECT r FROM RequestItem r WHERE r.id = :id"),
-    @NamedQuery(name = "RequestItem.findByArrivalDate", query = "SELECT r FROM RequestItem r WHERE r.arrivalDate = :arrivalDate"),
+    @NamedQuery(name = "RequestItem.findByArrival", query = "SELECT r FROM RequestItem r WHERE r.arrival = :arrival"),
     @NamedQuery(name = "RequestItem.findByWeight", query = "SELECT r FROM RequestItem r WHERE r.weight = :weight")})
 public class RequestItem implements Serializable {
 
@@ -58,7 +58,7 @@ public class RequestItem implements Serializable {
     @Basic(optional = false)
     @Column(name = "ARRIVAL_DATE")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date arrivalDate;
+    private Date arrival;
     @Basic(optional = false)
     @Column(name = "WEIGHT")
     private BigDecimal weight;
@@ -78,9 +78,9 @@ public class RequestItem implements Serializable {
         this.id = id;
     }
 
-    public RequestItem(Long id, Date arrivalDate, BigDecimal weight) {
+    public RequestItem(Long id, Date arrival, BigDecimal weight) {
         this.id = id;
-        this.arrivalDate = arrivalDate;
+        this.arrival = arrival;
         this.weight = weight;
     }
 
@@ -92,12 +92,12 @@ public class RequestItem implements Serializable {
         this.id = id;
     }
 
-    public Date getArrivalDate() {
-        return arrivalDate;
+    public Date getArrival() {
+        return arrival;
     }
 
-    public void setArrivalDate(Date arrivalDate) {
-        this.arrivalDate = arrivalDate;
+    public void setArrival(Date arrival) {
+        this.arrival = arrival;
     }
 
     public BigDecimal getWeight() {

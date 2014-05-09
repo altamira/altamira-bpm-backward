@@ -64,7 +64,7 @@ public class Request implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date sendDate;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "request", fetch = FetchType.EAGER)
-    private Set<RequestItem> requestItem;
+    private Set<RequestItem> items;
     @OneToOne(/*cascade = CascadeType.ALL,*/mappedBy = "request"/*, fetch = FetchType.LAZY*/)
     private QuotationRequest quotationRequest;
 
@@ -115,12 +115,12 @@ public class Request implements Serializable {
 
     @XmlTransient
     //@JsonIgnore
-    public Set<RequestItem> getRequestItem() {
-        return requestItem;
+    public Set<RequestItem> getItems() {
+        return items;
     }
 
-    public void setRequestItemSet(Set<RequestItem> requestItem) {
-        this.requestItem = requestItem;
+    public void setItems(Set<RequestItem> items) {
+        this.items = items;
     }
 
     @XmlTransient

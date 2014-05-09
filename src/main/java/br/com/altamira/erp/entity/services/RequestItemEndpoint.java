@@ -50,7 +50,7 @@ public class RequestItemEndpoint {
     	Material material = materialDao.create(entity.getMaterial());
     	entity.setMaterial(material);
 		Request request = requestDao.getCurrent();
-		request.getRequestItem().add(entity);
+		request.getItems().add(entity);
 		entity.setRequest(request);
         em.persist(entity);
         /*return Response.created(
@@ -112,7 +112,7 @@ public class RequestItemEndpoint {
     public Response update(@PathParam("id") long id, RequestItem entity) {
     	//if (entity.getRequest() == null) {
     		Request request = requestDao.getCurrent();
-    		request.getRequestItem().add(entity);
+    		request.getItems().add(entity);
     		entity.setRequest(request);
     	//}
         entity = em.merge(entity);

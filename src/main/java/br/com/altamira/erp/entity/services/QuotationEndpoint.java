@@ -271,7 +271,7 @@ public class QuotationEndpoint {
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
 
-            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
+            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
 
             BufferedImage imfg = null;
             try {

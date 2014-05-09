@@ -277,7 +277,7 @@ public class RequestEndpoint {
             parameters.put("REQUEST_ID", requestId);
             parameters.put("TOTAL_WEIGHT", totalWeight);
             parameters.put("altamira_logo", imfg);
-            parameters.put("USERNAME", httpRequest.getUserPrincipal().getName());
+            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
 
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
