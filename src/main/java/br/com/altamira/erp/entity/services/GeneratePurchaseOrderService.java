@@ -7,8 +7,11 @@ package br.com.altamira.erp.entity.services;
 import br.com.altamira.erp.entity.dao.OrderDao;
 import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import br.com.altamira.erp.entity.dao.SupplierDao;
+import br.com.altamira.erp.entity.model.PaymentCondition;
+import br.com.altamira.erp.entity.model.PaymentConditionItem;
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
+import br.com.altamira.erp.entity.model.PurchaseOrderPayment;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
 import br.com.altamira.erp.entity.model.PurchasePlanningItem;
 import br.com.altamira.erp.entity.model.Supplier;
@@ -21,6 +24,9 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
@@ -41,6 +47,7 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
     private SupplierDao supplierDao;
 
     @Override
+    @Transactional
     public void execute(DelegateExecution de) throws Exception {
 
         System.out.println("Generate Order service task execution started...");
@@ -83,7 +90,8 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
                     
                     BigDecimal company = entry.getKey();
                     List<Object[]> orderItemList = entry.getValue();
-                    
+
+                    // insert purchase order
                     PurchaseOrder purchaseOrder = new PurchaseOrder();
                     purchaseOrder.setPurchasePlanning(planning);
                     purchaseOrder.setSupplier(supplier);
@@ -99,11 +107,26 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
                     {
                         purchaseOrder.setComments(" ");
                     }
-
                     Long purchaseOrderId = orderDao.insertPurchaseOrder(purchaseOrder);
                     purchaseOrderIdList.add(purchaseOrderId.toString());
                     List<Long> purchaseOrderItemList = new ArrayList<Long>();
+                    
+                    // insert records for Purchase Order Payment
+                    List<PaymentConditionItem> conditionItems = orderDao.findPaymentConditionItemsByPaymentCondition(supplier.getPaymentCondition());
+                    for(PaymentConditionItem pci : conditionItems)
+                    {
+                        BigInteger tempPercentage = pci.getPercentage();
+                        BigInteger tempPeriod = pci.getPeriod();
+                        
+                        PurchaseOrderPayment pop = new PurchaseOrderPayment();
+                        pop.setPurchaseOrder(purchaseOrder);
+                        pop.setPercentage(new BigDecimal(tempPercentage));
+                        pop.setPeriod(tempPeriod.shortValue());
+                        
+                        orderDao.insertPurchaseOrderPayment(pop);
+                    }
 
+                    // insert Purchase Order Items
                     for (Object[] rs : orderItemList) {
 
                         BigDecimal planningItemId = (BigDecimal) rs[0];

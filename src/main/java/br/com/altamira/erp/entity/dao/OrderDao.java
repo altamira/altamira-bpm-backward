@@ -4,8 +4,11 @@
  */
 package br.com.altamira.erp.entity.dao;
 
+import br.com.altamira.erp.entity.model.PaymentCondition;
+import br.com.altamira.erp.entity.model.PaymentConditionItem;
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
+import br.com.altamira.erp.entity.model.PurchaseOrderPayment;
 import br.com.altamira.erp.entity.model.PurchaseOrderReportLog;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
@@ -134,12 +137,16 @@ public class OrderDao {
     public long insertPurchaseOrder(PurchaseOrder purchaseOrder) {
 
         entityManager.persist(purchaseOrder);
+        entityManager.flush();
+        
         return purchaseOrder.getId();
     }
 
     public long insertPurchaseOrderItem(PurchaseOrderItem purchaseOrderItem) {
 
         entityManager.persist(purchaseOrderItem);
+        entityManager.flush();
+        
         return purchaseOrderItem.getId();
     }
 
@@ -165,5 +172,20 @@ public class OrderDao {
         resultMap.put("MAIL_ADDRESS", result[2]);
 
         return resultMap;
+    }
+    
+    public List<PaymentConditionItem> findPaymentConditionItemsByPaymentCondition(PaymentCondition paymentCondition) {
+        
+        return entityManager.createQuery("SELECT pci FROM PaymentConditionItem pci WHERE pci.paymentCondition = :paymentCondition")
+                .setParameter("paymentCondition", paymentCondition)
+                .getResultList();
+    }
+    
+    public BigDecimal insertPurchaseOrderPayment(PurchaseOrderPayment purchaseOrderPayment)
+    {
+        entityManager.persist(purchaseOrderPayment);
+        entityManager.flush();
+        
+        return purchaseOrderPayment.getId();
     }
 }
