@@ -81,8 +81,8 @@ WHERE QI.QUOTATION = $P{QUOTATION_ID}]]>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
-		<band height="63" splitType="Stretch">
+	<pageHeader>
+		<band height="63">
 			<frame>
 				<reportElement uuid="3ddcb77c-a0af-40f2-b879-9ed4854087f2" x="0" y="0" width="802" height="60"/>
 				<box>
@@ -170,9 +170,9 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</textField>
 			</frame>
 		</band>
-	</title>
-	<pageHeader>
-		<band height="66" splitType="Stretch">
+	</pageHeader>
+	<detail>
+		<band height="66">
 			<staticText>
 				<reportElement uuid="e05a3a44-f7ff-4064-9a42-884daad58323" x="1" y="47" width="45" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -220,8 +220,6 @@ new DecimalFormat("#00000").format($P{QUOTATION_ID})+
 				<text><![CDATA[Quotação]]></text>
 			</staticText>
 		</band>
-	</pageHeader>
-	<detail>
 		<band height="90">
 			<crosstab columnBreakOffset="500" ignoreWidth="false">
 				<reportElement uuid="fea5b996-0ac0-40e1-8e7a-4c15351b7363" style="Crosstab Data Text" mode="Transparent" x="0" y="5" width="802" height="62"/>
