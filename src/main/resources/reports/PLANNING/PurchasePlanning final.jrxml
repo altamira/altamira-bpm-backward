@@ -178,7 +178,7 @@ GROUP BY PP.CREATED_DATE, PP.QUOTATION]]>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
-	<title>
+	<pageHeader>
 		<band height="63" splitType="Stretch">
 			<frame>
 				<reportElement uuid="5166b836-c3e6-4958-b769-434b95988252" x="0" y="0" width="802" height="60"/>
@@ -267,8 +267,8 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 				</textField>
 			</frame>
 		</band>
-	</title>
-	<pageHeader>
+	</pageHeader>
+	<detail>
 		<band height="46" splitType="Stretch">
 			<textField>
 				<reportElement uuid="945dee5b-908b-48f6-a9ad-3e4693152455" x="0" y="14" width="802" height="15"/>
@@ -303,11 +303,9 @@ new DecimalFormat("#00000").format($P{PLANNING_ID})+
 				<text><![CDATA[Planejamento de Compra]]></text>
 			</staticText>
 		</band>
-	</pageHeader>
-	<detail>
-		<band height="68" splitType="Stretch">
+		<band height="71">
 			<crosstab columnBreakOffset="100">
-				<reportElement uuid="81e92333-0a1e-4cf4-b553-f71b1eb4fc4f" positionType="Float" x="0" y="2" width="802" height="44"/>
+				<reportElement uuid="81e92333-0a1e-4cf4-b553-f71b1eb4fc4f" positionType="Float" x="0" y="5" width="802" height="44"/>
 				<crosstabDataset isDataPreSorted="true">
 					<dataset>
 						<datasetRun subDataset="supplierDataSet" uuid="38d41c99-b122-4219-856d-906f406aea9b">
@@ -651,7 +649,7 @@ new DecimalFormat("#00000").format($P{PLANNING_ID})+
 				</crosstabCell>
 			</crosstab>
 			<textField>
-				<reportElement uuid="debe7396-50c5-47e8-b1ce-48cb20a0e7ea" positionType="Float" x="148" y="46" width="45" height="20"/>
+				<reportElement uuid="debe7396-50c5-47e8-b1ce-48cb20a0e7ea" positionType="Float" x="148" y="49" width="45" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -665,7 +663,7 @@ new DecimalFormat("#00000").format($P{PLANNING_ID})+
 				<textFieldExpression><![CDATA["Total:"]]></textFieldExpression>
 			</textField>
 			<textField pattern="#,##0.00">
-				<reportElement uuid="cc30b967-a5fb-4f1c-af89-cd9118de6bd0" positionType="Float" x="193" y="46" width="34" height="20"/>
+				<reportElement uuid="cc30b967-a5fb-4f1c-af89-cd9118de6bd0" positionType="Float" x="193" y="49" width="34" height="20"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>

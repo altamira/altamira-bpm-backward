@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="quotation" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="bff67084-cdee-40b4-8a72-c0d51495ce6b">
-	<property name="ireport.zoom" value="1.6105100000000037"/>
+	<property name="ireport.zoom" value="1.6105100000000039"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<property name="ireport.callouts" value="##Wed Jan 29 11:54:44 IST 2014"/>
@@ -60,9 +60,10 @@ AND QIQ.SUPPLIER = S.ID]]>
 			<defaultValueExpression><![CDATA[$P{QUOTATION_ID}]]></defaultValueExpression>
 		</parameter>
 		<queryString>
-			<![CDATA[SELECT QR.REQUEST FROM QUOTATION_REQUEST QR WHERE QR.QUOTATION = $P{QUOTATION_ID}]]>
+			<![CDATA[SELECT QR.REQUEST, R.CREATED_DATE FROM QUOTATION_REQUEST QR, REQUEST R WHERE QR.QUOTATION = $P{QUOTATION_ID} AND R.ID = QR.REQUEST]]>
 		</queryString>
 		<field name="REQUEST" class="java.math.BigDecimal"/>
+		<field name="CREATED_DATE" class="java.sql.Timestamp"/>
 	</subDataset>
 	<parameter name="PRICELIST" class="java.util.List"/>
 	<parameter name="QUOTATION_ID" class="java.math.BigDecimal">
@@ -172,32 +173,39 @@ CNPJ: 43.799.295/0001-10    IE: 109.095.380.110]]></text>
 		</band>
 	</pageHeader>
 	<detail>
-		<band height="66">
+		<band height="89">
 			<staticText>
-				<reportElement uuid="e05a3a44-f7ff-4064-9a42-884daad58323" x="1" y="47" width="45" height="15"/>
+				<reportElement uuid="e05a3a44-f7ff-4064-9a42-884daad58323" x="1" y="47" width="110" height="15"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="8" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
 				</textElement>
-				<text><![CDATA[Requisição:]]></text>
+				<text><![CDATA[Requisições de Compra de Aço:]]></text>
 			</staticText>
 			<componentElement>
-				<reportElement uuid="0cb8242e-2637-4dc0-a940-f83f8d20ae0a" x="50" y="47" width="752" height="15"/>
-				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
+				<reportElement uuid="0cb8242e-2637-4dc0-a940-f83f8d20ae0a" x="0" y="64" width="800" height="18"/>
+				<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Horizontal" ignoreWidth="false">
 					<datasetRun subDataset="dataset2" uuid="2f738881-19a3-4825-8313-dcdf97a2a609">
 						<datasetParameter name="QUOTATION_ID">
 							<datasetParameterExpression><![CDATA[$P{QUOTATION_ID}]]></datasetParameterExpression>
 						</datasetParameter>
 						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
 					</datasetRun>
-					<jr:listContents height="15" width="752">
+					<jr:listContents height="18" width="80">
 						<textField>
-							<reportElement uuid="7f897eba-063d-41d1-a664-03df5ffaffdc" x="2" y="0" width="750" height="15"/>
-							<textElement textAlignment="Left" verticalAlignment="Middle">
+							<reportElement uuid="7f897eba-063d-41d1-a664-03df5ffaffdc" x="0" y="0" width="75" height="15"/>
+							<box leftPadding="3">
+								<pen lineWidth="0.5"/>
+								<topPen lineWidth="0.5"/>
+								<leftPen lineWidth="0.5"/>
+								<bottomPen lineWidth="0.5"/>
+								<rightPen lineWidth="0.5"/>
+							</box>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 							</textElement>
-							<textFieldExpression><![CDATA["Nro "
-+ new DecimalFormat("#00000").format($F{REQUEST})
-+" - Requisicao de Compra de Aço"]]></textFieldExpression>
+							<textFieldExpression><![CDATA[new DecimalFormat("#00000").format($F{REQUEST})
++"  "+
+(new SimpleDateFormat("dd/MM/yyyy")).format($F{CREATED_DATE})]]></textFieldExpression>
 						</textField>
 					</jr:listContents>
 				</jr:list>

@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="purchaseOrder" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="76524c99-dab0-4afb-9cde-69ae493a1626">
 	<property name="ireport.zoom" value="1.9487171000000099"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="1157"/>
+	<property name="ireport.y" value="0"/>
 	<subDataset name="productsDataset" uuid="b0114484-5912-402a-bb48-bbbaf3e417a6">
 		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
 			<defaultValueExpression><![CDATA[$P{PURCHASE_ORDER_ID}]]></defaultValueExpression>
@@ -203,8 +203,7 @@ and c.location_address = la.id]]>
 		<queryString>
 			<![CDATA[select cp.id as contact_person_id,
        cp.first_name,
-       cp.last_name,
-       (select cpm.address from contact_person_mail cpm where cpm.contact_person = cp.id) as email
+       cp.last_name
 from supplier s,
      supplier_contact_person scp,
      contact_person cp
@@ -215,7 +214,6 @@ and scp.contact_person = cp.id]]>
 		<field name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
 		<field name="FIRST_NAME" class="java.lang.String"/>
 		<field name="LAST_NAME" class="java.lang.String"/>
-		<field name="EMAIL" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="foneDataset" uuid="7682aa6f-9d35-4583-9789-624e66fce1f9">
 		<parameter name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
@@ -279,8 +277,7 @@ WHERE POY.PURCHASE_ORDER = $P{PURCHASE_ORDER_ID}]]>
 		<queryString>
 			<![CDATA[select cic.contact_person as contact_person_id,
        cp.first_name,
-       cp.last_name,
-       (select cpm.address from contact_person_mail cpm where cpm.contact_person = cic.contact_person) as email
+       cp.last_name
 from company_invoice_contact cic,
      contact_person cp
 where cic.company = (select company_invoice from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
@@ -289,7 +286,6 @@ and cic.contact_person = cp.id]]>
 		<field name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
 		<field name="FIRST_NAME" class="java.lang.String"/>
 		<field name="LAST_NAME" class="java.lang.String"/>
-		<field name="EMAIL" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="contact_CobrancaDataset" uuid="59018140-f33a-4720-8c60-d0557ab21f26">
 		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
@@ -298,8 +294,7 @@ and cic.contact_person = cp.id]]>
 		<queryString>
 			<![CDATA[select cic.contact_person as contact_person_id,
        cp.first_name,
-       cp.last_name,
-       (select cpm.address from contact_person_mail cpm where cpm.contact_person = cic.contact_person) as email
+       cp.last_name
 from company_billing_contact cic,
      contact_person cp
 where cic.company = (select company_billing from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
@@ -308,7 +303,6 @@ and cic.contact_person = cp.id]]>
 		<field name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
 		<field name="FIRST_NAME" class="java.lang.String"/>
 		<field name="LAST_NAME" class="java.lang.String"/>
-		<field name="EMAIL" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="contact_EntregaDataset" uuid="c7bcafc2-c4d9-4b7e-b253-1431702cde0e">
 		<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal">
@@ -317,8 +311,7 @@ and cic.contact_person = cp.id]]>
 		<queryString>
 			<![CDATA[select cic.contact_person as contact_person_id,
        cp.first_name,
-       cp.last_name,
-       (select cpm.address from contact_person_mail cpm where cpm.contact_person = cic.contact_person) as email
+       cp.last_name
 from company_shipping_contact cic,
      contact_person cp
 where cic.company = (select company_shipping from purchase_order po where po.id = $P{PURCHASE_ORDER_ID})
@@ -327,7 +320,6 @@ and cic.contact_person = cp.id]]>
 		<field name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
 		<field name="FIRST_NAME" class="java.lang.String"/>
 		<field name="LAST_NAME" class="java.lang.String"/>
-		<field name="EMAIL" class="java.lang.String"/>
 	</subDataset>
 	<subDataset name="personDetailsDataset" uuid="b5c7b1c3-755a-49e9-aad1-e4f9ad6449da">
 		<parameter name="USERNAME" class="java.lang.String">
@@ -355,6 +347,15 @@ where upper(u.name) = upper($P{USERNAME})
 and p.id(+) = u.person)]]>
 		</queryString>
 		<field name="DETAILS" class="java.lang.String"/>
+	</subDataset>
+	<subDataset name="emailDataset" uuid="92ccbe70-a4b6-44b5-a910-c888ada52e52">
+		<parameter name="CONTACT_PERSON_ID" class="java.math.BigDecimal"/>
+		<queryString>
+			<![CDATA[select cpm.address
+from contact_person_mail cpm
+where cpm.contact_person = $P{CONTACT_PERSON_ID}]]>
+		</queryString>
+		<field name="ADDRESS" class="java.lang.String"/>
 	</subDataset>
 	<parameter name="altamira_logo" class="java.lang.Object"/>
 	<parameter name="PURCHASE_ORDER_ID" class="java.math.BigDecimal"/>
@@ -528,7 +529,7 @@ FROM
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<componentElement>
-					<reportElement uuid="cb467200-7325-408b-a1c9-590fc253adff" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="4" y="59" width="549" height="33"/>
+					<reportElement uuid="cb467200-7325-408b-a1c9-590fc253adff" positionType="Float" mode="Transparent" x="4" y="59" width="549" height="33"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="contactDataset" uuid="94dad8ad-147d-4f3b-a608-bf679c761467">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -565,22 +566,8 @@ FROM
 								</textElement>
 								<text><![CDATA[E-mail]]></text>
 							</staticText>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="e9ee626e-e071-4e84-bc1e-c256b02af8c7" x="256" y="2" width="291" height="12"/>
-								<box leftPadding="2">
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
-								</box>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
-							</textField>
 							<componentElement>
-								<reportElement uuid="3d3279a0-128f-4c4c-8df6-7cdb28f2c753" positionType="Float" stretchType="RelativeToBandHeight" x="54" y="17" width="494" height="14"/>
+								<reportElement uuid="3d3279a0-128f-4c4c-8df6-7cdb28f2c753" positionType="Float" x="54" y="17" width="494" height="14"/>
 								<jr:list printOrder="Horizontal" ignoreWidth="false">
 									<datasetRun subDataset="foneDataset" uuid="0560bc8a-949f-4e56-bff4-b8b0f44d890b">
 										<datasetParameter name="CONTACT_PERSON_ID">
@@ -665,6 +652,33 @@ FROM
 												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{EXTENSION}]]></textFieldExpression>
+										</textField>
+									</jr:listContents>
+								</jr:list>
+							</componentElement>
+							<componentElement>
+								<reportElement uuid="baf4d34c-81f8-4590-be1c-2687615082aa" positionType="Float" x="256" y="2" width="291" height="15"/>
+								<jr:list printOrder="Vertical">
+									<datasetRun subDataset="emailDataset" uuid="8b2a6032-63a9-4895-86b3-4e4f40a73e6b">
+										<datasetParameter name="CONTACT_PERSON_ID">
+											<datasetParameterExpression><![CDATA[$F{CONTACT_PERSON_ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:listContents height="15" width="291">
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="e9ee626e-e071-4e84-bc1e-c256b02af8c7" x="0" y="0" width="291" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
 										</textField>
 									</jr:listContents>
 								</jr:list>
@@ -916,7 +930,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<componentElement>
-					<reportElement uuid="0f77accd-5e82-488e-b18b-b7b50b3605a0" positionType="Float" stretchType="RelativeToBandHeight" x="4" y="1" width="549" height="45"/>
+					<reportElement uuid="0f77accd-5e82-488e-b18b-b7b50b3605a0" positionType="Float" x="4" y="1" width="549" height="45"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="faturamentoDataset" uuid="5208453d-ae2a-4a8d-81b3-6e7c713286cd">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1111,7 +1125,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 					</jr:list>
 				</componentElement>
 				<componentElement>
-					<reportElement uuid="b3f46831-898a-41bb-9e2e-df2f3744e087" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="4" y="46" width="549" height="33"/>
+					<reportElement uuid="b3f46831-898a-41bb-9e2e-df2f3744e087" positionType="Float" mode="Transparent" x="4" y="46" width="549" height="33"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="contact_faturamentoDataset" uuid="095fc6ef-150c-490d-9679-5ce25a0c28c3">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1148,22 +1162,8 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 								</textElement>
 								<text><![CDATA[E-mail]]></text>
 							</staticText>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="ef351f42-b3bd-4fcc-8c65-56a5e8fa8504" x="253" y="2" width="294" height="12"/>
-								<box leftPadding="2">
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
-								</box>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
-							</textField>
 							<componentElement>
-								<reportElement uuid="af0f3e85-82a8-4e01-a901-0df3933773a8" positionType="Float" stretchType="RelativeToBandHeight" x="54" y="17" width="494" height="14"/>
+								<reportElement uuid="af0f3e85-82a8-4e01-a901-0df3933773a8" positionType="Float" x="54" y="17" width="494" height="14"/>
 								<jr:list printOrder="Horizontal" ignoreWidth="false">
 									<datasetRun subDataset="foneDataset" uuid="47494e3e-4b1f-47f7-8ef3-56ed6d3f6fc5">
 										<datasetParameter name="CONTACT_PERSON_ID">
@@ -1248,6 +1248,33 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{EXTENSION}]]></textFieldExpression>
+										</textField>
+									</jr:listContents>
+								</jr:list>
+							</componentElement>
+							<componentElement>
+								<reportElement uuid="d6201aeb-cfef-43c9-93ae-7b856e9c3727" positionType="Float" x="253" y="2" width="294" height="15"/>
+								<jr:list>
+									<datasetRun subDataset="emailDataset" uuid="14728467-7646-4e3f-89a9-ced9a8058ce8">
+										<datasetParameter name="CONTACT_PERSON_ID">
+											<datasetParameterExpression><![CDATA[$F{CONTACT_PERSON_ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:listContents height="15" width="294">
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="ef351f42-b3bd-4fcc-8c65-56a5e8fa8504" x="0" y="0" width="294" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
 										</textField>
 									</jr:listContents>
 								</jr:list>
@@ -1421,7 +1448,7 @@ $F{PERIOD} + " dia(s)"]]></textFieldExpression>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<componentElement>
-					<reportElement uuid="e71287fd-6464-414c-9965-73895c7b387c" positionType="Float" stretchType="RelativeToBandHeight" x="4" y="1" width="549" height="45"/>
+					<reportElement uuid="e71287fd-6464-414c-9965-73895c7b387c" positionType="Float" x="4" y="1" width="549" height="45"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="CobrancaDataset" uuid="5d6fedc6-6a3c-4575-a49d-006833e3c8c6">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1616,7 +1643,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 					</jr:list>
 				</componentElement>
 				<componentElement>
-					<reportElement uuid="ad15f192-eb98-4395-9310-fb1ea537eab1" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="4" y="46" width="549" height="33"/>
+					<reportElement uuid="ad15f192-eb98-4395-9310-fb1ea537eab1" positionType="Float" mode="Transparent" x="4" y="46" width="549" height="33"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="contact_CobrancaDataset" uuid="2f334bd3-1da9-4c5e-9463-a2327100678e">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -1653,22 +1680,8 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 								</textElement>
 								<text><![CDATA[E-mail]]></text>
 							</staticText>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="a10f0890-811a-4c29-b4d7-e8e63445d0dd" x="253" y="2" width="294" height="12"/>
-								<box leftPadding="2">
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
-								</box>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
-							</textField>
 							<componentElement>
-								<reportElement uuid="f716bd65-f0e5-4413-a1ec-0a7d0388d4a4" positionType="Float" stretchType="RelativeToBandHeight" x="54" y="17" width="494" height="14"/>
+								<reportElement uuid="f716bd65-f0e5-4413-a1ec-0a7d0388d4a4" positionType="Float" x="54" y="17" width="494" height="14"/>
 								<jr:list printOrder="Horizontal" ignoreWidth="false">
 									<datasetRun subDataset="foneDataset" uuid="fa0b66d6-28fb-4bb1-bed2-c01fe4d9e268">
 										<datasetParameter name="CONTACT_PERSON_ID">
@@ -1757,6 +1770,33 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 									</jr:listContents>
 								</jr:list>
 							</componentElement>
+							<componentElement>
+								<reportElement uuid="0bc97f83-61f7-40f4-b30f-5b54ec94c308" positionType="Float" x="253" y="2" width="294" height="15"/>
+								<jr:list>
+									<datasetRun subDataset="emailDataset" uuid="0cc8f73e-4b4f-4fc1-b829-fd0cca94bf52">
+										<datasetParameter name="CONTACT_PERSON_ID">
+											<datasetParameterExpression><![CDATA[$F{CONTACT_PERSON_ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:listContents height="15" width="294">
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="a10f0890-811a-4c29-b4d7-e8e63445d0dd" x="0" y="0" width="294" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
+										</textField>
+									</jr:listContents>
+								</jr:list>
+							</componentElement>
 						</jr:listContents>
 					</jr:list>
 				</componentElement>
@@ -1788,7 +1828,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<componentElement>
-					<reportElement uuid="3e581739-2f23-4ba8-b41d-671b0afc39d6" positionType="Float" stretchType="RelativeToBandHeight" x="4" y="1" width="549" height="58"/>
+					<reportElement uuid="3e581739-2f23-4ba8-b41d-671b0afc39d6" positionType="Float" x="4" y="1" width="549" height="58"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="EntregaDataset" uuid="d7656db7-4611-4f0b-a170-b776458db718">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -2046,7 +2086,7 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 					</jr:list>
 				</componentElement>
 				<componentElement>
-					<reportElement uuid="041b900d-99c0-4c2b-ad7e-e3f43a7761b5" positionType="Float" stretchType="RelativeToBandHeight" mode="Transparent" x="4" y="59" width="549" height="33"/>
+					<reportElement uuid="041b900d-99c0-4c2b-ad7e-e3f43a7761b5" positionType="Float" mode="Transparent" x="4" y="59" width="549" height="33"/>
 					<jr:list xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd" printOrder="Vertical">
 						<datasetRun subDataset="contact_EntregaDataset" uuid="72ef5255-1ee3-495c-ba91-1306038c440f">
 							<datasetParameter name="PURCHASE_ORDER_ID">
@@ -2083,22 +2123,8 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 								</textElement>
 								<text><![CDATA[E-mail]]></text>
 							</staticText>
-							<textField isBlankWhenNull="true">
-								<reportElement uuid="2306bf52-0502-42c7-bb24-2898c7dafb5a" x="253" y="2" width="294" height="12"/>
-								<box leftPadding="2">
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
-								</box>
-								<textElement verticalAlignment="Middle">
-									<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{EMAIL}]]></textFieldExpression>
-							</textField>
 							<componentElement>
-								<reportElement uuid="718883e6-9abe-41b5-a983-2f8fb9d057a8" positionType="Float" stretchType="RelativeToBandHeight" x="54" y="17" width="494" height="14"/>
+								<reportElement uuid="718883e6-9abe-41b5-a983-2f8fb9d057a8" positionType="Float" x="54" y="17" width="494" height="14"/>
 								<jr:list printOrder="Horizontal" ignoreWidth="false">
 									<datasetRun subDataset="foneDataset" uuid="180201a5-1703-4934-ad76-95a6163e0b7c">
 										<datasetParameter name="CONTACT_PERSON_ID">
@@ -2183,6 +2209,33 @@ $F{STATE_TAX_ID}.substring(9)]]></textFieldExpression>
 												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 											</textElement>
 											<textFieldExpression><![CDATA[$F{EXTENSION}]]></textFieldExpression>
+										</textField>
+									</jr:listContents>
+								</jr:list>
+							</componentElement>
+							<componentElement>
+								<reportElement uuid="a90e2412-c296-407c-a43e-34b0cd7f1311" positionType="Float" x="253" y="2" width="294" height="15"/>
+								<jr:list>
+									<datasetRun subDataset="emailDataset" uuid="f90f50eb-99d1-4a55-bfef-4fb9fa185afa">
+										<datasetParameter name="CONTACT_PERSON_ID">
+											<datasetParameterExpression><![CDATA[$F{CONTACT_PERSON_ID}]]></datasetParameterExpression>
+										</datasetParameter>
+										<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+									</datasetRun>
+									<jr:listContents height="15" width="294">
+										<textField isBlankWhenNull="true">
+											<reportElement uuid="2306bf52-0502-42c7-bb24-2898c7dafb5a" x="0" y="0" width="294" height="12"/>
+											<box leftPadding="2">
+												<pen lineWidth="0.5"/>
+												<topPen lineWidth="0.5"/>
+												<leftPen lineWidth="0.5"/>
+												<bottomPen lineWidth="0.5"/>
+												<rightPen lineWidth="0.5"/>
+											</box>
+											<textElement verticalAlignment="Middle">
+												<font fontName="Times New Roman" size="8" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
+											</textElement>
+											<textFieldExpression><![CDATA[$F{ADDRESS}]]></textFieldExpression>
 										</textField>
 									</jr:listContents>
 								</jr:list>
