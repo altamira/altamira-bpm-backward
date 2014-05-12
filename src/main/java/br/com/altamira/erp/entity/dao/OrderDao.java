@@ -15,6 +15,7 @@ import java.io.ObjectOutputStream;
 import java.math.BigDecimal;
 import java.sql.Blob;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -150,28 +151,38 @@ public class OrderDao {
         return purchaseOrderItem.getId();
     }
 
-    public Map getSupplierMailAddressForPurchaseOrder(BigDecimal purchaseOrderId) {
+    public List<Map> getSupplierMailAddressForPurchaseOrder(BigDecimal purchaseOrderId) {
 
         StringBuffer selectSql = new StringBuffer().append(" SELECT PO.ID, ")
                                                    .append("        S.NAME, ")
-                                                   .append("        SC.MAIL_ADDRESS ")
+                                                   .append("        CPM.ADDRESS AS MAIL_ADDRESS ")
                                                    .append(" FROM PURCHASE_ORDER PO, ")
                                                    .append("      SUPPLIER S, ")
-                                                   .append("      SUPPLIER_CONTACT SC ")
-                                                   .append(" WHERE PO.ID = :purchase_order_id ")
-                                                   .append(" AND PO.SUPPLIER = S.ID ")
-                                                   .append(" AND S.ID = SC.SUPPLIER ");
+                                                   .append("      SUPPLIER_CONTACT_PERSON SCP, ")
+                                                   .append("      CONTACT_PERSON_MAIL CPM ")
+                                                   .append(" WHERE PO.ID = :purchase_order_id AND ")
+                                                   .append("       PO.SUPPLIER = S.ID AND ")
+                                                   .append("       S.ID = SCP.SUPPLIER AND ")
+                                                   .append("       SCP.CONTACT_PERSON = CPM.CONTACT_PERSON ");
 
-        Object[] result = (Object[]) entityManager.createNativeQuery(selectSql.toString())
-                .setParameter("purchase_order_id", purchaseOrderId)
-                .getSingleResult();
+        List<Object[]> result = (List<Object[]>) entityManager.createNativeQuery(selectSql.toString())
+                                                              .setParameter("purchase_order_id", purchaseOrderId)
+                                                              .getResultList();
 
-        Map resultMap = new HashMap();
-        resultMap.put("PURCHASE_ORDER_ID", result[0]);
-        resultMap.put("SUPPLIER_NAME", result[1]);
-        resultMap.put("MAIL_ADDRESS", result[2]);
+        List<Map> resultList = new ArrayList<Map>();
+        
+        for(Object[] res : result)
+        {
+            Map resultMap = new HashMap();
+            resultMap.put("PURCHASE_ORDER_ID", res[0]);
+            resultMap.put("SUPPLIER_NAME", res[1]);
+            resultMap.put("MAIL_ADDRESS", res[2]);
+            
+            resultList.add(resultMap);
+        }
+        
 
-        return resultMap;
+        return resultList;
     }
     
     public List<PaymentConditionItem> findPaymentConditionItemsByPaymentCondition(PaymentCondition paymentCondition) {

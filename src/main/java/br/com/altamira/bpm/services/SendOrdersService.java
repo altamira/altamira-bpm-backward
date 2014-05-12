@@ -30,6 +30,11 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.hibernate.jdbc.ReturningWork;
 
 import br.com.altamira.erp.entity.dao.OrderDao;
+import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.Context;
 import org.hibernate.Session;
 
 /**
@@ -37,7 +42,6 @@ import org.hibernate.Session;
  * @author PARTH
  */
 @Stateless
-//@TransactionManagement(TransactionManagementType.BEAN)
 public class SendOrdersService implements JavaDelegate {
 
     @PersistenceContext(name = "persistence/altamira-bpm", unitName = "altamira-bpm-PU")
@@ -46,8 +50,8 @@ public class SendOrdersService implements JavaDelegate {
     @Inject
     private OrderDao orderDao;
     
-    @Inject
-    private IdentityService identityService;
+    @Context
+    private HttpServletRequest httpRequest;
 
     @Inject
     private MailService mailService;
@@ -69,21 +73,34 @@ public class SendOrdersService implements JavaDelegate {
             Map<String, InputStream> emailAttachmentList = new HashMap<String, InputStream>();
             emailAttachmentList.put("PurchaseOrderReport", bais);
 
-            Map supplierInfo = orderDao.getSupplierMailAddressForPurchaseOrder(purchaseOrderId);
-
+            List<Map> supplierInfo = orderDao.getSupplierMailAddressForPurchaseOrder(purchaseOrderId);
+            
+            BigDecimal pid =  (BigDecimal) (supplierInfo.get(0).get("PURCHASE_ORDER_ID"));
+            String supplierName = (String) (supplierInfo.get(0).get("SUPPLIER_NAME"));
+            
+            String toAddress = new String();
+            for (Map supplier : supplierInfo) {
+                
+                String tempAddress = (String) supplier.get("MAIL_ADDRESS");
+                if(toAddress.isEmpty())
+                    toAddress+=tempAddress;
+                else
+                    toAddress+=(","+tempAddress);
+            }
+            
             String message = "Please find the attachment for the Purchase Order";
 
             String subject = "Purchase Order ID :"
-                    + new DecimalFormat("#00000").format((BigDecimal) supplierInfo.get("PURCHASE_ORDER_ID"))
-                    + " Supplier: "
-                    + (String) supplierInfo.get("SUPPLIER_NAME");
+                           + new DecimalFormat("#00000").format(pid)
+                           + " Supplier: "
+                           + supplierName;
 
-            mailService.sendMail((String) supplierInfo.get("MAIL_ADDRESS"),
-                    null,
-                    null,
-                    subject,
-                    message,
-                    emailAttachmentList);
+            mailService.sendMail(toAddress,
+                                 null,
+                                 null,
+                                 subject,
+                                 message,
+                                 emailAttachmentList);
         }
 
     }
@@ -106,9 +123,7 @@ public class SendOrdersService implements JavaDelegate {
             Date purchaseOrderDate = orderDao.getPurchaseOrderCreatedDateById(orderId.longValue());
 
             parameters.put("PURCHASE_ORDER_DATE", purchaseOrderDate);
-            parameters.put("USERNAME", StringUtils.defaultIfEmpty(
-                    identityService.getCurrentAuthentication() == null
-                    ? "" : identityService.getCurrentAuthentication().getUserId(), ""));
+            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
 
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
