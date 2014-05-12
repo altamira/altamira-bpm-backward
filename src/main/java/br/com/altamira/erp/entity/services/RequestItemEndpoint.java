@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.dao.MaterialDao;
 import br.com.altamira.erp.entity.dao.RequestDao;
+import br.com.altamira.erp.entity.model.Company;
 import br.com.altamira.erp.entity.model.Material;
 import br.com.altamira.erp.entity.model.Request;
 import br.com.altamira.erp.entity.model.RequestItem;
@@ -45,7 +46,7 @@ public class RequestItemEndpoint {
 
     @POST
     @Consumes("application/json")
-    public Response create(@PathParam("request") long requestId, RequestItem entity) {
+    public Response create(@PathParam("request") Long requestId, RequestItem entity) {
     	entity.setId(null);
     	Material material = materialDao.create(entity.getMaterial());
     	entity.setMaterial(material);
@@ -63,7 +64,7 @@ public class RequestItemEndpoint {
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
-    public Response deleteById(@PathParam("id") long id) {
+    public Response deleteById(@PathParam("request") long requestId, @PathParam("id") Long id) {
         RequestItem entity = em.find(RequestItem.class, id);
         if (entity == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -75,7 +76,7 @@ public class RequestItemEndpoint {
     @GET
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
-    public Response findById(@PathParam("id") long id) {
+    public Response findById(@PathParam("request") long requestId, @PathParam("id") Long id) {
         TypedQuery<RequestItem> findByIdQuery = em.createNamedQuery("RequestItem.findById",RequestItem.class);
         findByIdQuery.setParameter("id", id);
         RequestItem entity;
@@ -109,16 +110,22 @@ public class RequestItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("id") long id, RequestItem entity) {
-    	//if (entity.getRequest() == null) {
-    		Request request = requestDao.getCurrent();
-    		request.getItems().add(entity);
+    public Response update(@PathParam("request") long requestId, @PathParam("id") Long id, RequestItem entity) {
+    	entity.setRequest(em.find(Request.class, requestId));
+    	entity.setId(id);
+    	/*if (entity.getRequest() == null) {
+    		Request request = requestDao.find(requestId);
+    		//request.getItems().add(entity);
     		entity.setRequest(request);
-    	//}
+    	}
+    	if (entity.getMaterial().getCompany() == null) {
+    		entity.getMaterial().setCompany(em.find(Company.class, 1));
+    	}*/
         entity = em.merge(entity);
-        return Response.ok(UriBuilder.fromResource(RequestItemEndpoint.class)
+        /*return Response.ok(UriBuilder.fromResource(RequestItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 }

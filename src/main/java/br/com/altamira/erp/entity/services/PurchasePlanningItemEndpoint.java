@@ -58,7 +58,7 @@ public class PurchasePlanningItemEndpoint {
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
-    public Response deleteById(@PathParam("id") long id) {
+    public Response deleteById(@PathParam("purchasePlanning") long purchasePlanningId, @PathParam("id") long id) {
         PurchasePlanningItem entity = em.find(PurchasePlanningItem.class, id);
         if (entity == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -70,7 +70,7 @@ public class PurchasePlanningItemEndpoint {
     @GET
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
-    public Response findById(@PathParam("id") long id) {
+    public Response findById(@PathParam("purchasePlanning") long purchasePlanningId, @PathParam("id") long id) {
         TypedQuery<PurchasePlanningItem> findByIdQuery = em.createNamedQuery("PurchasePlanningItem.findById", PurchasePlanningItem.class);
         findByIdQuery.setParameter("id", id);
         PurchasePlanningItem entity;
@@ -104,11 +104,14 @@ public class PurchasePlanningItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("id") long id, PurchasePlanningItem entity) {
+    public Response update(@PathParam("purchasePlanning") long purchasePlanningId, @PathParam("id") long id, PurchasePlanningItem entity) {
+    	entity.setPurchasePlanning(em.find(PurchasePlanning.class, purchasePlanningId));
+    	entity.setId(id);
         entity = em.merge(entity);
-        return Response.ok(UriBuilder.fromResource(PurchasePlanningItemEndpoint.class)
+        /*return Response.ok(UriBuilder.fromResource(PurchasePlanningItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 }

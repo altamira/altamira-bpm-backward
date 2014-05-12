@@ -112,12 +112,14 @@ public class QuotationItemQuoteEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("id") long id, QuotationItemQuote entity) {
+    public Response update(@PathParam("quotation") long quotationId, @PathParam("item") long quotationItemId, @PathParam("id") long id, QuotationItemQuote entity) {
+    	entity.setQuotationItem(em.find(QuotationItem.class, quotationItemId));
     	entity.setId(id);
         entity = em.merge(entity);
-        return Response.ok(UriBuilder.fromResource(QuotationItemQuoteEndpoint.class)
+        /*return Response.ok(UriBuilder.fromResource(QuotationItemQuoteEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 }

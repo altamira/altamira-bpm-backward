@@ -52,7 +52,7 @@ public class PurchaseOrderItemEndpoint {
 
     @DELETE
     @Path("/{id:[0-9][0-9]*}")
-    public Response deleteById(@PathParam("id") long id) {
+    public Response deleteById(@PathParam("purchaseOrder") long purchaseOrderId, @PathParam("id") long id) {
         PurchaseOrderItem entity = em.find(PurchaseOrderItem.class, id);
         if (entity == null) {
             return Response.status(Status.NOT_FOUND).build();
@@ -64,7 +64,7 @@ public class PurchaseOrderItemEndpoint {
     @GET
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
-    public Response findById(@PathParam("id") long id) {
+    public Response findById(@PathParam("purchaseOrder") long purchaseOrderId, @PathParam("id") long id) {
         TypedQuery<PurchaseOrderItem> findByIdQuery = em.createNamedQuery("PurchaseOrderItem.findById", PurchaseOrderItem.class);
         findByIdQuery.setParameter("id", id);
         PurchaseOrderItem entity;
@@ -98,11 +98,14 @@ public class PurchaseOrderItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("id") long id, PurchaseOrderItem entity) {
+    public Response update(@PathParam("purchaseOrder") long purchaseOrderId, @PathParam("id") long id, PurchaseOrderItem entity) {
+    	entity.setPurchaseOrder(em.find(PurchaseOrder.class, purchaseOrderId));
+    	entity.setId(id);
         entity = em.merge(entity);
-        return Response.ok(UriBuilder.fromResource(PurchaseOrderItemEndpoint.class)
+        /*return Response.ok(UriBuilder.fromResource(PurchaseOrderItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
-                .build();
+                .build();*/
+        return Response.ok().entity(entity).build();
     }
 }
