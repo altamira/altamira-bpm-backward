@@ -43,7 +43,7 @@ public class PaymentCondition implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 20)
@@ -57,20 +57,20 @@ public class PaymentCondition implements Serializable {
     public PaymentCondition() {
     }
 
-    public PaymentCondition(BigDecimal id) {
+    public PaymentCondition(Long id) {
         this.id = id;
     }
 
-    public PaymentCondition(BigDecimal id, String name) {
+    public PaymentCondition(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

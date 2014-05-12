@@ -40,7 +40,7 @@ public class SupplierContactPerson implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Size(max = 20)
     @Column(name = "DEPARTMENT", columnDefinition = "varchar2(20)")
     private String department;
@@ -54,15 +54,15 @@ public class SupplierContactPerson implements Serializable {
     public SupplierContactPerson() {
     }
 
-    public SupplierContactPerson(BigDecimal id) {
+    public SupplierContactPerson(Long id) {
         this.id = id;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

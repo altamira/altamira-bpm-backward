@@ -45,7 +45,7 @@ public class ContactPersonFone implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Column(name = "AREA_CODE")
     private Integer areaCode;
     @Column(name = "PREFIX")
@@ -69,20 +69,20 @@ public class ContactPersonFone implements Serializable {
     public ContactPersonFone() {
     }
 
-    public ContactPersonFone(BigDecimal id) {
+    public ContactPersonFone(Long id) {
         this.id = id;
     }
 
-    public ContactPersonFone(BigDecimal id, short countryCode) {
+    public ContactPersonFone(Long id, short countryCode) {
         this.id = id;
         this.countryCode = countryCode;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

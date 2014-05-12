@@ -44,7 +44,7 @@ public class Company implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 50)
@@ -78,20 +78,20 @@ public class Company implements Serializable {
     public Company() {
     }
 
-    public Company(BigDecimal id) {
+    public Company(Long id) {
         this.id = id;
     }
 
-    public Company(BigDecimal id, String name) {
+    public Company(Long id, String name) {
         this.id = id;
         this.name = name;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

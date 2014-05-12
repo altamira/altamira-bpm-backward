@@ -41,7 +41,7 @@ public class PaymentConditionItem implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Column(name = "PERIOD")
@@ -57,21 +57,21 @@ public class PaymentConditionItem implements Serializable {
     public PaymentConditionItem() {
     }
 
-    public PaymentConditionItem(BigDecimal id) {
+    public PaymentConditionItem(Long id) {
         this.id = id;
     }
 
-    public PaymentConditionItem(BigDecimal id, BigInteger period, BigInteger percentage) {
+    public PaymentConditionItem(Long id, BigInteger period, BigInteger percentage) {
         this.id = id;
         this.period = period;
         this.percentage = percentage;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

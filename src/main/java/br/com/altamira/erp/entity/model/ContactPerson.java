@@ -44,7 +44,7 @@ public class ContactPerson implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 30)
@@ -63,20 +63,20 @@ public class ContactPerson implements Serializable {
     public ContactPerson() {
     }
 
-    public ContactPerson(BigDecimal id) {
+    public ContactPerson(Long id) {
         this.id = id;
     }
 
-    public ContactPerson(BigDecimal id, String firstName) {
+    public ContactPerson(Long id, String firstName) {
         this.id = id;
         this.firstName = firstName;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

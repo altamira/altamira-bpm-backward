@@ -48,7 +48,7 @@ public class LocationAddress implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "ID")
-    private BigDecimal id;
+    private Long id;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 100)
@@ -86,20 +86,20 @@ public class LocationAddress implements Serializable {
     public LocationAddress() {
     }
 
-    public LocationAddress(BigDecimal id) {
+    public LocationAddress(Long id) {
         this.id = id;
     }
 
-    public LocationAddress(BigDecimal id, String address) {
+    public LocationAddress(Long id, String address) {
         this.id = id;
         this.address = address;
     }
 
-    public BigDecimal getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(BigDecimal id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
