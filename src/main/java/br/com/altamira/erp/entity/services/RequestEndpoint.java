@@ -132,6 +132,7 @@ public class RequestEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response update(@PathParam("id") long id/*, Request entity*/) {
     	
     	Request request = requestDao.getCurrent();
@@ -141,13 +142,10 @@ public class RequestEndpoint {
     	Request entity = em.merge(request);
         em.flush();
 
-        /*
         Map<String, Object> variables = new HashMap<String, Object>();
-
         variables.put("requestId", request.getId());
 
         runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-        */
         
         return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

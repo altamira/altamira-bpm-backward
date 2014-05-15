@@ -321,12 +321,19 @@
 					<version>1.1.4.Final</version>
 					<scope>test</scope>
 				</dependency>
-				<!-- <dependency>
+				<dependency>
 					<groupId>org.jboss.resteasy</groupId>
 					<artifactId>resteasy-client</artifactId>
-					<version>3.0.4.Final</version>
-				</dependency> -->
-
+					<version>3.0.8.Final</version>
+                                        <scope>test</scope>
+				</dependency>
+                                <dependency>
+                                    <groupId>org.jboss.resteasy</groupId>
+                                    <artifactId>resteasy-jackson-provider</artifactId>
+                                    <version>3.0.8.Final</version>
+                                    <scope>test</scope>
+                                </dependency>
+                                
 
 			</dependencies>
 		</profile>
