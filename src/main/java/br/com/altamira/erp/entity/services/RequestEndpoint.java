@@ -52,6 +52,7 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  *
@@ -68,6 +69,9 @@ public class RequestEndpoint {
     
     @Inject
     private RequestDao requestDao;
+    
+    @Inject
+    private QuotationDao quotationDao;
     
     @Context
     private HttpServletRequest httpRequest;
@@ -142,10 +146,16 @@ public class RequestEndpoint {
     	Request entity = em.merge(request);
         em.flush();
 
+        // Start process instance
         Map<String, Object> variables = new HashMap<String, Object>();
         variables.put("requestId", request.getId());
 
-        runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+        String instanceId = processInstance.getProcessInstanceId();
+        
+        // call CREATE_QUOTATION procedure
+        Quotation quotation = quotationDao.getCurrent();
+        runtimeService.setVariable(instanceId, "quotationId", quotation.getId());
         
         return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

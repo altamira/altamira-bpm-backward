@@ -44,6 +44,8 @@ import javax.ws.rs.core.Context;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.task.Task;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
@@ -61,6 +63,9 @@ public class PurchasePlanningEndpoint {
 
     @Inject
     private PurchasePlanningDao purchasePlanningDao;
+    
+    @Inject
+    private TaskService taskService;
 
     @Inject
     private MailService mailService;
@@ -138,7 +143,7 @@ public class PurchasePlanningEndpoint {
     	PurchasePlanning entity = em.merge(purchasePlanning);
         em.flush();
 
-        // TO-DO send mail for notification for purchase planning approval
+        // send mail for notification for purchase planning approval
         String to = "alessandro.holanda@altamira.com.br";
         String cc = null;
         String bcc = null;
@@ -163,6 +168,13 @@ public class PurchasePlanningEndpoint {
 
         runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
         */
+        
+        // get relevant task for planningId
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", purchasePlanning.getId()).list();
+        
+        // complete task
+        Task task = tasks.get(0);
+        taskService.complete(task.getId());
 
         return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

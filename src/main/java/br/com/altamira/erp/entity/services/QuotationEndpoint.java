@@ -1,6 +1,8 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import br.com.altamira.erp.entity.dao.QuotationDao;
+import br.com.altamira.erp.entity.model.PurchasePlanning;
 
 import java.util.List;
 
@@ -55,6 +57,9 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.task.Task;
 import org.codehaus.jackson.type.TypeReference;
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
@@ -72,6 +77,15 @@ public class QuotationEndpoint {
 
     @Inject
     private QuotationDao quotationDao;
+    
+    @Inject
+    private PurchasePlanningDao purchasePlanningDao;
+    
+    @Inject
+    private RuntimeService runtimeService;
+    
+    @Inject
+    private TaskService taskService;
     
     @Context
     private HttpServletRequest httpRequest;
@@ -140,18 +154,22 @@ public class QuotationEndpoint {
     	
     	Quotation quotation = quotationDao.getCurrent();
     	
-    	quotation.setClosedDate(DateTime.now().toDate());
+        // get relevant task for quotationId
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("quotationId", quotation.getId()).list();
         
+        // complete task
+        Task task = tasks.get(0);
+        String instanceId = task.getProcessInstanceId();
+        taskService.complete(task.getId());
+        
+        // call CREATE_PURCHASE_PLANNING procedure
+        PurchasePlanning planning = purchasePlanningDao.getCurrent();
+        runtimeService.setVariable(instanceId, "planningId", planning.getId());
+        
+        // close Quotation
+    	quotation.setClosedDate(DateTime.now().toDate());
         Quotation entity = em.merge(quotation);
         em.flush();
-
-        /*
-        Map<String, Object> variables = new HashMap<String, Object>();
-
-        variables.put("requestId", request.getId());
-
-        runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-        */
         
         return Response.ok(UriBuilder.fromResource(QuotationEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())
