@@ -20,6 +20,7 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import static org.junit.Assert.*;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -31,11 +32,6 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class MaterialEndpointTest 
 {
-    
-    private static URI getBaseURI() 
-    {
-        return UriBuilder.fromUri("http://localhost/").port(8080).build();
-    }
     
     @Test
     public void testCreate() throws Exception
@@ -93,12 +89,13 @@ public class MaterialEndpointTest
         
         // Do the test
         Long materialId = mat.getId();
-        ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials");
+        ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials/"+materialId);
         request.accept(MediaType.APPLICATION_JSON);
         
         ClientResponse<Material> response = request.get(Material.class);
         Material materialResponse = response.getEntity();
         
+        // Check the results
         Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assert.assertEquals(mat.getId(), materialResponse.getId());
         
@@ -122,12 +119,82 @@ public class MaterialEndpointTest
     @Test
     public void testUpdate() throws Exception
     {
-        fail(); // yet to develop
+        Material material = new Material();
+
+        material.setId(null);
+        material.setLamination("XX");
+        material.setLength(new BigDecimal("1.5"));
+        material.setTax(new BigDecimal(3.4));
+        material.setThickness(new BigDecimal("9.8"));
+        material.setTreatment("XX");
+        material.setWidth(new BigDecimal("9.9"));
+        
+        ClientRequest req = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials");
+        req.accept(MediaType.APPLICATION_JSON);
+        req.body(MediaType.APPLICATION_JSON, material);
+        
+        ClientResponse<Material> res = req.post(Material.class);
+        Material materialToUpdate = res.getEntity();
+        
+        // Do the test
+        materialToUpdate.setLamination("ZY");
+        materialToUpdate.setLength(new BigDecimal("5.1"));
+        materialToUpdate.setThickness(new BigDecimal("2.2"));
+        materialToUpdate.setTreatment("ZX");
+        
+        ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials/"+materialToUpdate.getId());
+        request.accept(MediaType.APPLICATION_JSON);
+        request.body(MediaType.APPLICATION_JSON, materialToUpdate);
+        
+        ClientResponse<Material> response = request.put(Material.class);
+        Material materialUpdated = response.getEntity();
+        
+        // Check the results
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+        
+        ClientRequest requestTest = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials/"+materialUpdated.getId());
+        request.accept(MediaType.APPLICATION_JSON);
+        
+        ClientResponse<Material> responseTest = requestTest.get(Material.class);
+        Material materialTest = responseTest.getEntity();
+        
+        Assert.assertEquals(materialTest, materialToUpdate);
     }
     
     @Test
     public void testDelete() throws Exception
     {
-        fail(); // yet to develop
+        Material material = new Material();
+
+        material.setId(null);
+        material.setLamination("XX");
+        material.setLength(new BigDecimal("1.5"));
+        material.setTax(new BigDecimal(3.4));
+        material.setThickness(new BigDecimal("9.8"));
+        material.setTreatment("XX");
+        material.setWidth(new BigDecimal("9.9"));
+        
+        ClientRequest req = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials");
+        req.accept(MediaType.APPLICATION_JSON);
+        req.body(MediaType.APPLICATION_JSON, material);
+        
+        ClientResponse<Material> res = req.post(Material.class);
+        Material materialToDelete = res.getEntity();
+        
+        // Do the test
+        ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials/"+materialToDelete.getId());
+        request.accept(MediaType.APPLICATION_JSON);
+        
+        ClientResponse response = request.delete();
+        
+        // Check the results
+        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), response.getStatus());
+        
+        ClientRequest requestTest = new ClientRequest("http://localhost:8080/altamira-bpm/rest/materials/"+materialToDelete.getId());
+        request.accept(MediaType.APPLICATION_JSON);
+        
+        ClientResponse<Material> responseTest = requestTest.get(Material.class);
+        
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), responseTest.getStatus());
     }
 }

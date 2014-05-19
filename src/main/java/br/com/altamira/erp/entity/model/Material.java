@@ -75,7 +75,7 @@ public class Material implements Serializable {
     @Column(name = "TAX")
     private BigDecimal tax;
     @JoinColumn(name = "COMPANY", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
     private Company company;
 
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "material"/*, fetch = FetchType.LAZY*/)
