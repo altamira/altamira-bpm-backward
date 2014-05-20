@@ -52,7 +52,9 @@ import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  *
@@ -66,6 +68,9 @@ public class RequestEndpoint {
 
     @Inject
     private RuntimeService runtimeService;
+    
+    @Inject
+    private TaskService taskService;
     
     @Inject
     private RequestDao requestDao;
@@ -145,17 +150,36 @@ public class RequestEndpoint {
         
     	Request entity = em.merge(request);
         em.flush();
-
-        // Start process instance
-        Map<String, Object> variables = new HashMap<String, Object>();
-        variables.put("requestId", request.getId());
-
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
-        String instanceId = processInstance.getProcessInstanceId();
         
         // call CREATE_QUOTATION procedure
         Quotation quotation = quotationDao.getCurrent();
-        runtimeService.setVariable(instanceId, "quotationId", quotation.getId());
+        
+        // Check if quotation is found in any active quotation task?
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("quotationId", quotation.getId()).list();
+        
+        if(!tasks.isEmpty())
+        {
+            // add requestId to the existing process instance
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            
+            List<Long> requestIdList = (List<Long>) runtimeService.getVariable(instanceId, "requestId");
+            requestIdList.add(request.getId());
+            runtimeService.setVariable(instanceId, "requestId", requestIdList);
+        }
+        else
+        {
+            // Start process instance
+            List<Long> requestIdList = new ArrayList<Long>();
+            requestIdList.add(request.getId());
+            
+            Map<String, Object> variables = new HashMap<String, Object>();
+            variables.put("requestId", requestIdList);
+            
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("SteelRawMaterialPurchasingRequest", variables);
+            String instanceId = processInstance.getProcessInstanceId();
+            runtimeService.setVariable(instanceId, "quotationId", quotation.getId());
+        }
         
         return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

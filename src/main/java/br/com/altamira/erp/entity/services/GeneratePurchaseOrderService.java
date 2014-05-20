@@ -7,7 +7,6 @@ package br.com.altamira.erp.entity.services;
 import br.com.altamira.erp.entity.dao.OrderDao;
 import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import br.com.altamira.erp.entity.dao.SupplierDao;
-import br.com.altamira.erp.entity.model.PaymentCondition;
 import br.com.altamira.erp.entity.model.PaymentConditionItem;
 import br.com.altamira.erp.entity.model.PurchaseOrder;
 import br.com.altamira.erp.entity.model.PurchaseOrderItem;
@@ -24,9 +23,8 @@ import java.util.List;
 import java.util.Map;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.transaction.Transactional;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
@@ -35,7 +33,8 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * @author PARTH
  */
 @Stateless
-public class GeneratePurchaseOrderService implements JavaDelegate {
+@Named("generatePurchaseOrder")
+public class GeneratePurchaseOrderService {
 
     @Inject
     private OrderDao orderDao;
@@ -46,15 +45,14 @@ public class GeneratePurchaseOrderService implements JavaDelegate {
     @Inject
     private SupplierDao supplierDao;
 
-    @Override
     @Transactional
     public void execute(DelegateExecution de) throws Exception {
 
         System.out.println("Generate Order service task execution started...");
 
-        List<String> planningIdList = (List<String>) de.getVariable("planningId");
+        //List<String> planningIdList = (List<String>) de.getVariable("planningId");
 
-        BigDecimal planningId = new BigDecimal(planningIdList.get(0));
+        BigDecimal planningId = new BigDecimal(de.getVariable("planningId").toString());
 
         List<BigDecimal> supplierList = orderDao.selectDistinctSuppliersFromPurchasePlan(planningId.longValue());
 

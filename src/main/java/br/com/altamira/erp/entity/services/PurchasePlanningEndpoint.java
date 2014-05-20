@@ -136,9 +136,10 @@ public class PurchasePlanningEndpoint {
     @Consumes("application/json")
     public Response update(@PathParam("id") long id/*, PurchasePlanning entity*/) {
     	
-    	PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+    	//PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+        PurchasePlanning purchasePlanning = purchasePlanningDao.findPurchasePlanningById(id);
     	
-    	purchasePlanning.setApproveDate(DateTime.now().toDate());
+    	purchasePlanning.setClosedDate(DateTime.now().toDate());
         
     	PurchasePlanning entity = em.merge(purchasePlanning);
         em.flush();
