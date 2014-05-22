@@ -44,6 +44,7 @@ import javax.ws.rs.core.Context;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.task.Task;
 
@@ -63,6 +64,9 @@ public class PurchasePlanningEndpoint {
 
     @Inject
     private PurchasePlanningDao purchasePlanningDao;
+    
+    @Inject
+    private RuntimeService runtimeService;
     
     @Inject
     private TaskService taskService;
@@ -136,8 +140,7 @@ public class PurchasePlanningEndpoint {
     @Consumes("application/json")
     public Response update(@PathParam("id") long id/*, PurchasePlanning entity*/) {
     	
-    	//PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
-        PurchasePlanning purchasePlanning = purchasePlanningDao.findPurchasePlanningById(id);
+    	PurchasePlanning purchasePlanning = purchasePlanningDao.findOpenPurchasePlanning();
     	
     	purchasePlanning.setClosedDate(DateTime.now().toDate());
         
@@ -175,6 +178,8 @@ public class PurchasePlanningEndpoint {
         
         // complete task
         Task task = tasks.get(0);
+        String instanceId = task.getProcessInstanceId();
+        runtimeService.setVariable(instanceId, "quotationReopen", false);
         taskService.complete(task.getId());
 
         return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)

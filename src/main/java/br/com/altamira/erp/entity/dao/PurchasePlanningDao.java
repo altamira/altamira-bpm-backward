@@ -119,5 +119,17 @@ public class PurchasePlanningDao {
 
         return results.get(0);
     }
+    
+    public PurchasePlanning findOpenPurchasePlanning()
+    {   
+        List<PurchasePlanning> planning = entityManager.createNamedQuery("PurchasePlanning.getCurrent", PurchasePlanning.class)
+                                                       .getResultList();
+        
+        if (planning.isEmpty()) {
 
+            return null;
+        }
+
+        return planning.get(0);
+    }
 }

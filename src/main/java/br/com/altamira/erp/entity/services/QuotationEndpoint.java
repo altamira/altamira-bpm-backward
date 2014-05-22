@@ -166,6 +166,14 @@ public class QuotationEndpoint {
         PurchasePlanning planning = purchasePlanningDao.getCurrent();
         runtimeService.setVariable(instanceId, "planningId", planning.getId());
         
+        // remove quotation reopen variable
+        runtimeService.removeVariable(instanceId, "quotationReopen");
+//        Object obj = runtimeService.getVariable(instanceId, "quotationReopen");
+//        if(obj!=null)
+//        {
+//            boolean quotationReopen = (Boolean) obj;
+//        }
+        
         // close Quotation
     	quotation.setClosedDate(DateTime.now().toDate());
         Quotation entity = em.merge(quotation);

@@ -50,10 +50,8 @@ public class GeneratePurchaseOrderService {
 
         System.out.println("Generate Order service task execution started...");
 
-        //List<String> planningIdList = (List<String>) de.getVariable("planningId");
-
         BigDecimal planningId = new BigDecimal(de.getVariable("planningId").toString());
-
+        
         List<BigDecimal> supplierList = orderDao.selectDistinctSuppliersFromPurchasePlan(planningId.longValue());
 
         List<String> purchaseOrderIdList = new ArrayList<String>();

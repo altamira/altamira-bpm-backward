@@ -1,7 +1,9 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import br.com.altamira.erp.entity.dao.QuotationDao;
 import br.com.altamira.erp.entity.dao.RequestDao;
+import br.com.altamira.erp.entity.model.PurchasePlanning;
 
 import java.util.List;
 
@@ -78,6 +80,9 @@ public class RequestEndpoint {
     @Inject
     private QuotationDao quotationDao;
     
+    @Inject
+    private PurchasePlanningDao purchasePlanningDao;
+    
     @Context
     private HttpServletRequest httpRequest;
 
@@ -150,6 +155,36 @@ public class RequestEndpoint {
         
     	Request entity = em.merge(request);
         em.flush();
+        
+        //boolean isReopenNeeded = false;
+        // check if Purchase Planning is open or not.
+        PurchasePlanning planning = purchasePlanningDao.findOpenPurchasePlanning();
+        
+        if(planning!=null)
+        {
+            // In Camunda, go back to the quotation task (P.S. Find task based on planningId)
+            // TO-DO ************************************
+            List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", planning.getId()).list();
+            
+            if(!tasks.isEmpty())
+            {
+                Task task = tasks.get(0);
+                String instanceId = task.getProcessInstanceId();
+                
+                Object obj = runtimeService.getVariable(instanceId, "quotationReopen");
+                if(obj==null)
+                {
+                    // fetch respective quotation and reopen it.
+                    Quotation reopenQuotation =  planning.getQuotation();
+                    reopenQuotation.setClosedDate(null);
+                    em.merge(reopenQuotation);
+                    em.flush();
+                    
+                    runtimeService.setVariable(instanceId, "quotationReopen", true);
+                    taskService.complete(task.getId());
+                }
+            }
+        }
         
         // call CREATE_QUOTATION procedure
         Quotation quotation = quotationDao.getCurrent();
