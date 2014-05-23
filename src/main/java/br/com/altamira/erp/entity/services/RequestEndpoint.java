@@ -172,7 +172,7 @@ public class RequestEndpoint {
                 String instanceId = task.getProcessInstanceId();
                 
                 Object obj = runtimeService.getVariable(instanceId, "quotationReopen");
-                if(obj==null)
+                if(obj==null || ((Boolean) obj).equals(Boolean.FALSE))
                 {
                     // fetch respective quotation and reopen it.
                     Quotation reopenQuotation =  planning.getQuotation();
