@@ -198,6 +198,43 @@ public class PurchasePlanningEndpoint {
                 .entity(entity)
                 .build();
     }
+    
+    @PUT
+    @Path("/approvePlanning/{id:[0-9][0-9]*}")
+    @Produces("application/json")
+    public Response approvePlanning(@PathParam("id") long planningId,
+                                    @QueryParam("approved") boolean orderStatus,
+                                    @QueryParam("reason") String reason)
+    {
+        // find the relevant task of the Purchase planning
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", planningId).list();
+        
+        if(!tasks.isEmpty())
+        {
+            // get the purchase planning and set approve status
+            PurchasePlanning planning = purchasePlanningDao.findPurchasePlanningById(planningId);
+            planning.setApproveDate(DateTime.now().toDate());
+            
+            PurchasePlanning entity = em.merge(planning);
+            em.flush();
+        
+            // complete task
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            runtimeService.setVariable(task.getProcessInstanceId(), "approved", orderStatus);
+            runtimeService.setVariable(task.getProcessInstanceId(), "reason", reason);
+            taskService.complete(task.getId());
+            
+            return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
+                .path(String.valueOf(entity.getId())).build())
+                .entity(entity)
+                .build();
+        }
+        else
+        {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+    }
 
     @GET
     @Path("{id:[0-9][0-9]*}/report")

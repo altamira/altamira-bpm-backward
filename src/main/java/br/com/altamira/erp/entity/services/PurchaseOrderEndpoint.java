@@ -43,6 +43,9 @@ import javax.ws.rs.core.Context;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.task.Task;
 
 import org.hibernate.Session;
 import org.hibernate.jdbc.ReturningWork;
@@ -59,6 +62,12 @@ public class PurchaseOrderEndpoint {
     
     @Inject
     OrderDao orderDao;
+    
+    @Inject
+    private RuntimeService runtimeService;
+    
+    @Inject
+    private TaskService taskService;
     
     @Context
     private HttpServletRequest httpRequest;
@@ -129,6 +138,56 @@ public class PurchaseOrderEndpoint {
                 .path(String.valueOf(entity.getId())).build())
                 .entity(entity)
                 .build();
+    }
+    
+    @PUT
+    @Path("/checkOrders/{id:[0-9][0-9]*}")
+    public Response checkOrders(@PathParam("id") long planningId)
+    {
+        // find relevant task
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", planningId).list();
+        
+        if(!tasks.isEmpty())
+        {
+            // complete task
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            taskService.complete(task.getId());
+            
+            return Response.ok(UriBuilder.fromResource(PurchaseOrderEndpoint.class))
+                           .build();
+        }
+        else
+        {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        
+    }
+    
+    @PUT
+    @Path("/confirmOrders/{id:[0-9][0-9]*}")
+    public Response confirmOrders(@PathParam("id") long planningId,
+                                  @QueryParam("orderStatus") String orderStatus)
+    {
+        // find relevnt task
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", planningId).list();
+        
+        if(!tasks.isEmpty())
+        {
+            // complete task
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            runtimeService.setVariable(instanceId, "orderStatus", orderStatus);
+            taskService.complete(task.getId());
+            
+            return Response.ok(UriBuilder.fromResource(PurchaseOrderEndpoint.class))
+                           .build();
+        }
+        else
+        {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        
     }
     
     @GET

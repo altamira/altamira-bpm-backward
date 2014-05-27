@@ -82,7 +82,7 @@
       <bpmn2:outgoing>SequenceFlow_8</bpmn2:outgoing>
     </bpmn2:userTask>
     <bpmn2:sequenceFlow id="SequenceFlow_8" name="" sourceRef="CheckOrdersUserTask" targetRef="SendOrdersServiceTask"/>
-    <bpmn2:serviceTask id="SendOrdersServiceTask" camunda:class="br.com.altamira.bpm.delegate.LoggerDelegate" name="Enviar&#xD;&#xA;Pedidos">
+    <bpmn2:serviceTask id="SendOrdersServiceTask" camunda:expression="#{sendOrders.execute(execution)}" name="Enviar&#xD;&#xA;Pedidos">
       <bpmn2:incoming>SequenceFlow_8</bpmn2:incoming>
       <bpmn2:incoming>SequenceFlow_15</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_9</bpmn2:outgoing>
@@ -109,7 +109,7 @@
       </bpmn2:timerEventDefinition>
     </bpmn2:boundaryEvent>
     <bpmn2:sequenceFlow id="SequenceFlow_13" name="" sourceRef="ConfirmReceiptTimeoutBoundaryEvent" targetRef="NotifyPurchaseManagerServiceTask"/>
-    <bpmn2:serviceTask id="NotifyPurchaseManagerServiceTask" camunda:class="br.com.altamira.bpm.delegate.LoggerDelegate" name="Notificar &#xD;&#xA;Gerente &#xD;&#xA;Compras">
+    <bpmn2:serviceTask id="NotifyPurchaseManagerServiceTask" camunda:expression="#{sendNotification.execute(execution)}" name="Notificar &#xD;&#xA;Gerente &#xD;&#xA;Compras">
       <bpmn2:incoming>SequenceFlow_13</bpmn2:incoming>
       <bpmn2:outgoing>SequenceFlow_14</bpmn2:outgoing>
     </bpmn2:serviceTask>

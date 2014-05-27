@@ -8,17 +8,19 @@ import java.math.BigDecimal;
 import java.util.List;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  *
  * @author PARTH
  */
 @Stateless
-public class SendNotificationService implements JavaDelegate {
+@Named("sendNotification")
+public class SendNotificationService {
 
     private static final String notificationFromUserName = "parth.patel@server1.com";
 
@@ -32,6 +34,7 @@ public class SendNotificationService implements JavaDelegate {
     @Inject
     MailService mailService;
 
+    @Transactional
     public void execute(DelegateExecution execution) throws Exception {
 
         System.out.println("Send Notification Task execution started...");

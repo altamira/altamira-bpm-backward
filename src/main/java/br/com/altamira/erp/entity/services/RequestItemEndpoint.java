@@ -110,7 +110,8 @@ public class RequestItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("request") long requestId, @PathParam("id") Long id, RequestItem entity) {
+    @Produces("application/json")
+    public Object update(@PathParam("request") long requestId, @PathParam("id") Long id, RequestItem entity) {
     	entity.setRequest(em.find(Request.class, requestId));
     	entity.setId(id);
     	/*if (entity.getRequest() == null) {

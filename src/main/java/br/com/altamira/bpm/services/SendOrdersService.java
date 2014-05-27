@@ -23,17 +23,13 @@ import javax.persistence.PersistenceContext;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
-import org.apache.commons.lang.StringUtils;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.hibernate.jdbc.ReturningWork;
 
 import br.com.altamira.erp.entity.dao.OrderDao;
-import java.util.ArrayList;
+import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
+import javax.transaction.Transactional;
 import javax.ws.rs.core.Context;
 import org.hibernate.Session;
 
@@ -42,7 +38,8 @@ import org.hibernate.Session;
  * @author PARTH
  */
 @Stateless
-public class SendOrdersService implements JavaDelegate {
+@Named("sendOrders")
+public class SendOrdersService {
 
     @PersistenceContext(name = "persistence/altamira-bpm", unitName = "altamira-bpm-PU")
     private EntityManager entityManager;
@@ -56,7 +53,7 @@ public class SendOrdersService implements JavaDelegate {
     @Inject
     private MailService mailService;
 
-    @Override
+    @Transactional
     public void execute(DelegateExecution de) throws Exception {
 
         System.out.println("Send Orders To Suppliers service task execution started...");
