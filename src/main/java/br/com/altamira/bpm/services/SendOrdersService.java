@@ -31,6 +31,8 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 import javax.ws.rs.core.Context;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.hibernate.Session;
 
 /**
@@ -47,8 +49,8 @@ public class SendOrdersService {
     @Inject
     private OrderDao orderDao;
     
-    @Context
-    private HttpServletRequest httpRequest;
+    @Inject
+    IdentityService identityService;
 
     @Inject
     private MailService mailService;
@@ -120,8 +122,7 @@ public class SendOrdersService {
             Date purchaseOrderDate = orderDao.getPurchaseOrderCreatedDateById(orderId.longValue());
 
             parameters.put("PURCHASE_ORDER_DATE", purchaseOrderDate);
-            parameters.put("USERNAME", httpRequest.getUserPrincipal() == null ? "" : httpRequest.getUserPrincipal().getName());
-
+            parameters.put("USERNAME", identityService.getCurrentAuthentication() == null ? "" : identityService.getCurrentAuthentication().getUserId());
             Locale locale = new Locale.Builder().setLanguage("pt").setRegion("BR").build();
             parameters.put("REPORT_LOCALE", locale);
 

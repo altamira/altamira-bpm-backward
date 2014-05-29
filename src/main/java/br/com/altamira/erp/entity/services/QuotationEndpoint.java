@@ -168,11 +168,6 @@ public class QuotationEndpoint {
         
         // remove quotation reopen variable
         runtimeService.removeVariable(instanceId, "quotationReopen");
-//        Object obj = runtimeService.getVariable(instanceId, "quotationReopen");
-//        if(obj!=null)
-//        {
-//            boolean quotationReopen = (Boolean) obj;
-//        }
         
         // close Quotation
     	quotation.setClosedDate(DateTime.now().toDate());

@@ -154,8 +154,7 @@ public class PurchaseOrderEndpoint {
             String instanceId = task.getProcessInstanceId();
             taskService.complete(task.getId());
             
-            return Response.ok(UriBuilder.fromResource(PurchaseOrderEndpoint.class))
-                           .build();
+            return Response.ok().build();
         }
         else
         {
@@ -180,8 +179,7 @@ public class PurchaseOrderEndpoint {
             runtimeService.setVariable(instanceId, "orderStatus", orderStatus);
             taskService.complete(task.getId());
             
-            return Response.ok(UriBuilder.fromResource(PurchaseOrderEndpoint.class))
-                           .build();
+            return Response.ok().build();
         }
         else
         {

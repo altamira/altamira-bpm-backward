@@ -153,11 +153,14 @@ public class PurchasePlanningEndpoint {
         String bcc = null;
         String subject = "Approve Purchase Plan:"+purchasePlanning.getId();
 
+        String urlContextPath = httpRequest.getRequestURL().substring(0, httpRequest.getRequestURL().length()-httpRequest.getRequestURI().length()) + 
+                                httpRequest.getContextPath();
+        
         StringBuffer text = new StringBuffer();
         text.append("Please click on below link to approve Purchase Plan:\n")
-            .append("http://localhost:8080/"+httpRequest.getContextPath()+"/forms/aprove-request.xhtml")
+            .append(urlContextPath+"/forms/aprove-request.xhtml")
             .append("\n\n"+"Below is the link for Purchase Planning Report:\n")
-            .append("http://localhost:8080/"+httpRequest.getContextPath()+"/rest/purchaseplannings/"+purchasePlanning.getId()+"/report");
+            .append(urlContextPath+"/rest/purchaseplannings/"+purchasePlanning.getId()+"/report");
 
         try {
             mailService.sendMail(to, cc, bcc, subject, text.toString(), null);
@@ -203,7 +206,7 @@ public class PurchasePlanningEndpoint {
     @Path("/approvePlanning/{id:[0-9][0-9]*}")
     @Produces("application/json")
     public Response approvePlanning(@PathParam("id") long planningId,
-                                    @QueryParam("approved") boolean orderStatus,
+                                    @QueryParam("approved") boolean approved,
                                     @QueryParam("reason") String reason)
     {
         // find the relevant task of the Purchase planning
@@ -211,18 +214,32 @@ public class PurchasePlanningEndpoint {
         
         if(!tasks.isEmpty())
         {
-            // get the purchase planning and set approve status
-            PurchasePlanning planning = purchasePlanningDao.findPurchasePlanningById(planningId);
-            planning.setApproveDate(DateTime.now().toDate());
-            
-            PurchasePlanning entity = em.merge(planning);
-            em.flush();
-        
-            // complete task
+            // get the Task
             Task task = tasks.get(0);
             String instanceId = task.getProcessInstanceId();
-            runtimeService.setVariable(task.getProcessInstanceId(), "approved", orderStatus);
+            runtimeService.setVariable(task.getProcessInstanceId(), "approved", approved);
             runtimeService.setVariable(task.getProcessInstanceId(), "reason", reason);
+            
+            // get the purchase planning
+            PurchasePlanning planning = purchasePlanningDao.findPurchasePlanningById(planningId);
+            PurchasePlanning entity = null;
+            
+            if(approved)
+            {
+                // set approve status inside purchase planning if planning is approved
+                planning.setApproveDate(DateTime.now().toDate());
+                entity = em.merge(planning);
+                em.flush();
+            }
+            else
+            {
+                // reopen purchase planning
+                planning.setClosedDate(null);
+                entity = em.merge(planning);
+                em.flush();
+            }
+            
+            // complete task
             taskService.complete(task.getId());
             
             return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)

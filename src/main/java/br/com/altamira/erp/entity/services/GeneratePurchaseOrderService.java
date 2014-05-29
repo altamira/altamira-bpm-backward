@@ -55,106 +55,96 @@ public class GeneratePurchaseOrderService {
 
         List<String> purchaseOrderIdList = new ArrayList<String>();
 
-        try {
+        for (BigDecimal supplierId : supplierList) {
 
-            for (BigDecimal supplierId : supplierList) {
+            PurchasePlanning planning = planningDao.findPurchasePlanningById(planningId.longValue());
+            Supplier supplier = supplierDao.find(supplierId.longValue());
 
-                PurchasePlanning planning = planningDao.findPurchasePlanningById(planningId.longValue());
-                Supplier supplier = supplierDao.find(supplierId.longValue());
+            List<Object[]> list = orderDao.selectOrderItemDetailsBySupplierId(planningId.longValue(), supplierId.longValue());
 
-                List<Object[]> list = orderDao.selectOrderItemDetailsBySupplierId(planningId.longValue(), supplierId.longValue());
+            // seperate orderItems based on company
+            Map<BigDecimal, List<Object[]>> seperatedOrderItemsMap = new HashMap<BigDecimal, List<Object[]>>();
+            for (Object[] rs : list) {
 
-                // seperate orderItems based on company
-                Map<BigDecimal, List<Object[]>> seperatedOrderItemsMap = new HashMap<BigDecimal, List<Object[]>>();
-                for (Object[] rs : list) {
-                    
-                    BigDecimal company = (BigDecimal) rs[6];
+                BigDecimal company = (BigDecimal) rs[6];
 
-                    if (seperatedOrderItemsMap.containsKey(company)) {
-                        List<Object[]> tempList = seperatedOrderItemsMap.get(company);
-                        tempList.add(rs);
-                    } else {
-                        List<Object[]> tempList = new ArrayList<Object[]>();
-                        tempList.add(rs);
-                        seperatedOrderItemsMap.put(company, tempList);
-                    }
-                }
-
-                // use seperate orderItems list to generate purchase ordres
-                for (Map.Entry<BigDecimal, List<Object[]>> entry : seperatedOrderItemsMap.entrySet()) {
-                    
-                    BigDecimal company = entry.getKey();
-                    List<Object[]> orderItemList = entry.getValue();
-
-                    // insert purchase order
-                    PurchaseOrder purchaseOrder = new PurchaseOrder();
-                    purchaseOrder.setPurchasePlanning(planning);
-                    purchaseOrder.setSupplier(supplier);
-                    purchaseOrder.setCreatedDate(new Date());
-                    purchaseOrder.setCompanyShipping(company.toBigInteger());
-                    purchaseOrder.setCompanyInvoice(BigInteger.ONE);
-                    purchaseOrder.setCompanyBilling(BigInteger.ONE);
-                    if(!company.toBigInteger().equals(BigInteger.ONE))
-                    {
-                        purchaseOrder.setComments("ATENÇÃO: Entrega através de operação triangular.");
-                    }
-                    else
-                    {
-                        purchaseOrder.setComments(" ");
-                    }
-                    Long purchaseOrderId = orderDao.insertPurchaseOrder(purchaseOrder);
-                    purchaseOrderIdList.add(purchaseOrderId.toString());
-                    List<Long> purchaseOrderItemList = new ArrayList<Long>();
-                    
-                    // insert records for Purchase Order Payment
-                    List<PaymentConditionItem> conditionItems = orderDao.findPaymentConditionItemsByPaymentCondition(supplier.getPaymentCondition());
-                    for(PaymentConditionItem pci : conditionItems)
-                    {
-                        BigInteger tempPercentage = pci.getPercentage();
-                        BigInteger tempPeriod = pci.getPeriod();
-                        
-                        PurchaseOrderPayment pop = new PurchaseOrderPayment();
-                        pop.setPurchaseOrder(purchaseOrder);
-                        pop.setPercentage(new BigDecimal(tempPercentage));
-                        pop.setPeriod(tempPeriod.shortValue());
-                        
-                        orderDao.insertPurchaseOrderPayment(pop);
-                    }
-
-                    // insert Purchase Order Items
-                    for (Object[] rs : orderItemList) {
-
-                        BigDecimal planningItemId = (BigDecimal) rs[0];
-                        Date date = (Date) rs[1];
-                        BigDecimal weight = ((BigDecimal) rs[2]);
-                        BigDecimal price = (BigDecimal) rs[3];
-                        BigDecimal tax = (BigDecimal) rs[4];
-                        BigDecimal standard = (BigDecimal) rs[5];
-
-                        PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
-                        purchaseOrderItem.setPurchaseOrder(purchaseOrder);
-
-                        PurchasePlanningItem planningItem = planningDao.findPurchasePlanningItemById(planningItemId.longValue());
-                        purchaseOrderItem.setPlanningItem(planningItem);
-
-                        purchaseOrderItem.setDate(date);
-                        purchaseOrderItem.setWeight(weight);
-                        purchaseOrderItem.setPrice(price);
-                        purchaseOrderItem.setTax(tax);
-                        purchaseOrderItem.setStandard(standard);
-
-                        Long purchaseOrderItemId = orderDao.insertPurchaseOrderItem(purchaseOrderItem);
-
-                        purchaseOrderItemList.add(purchaseOrderItemId);
-                    }
+                if (seperatedOrderItemsMap.containsKey(company)) {
+                    List<Object[]> tempList = seperatedOrderItemsMap.get(company);
+                    tempList.add(rs);
+                } else {
+                    List<Object[]> tempList = new ArrayList<Object[]>();
+                    tempList.add(rs);
+                    seperatedOrderItemsMap.put(company, tempList);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            // use seperate orderItems list to generate purchase ordres
+            for (Map.Entry<BigDecimal, List<Object[]>> entry : seperatedOrderItemsMap.entrySet()) {
+
+                BigDecimal company = entry.getKey();
+                List<Object[]> orderItemList = entry.getValue();
+
+                // insert purchase order
+                PurchaseOrder purchaseOrder = new PurchaseOrder();
+                purchaseOrder.setPurchasePlanning(planning);
+                purchaseOrder.setSupplier(supplier);
+                purchaseOrder.setCreatedDate(new Date());
+                purchaseOrder.setCompanyShipping(company.toBigInteger());
+                purchaseOrder.setCompanyInvoice(BigInteger.ONE);
+                purchaseOrder.setCompanyBilling(BigInteger.ONE);
+                if (!company.toBigInteger().equals(BigInteger.ONE)) {
+                    purchaseOrder.setComments("ATENÇÃO: Entrega através de operação triangular.");
+                } else {
+                    purchaseOrder.setComments(" ");
+                }
+                Long purchaseOrderId = orderDao.insertPurchaseOrder(purchaseOrder);
+                purchaseOrderIdList.add(purchaseOrderId.toString());
+                List<Long> purchaseOrderItemList = new ArrayList<Long>();
+
+                // insert records for Purchase Order Payment
+                List<PaymentConditionItem> conditionItems = orderDao.findPaymentConditionItemsByPaymentCondition(supplier.getPaymentCondition());
+                for (PaymentConditionItem pci : conditionItems) {
+                    BigInteger tempPercentage = pci.getPercentage();
+                    BigInteger tempPeriod = pci.getPeriod();
+
+                    PurchaseOrderPayment pop = new PurchaseOrderPayment();
+                    pop.setPurchaseOrder(purchaseOrder);
+                    pop.setPercentage(new BigDecimal(tempPercentage));
+                    pop.setPeriod(tempPeriod.shortValue());
+
+                    orderDao.insertPurchaseOrderPayment(pop);
+                }
+
+                // insert Purchase Order Items
+                for (Object[] rs : orderItemList) {
+
+                    BigDecimal planningItemId = (BigDecimal) rs[0];
+                    Date date = (Date) rs[1];
+                    BigDecimal weight = ((BigDecimal) rs[2]);
+                    BigDecimal price = (BigDecimal) rs[3];
+                    BigDecimal tax = (BigDecimal) rs[4];
+                    BigDecimal standard = (BigDecimal) rs[5];
+
+                    PurchaseOrderItem purchaseOrderItem = new PurchaseOrderItem();
+                    purchaseOrderItem.setPurchaseOrder(purchaseOrder);
+
+                    PurchasePlanningItem planningItem = planningDao.findPurchasePlanningItemById(planningItemId.longValue());
+                    purchaseOrderItem.setPlanningItem(planningItem);
+
+                    purchaseOrderItem.setDate(date);
+                    purchaseOrderItem.setWeight(weight==null ? new BigDecimal("0") : weight);
+                    purchaseOrderItem.setPrice(price);
+                    purchaseOrderItem.setTax(tax==null ? new BigDecimal("0") : tax);
+                    purchaseOrderItem.setStandard(standard);
+
+                    Long purchaseOrderItemId = orderDao.insertPurchaseOrderItem(purchaseOrderItem);
+
+                    purchaseOrderItemList.add(purchaseOrderItemId);
+                }
+            }
         }
 
         de.setVariable("purchaseOrderId", purchaseOrderIdList);
-
     }
 
 }
