@@ -22,6 +22,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.dao.MaterialDao;
+import br.com.altamira.erp.entity.model.Company;
 import br.com.altamira.erp.entity.model.Material;
 
 /**
@@ -46,6 +47,11 @@ public class MaterialEndpoint {
     	if (material == null) {
 	    	entity.setId(null);
 	
+                if(entity.getCompany()==null)
+                {
+                    entity.setCompany((Company)em.find(Company.class, new Long(1)));
+                }
+                
 	        em.persist(entity);
 
 	        return Response.created(

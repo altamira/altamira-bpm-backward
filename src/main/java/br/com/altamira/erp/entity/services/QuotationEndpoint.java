@@ -150,6 +150,7 @@ public class QuotationEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response update(@PathParam("id") long id/*, Quotation entity*/) {
     	
     	Quotation quotation = quotationDao.getCurrent();

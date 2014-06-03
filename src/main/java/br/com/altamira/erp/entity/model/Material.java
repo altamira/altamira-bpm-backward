@@ -74,7 +74,7 @@ public class Material implements Serializable {
     private BigDecimal length;
     @Column(name = "TAX")
     private BigDecimal tax;
-    @JoinColumn(name = "COMPANY", referencedColumnName = "ID")
+    @JoinColumn(name = "COMPANY", referencedColumnName = "ID", columnDefinition = "number default 1")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     private Company company;
 

@@ -132,7 +132,7 @@ public class GeneratePurchaseOrderService {
                     purchaseOrderItem.setPlanningItem(planningItem);
 
                     purchaseOrderItem.setDate(date);
-                    purchaseOrderItem.setWeight(weight==null ? new BigDecimal("0") : weight);
+                    purchaseOrderItem.setWeight(weight);
                     purchaseOrderItem.setPrice(price);
                     purchaseOrderItem.setTax(tax==null ? new BigDecimal("0") : tax);
                     purchaseOrderItem.setStandard(standard);

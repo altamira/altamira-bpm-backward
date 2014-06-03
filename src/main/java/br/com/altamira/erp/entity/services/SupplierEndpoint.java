@@ -21,6 +21,9 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import br.com.altamira.erp.entity.model.Supplier;
+import javax.inject.Inject;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  *
@@ -31,6 +34,9 @@ public class SupplierEndpoint {
 
     @PersistenceContext(unitName = "altamira-bpm-PU")
     private EntityManager em;
+    
+    @Inject
+    private TaskService taskService;
 
     @POST
     @Consumes("application/json")
@@ -98,4 +104,27 @@ public class SupplierEndpoint {
                 .entity(entity)
                 .build();
     }
+    
+    @PUT
+    @Path("/updateContactInfo/{id:[0-9][0-9]*}")
+    public Response updateContactInfo(@PathParam("id") long planningId)
+    {
+        // find the relevant task
+        List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", planningId).list();
+        
+        if(!tasks.isEmpty())
+        {
+            // complete task
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            taskService.complete(task.getId());
+            
+            return Response.ok().build();
+        }
+        else
+        {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+    }
+    
 }

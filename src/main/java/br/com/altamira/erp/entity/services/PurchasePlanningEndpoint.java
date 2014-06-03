@@ -138,6 +138,7 @@ public class PurchasePlanningEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response update(@PathParam("id") long id/*, PurchasePlanning entity*/) {
     	
     	PurchasePlanning purchasePlanning = purchasePlanningDao.findOpenPurchasePlanning();

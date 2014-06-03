@@ -127,7 +127,8 @@ public class OrderDao {
                                                    .append(" AND QI.LAMINATION = M.LAMINATION ")
                                                    .append(" AND QI.TREATMENT = M.TREATMENT ")
                                                    .append(" AND QI.THICKNESS = M.THICKNESS ")
-                                                   .append(" AND QI.ID = QIQ.QUOTATION_ITEM ");
+                                                   .append(" AND QI.ID = QIQ.QUOTATION_ITEM ")
+                                                   .append(" AND PPI.WEIGHT != 0");
 
         return entityManager.createNativeQuery(selectSql.toString())
                 .setParameter("planning_id", planningId)
