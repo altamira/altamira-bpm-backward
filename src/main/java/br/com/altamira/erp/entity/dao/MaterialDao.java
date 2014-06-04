@@ -62,7 +62,7 @@ public class MaterialDao {
     	if (entity == null) {
     		material.setId(null);
 	
-    		material.setCompany(entityManager.find(Company.class, 1));
+    		material.setCompany(entityManager.find(Company.class, new Long(1)));
     		
 	    	entityManager.persist(material);
         
