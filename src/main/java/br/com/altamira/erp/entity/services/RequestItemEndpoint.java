@@ -46,6 +46,7 @@ public class RequestItemEndpoint {
 
     @POST
     @Consumes("application/json")
+    @Produces("application/json")
     public Response create(@PathParam("request") Long requestId, RequestItem entity) {
     	entity.setId(null);
     	Material material = materialDao.create(entity.getMaterial());

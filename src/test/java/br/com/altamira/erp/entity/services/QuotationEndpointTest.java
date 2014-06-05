@@ -37,60 +37,28 @@ import br.com.altamira.erp.entity.model.UserPreference;
 @RunWith(Arquillian.class)
 public class QuotationEndpointTest {
 
-	@Inject
-	private QuotationEndpoint quotationendpoint;
-	
-	@Inject
-	private Quotation quotation;
-
-	@Deployment
-	public static JavaArchive createDeployment() {
-		return ShrinkWrap
-				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(QuotationEndpoint.class, Material.class,
-						Quotation.class, QuotationItem.class, Request.class,
-						RequestItem.class, Supplier.class,
-						MaterialStandard.class, PurchaseOrder.class,
-						PurchaseOrderItem.class, PurchasePlanning.class,
-						PurchasePlanningItem.class, Quotation.class,
-						QuotationItem.class, QuotationItemQuote.class,
-						QuotationRequest.class, Standard.class,
-						SupplierInStock.class,
-						SupplierPriceList.class, SupplierStandard.class,
-						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
-				.addAsManifestResource("META-INF/persistence.xml",
-						"persistence.xml")
-				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-	}
-
 	@Test
-	public void should_be_deployed() {
-		Assert.assertNotNull(quotationendpoint);
+	public void testGetCurrent() {
+		fail("Not yet implemented"); // TODO
 	}
-
-	@Test
-	public void testCreate() {
+        
+        @Test
+	public void testFindById() {
+		fail("Not yet implemented"); // TODO
+	}
+        
+        @Test
+	public void testListAll() {
+		//Assert.assertFalse(quotationendpoint.listAll(1, 1).isEmpty());
+	}
+        
+        @Test
+	public void testUpdate() {
 		fail("Not yet implemented"); // TODO
 	}
 
 	@Test
 	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testFindById() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testListAll() {
-		Assert.assertFalse(quotationendpoint.listAll(1, 1).isEmpty());
-	}
-
-	@Test
-	public void testUpdate() {
 		fail("Not yet implemented"); // TODO
 	}
 }
