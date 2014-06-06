@@ -159,19 +159,22 @@ public class QuotationEndpoint {
         List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("quotationId", quotation.getId()).list();
         
         // complete task
-        Task task = tasks.get(0);
-        String instanceId = task.getProcessInstanceId();
-        taskService.complete(task.getId());
+        if(!tasks.isEmpty())
+        {
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            taskService.complete(task.getId());
         
-        // call CREATE_PURCHASE_PLANNING procedure
-        PurchasePlanning planning = purchasePlanningDao.getCurrent();
-        runtimeService.setVariable(instanceId, "planningId", planning.getId());
+            // call CREATE_PURCHASE_PLANNING procedure
+            PurchasePlanning planning = purchasePlanningDao.getCurrent();
+            runtimeService.setVariable(instanceId, "planningId", planning.getId());
         
-        // remove quotation reopen variable
-        runtimeService.removeVariable(instanceId, "quotationReopen");
+            // remove quotation reopen variable
+            runtimeService.removeVariable(instanceId, "quotationReopen");
+        }
         
         // close Quotation
-    	quotation.setClosedDate(DateTime.now().toDate());
+        quotation.setClosedDate(DateTime.now().toDate());
         Quotation entity = em.merge(quotation);
         em.flush();
         

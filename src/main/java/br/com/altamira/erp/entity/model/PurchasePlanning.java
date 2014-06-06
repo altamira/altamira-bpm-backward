@@ -8,8 +8,8 @@ package br.com.altamira.erp.entity.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -27,7 +27,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -75,7 +74,7 @@ public class PurchasePlanning implements Serializable {
     private Quotation quotation;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.LAZY)
     private Set<PurchaseOrder> purchaseOrder;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "purchasePlanning", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "purchasePlanning", fetch = FetchType.EAGER)
     private Set<PurchasePlanningItem> purchasePlanningItem;
 
     public PurchasePlanning() {

@@ -8,8 +8,8 @@ package br.com.altamira.erp.entity.model;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
-
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,7 +25,6 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
-
 import org.codehaus.jackson.annotate.JsonIgnore;
 
 /**
@@ -62,11 +61,11 @@ public class Quotation implements Serializable {
     @Column(name = "CLOSED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
     private Date closedDate;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.LAZY)
     private Set<PurchasePlanning> purchasePlanning;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.LAZY)
     private Set<QuotationRequest> quotationRequest;
-    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "quotation", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotation", fetch = FetchType.EAGER)
     private Set<QuotationItem> quotationItem;
 
     public Quotation() {
