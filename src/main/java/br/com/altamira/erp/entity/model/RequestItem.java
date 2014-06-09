@@ -32,6 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonView;
 
 /**
  *
@@ -54,20 +55,29 @@ public class RequestItem implements Serializable {
     @SequenceGenerator(name = "RequestItemSequence", sequenceName = "REQUEST_ITEM_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RequestItemSequence")
     @Column(name = "ID")
+    @JsonView({JsonViews.RequestItemOnly.class, JsonViews.RequestExtended.class})
     private Long id;
+    
     @Basic(optional = false)
     @Column(name = "ARRIVAL_DATE")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonView({JsonViews.RequestItemOnly.class, JsonViews.RequestExtended.class})
     private Date arrival;
+    
     @Basic(optional = false)
     @Column(name = "WEIGHT")
+    @JsonView({JsonViews.RequestItemOnly.class, JsonViews.RequestExtended.class})
     private BigDecimal weight;
+    
     @JoinColumn(name = "REQUEST", referencedColumnName = "ID")
     @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
     private Request request;
+    
     @JoinColumn(name = "MATERIAL", referencedColumnName = "ID")
     @ManyToOne(optional = false/*, fetch = FetchType.LAZY*/)
+    @JsonView(JsonViews.RequestItemExtended.class)
     private Material material;
+    
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "requestItem"/*, fetch = FetchType.LAZY*/)
     private Set<PurchasePlanningItem> purchasePlanningItem;
 

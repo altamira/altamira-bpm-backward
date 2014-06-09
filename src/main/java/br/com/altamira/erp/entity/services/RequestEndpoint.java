@@ -3,6 +3,7 @@ package br.com.altamira.erp.entity.services;
 import br.com.altamira.erp.entity.dao.PurchasePlanningDao;
 import br.com.altamira.erp.entity.dao.QuotationDao;
 import br.com.altamira.erp.entity.dao.RequestDao;
+import br.com.altamira.erp.entity.model.JsonViews;
 import br.com.altamira.erp.entity.model.PurchasePlanning;
 
 import java.util.List;
@@ -55,6 +56,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
+import org.codehaus.jackson.map.annotate.JsonView;
 
 /**
  *
@@ -111,6 +113,7 @@ public class RequestEndpoint {
     @GET
     @Path("/{id:[0-9][0-9]*}")
     @Produces("application/json")
+    @JsonView(JsonViews.RequestExtended.class)
     public Response findById(@PathParam("id") long id) {
         TypedQuery<Request> findByIdQuery = em.createNamedQuery("Request.findById", Request.class);
         findByIdQuery.setParameter("id", id);
@@ -223,6 +226,7 @@ public class RequestEndpoint {
     @GET
     @Path("/current")
     @Produces("application/json")
+    @JsonView(JsonViews.RequestOnly.class)
     public Response getCurrent() {
     	Request entity = requestDao.getCurrent();
     	return Response.ok(UriBuilder.fromResource(RequestEndpoint.class)

@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.map.annotate.JsonView;
 
 /**
  *
@@ -42,7 +43,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
     @NamedQuery(name = "Request.findByCreatedDate", query = "SELECT r FROM Request r WHERE r.createdDate = :createdDate"),
     @NamedQuery(name = "Request.findByCreatorName", query = "SELECT r FROM Request r WHERE r.creatorName = :creatorName"),
     @NamedQuery(name = "Request.findBySendDate", query = "SELECT r FROM Request r WHERE r.sendDate = :sendDate"),
-	@NamedQuery(name = "Request.getCurrent", query = "SELECT r FROM Request r WHERE r.id = (SELECT MAX(rr.id) FROM Request rr WHERE rr.sendDate IS NULL)")})
+    @NamedQuery(name = "Request.getCurrent", query = "SELECT r FROM Request r WHERE r.id = (SELECT MAX(rr.id) FROM Request rr WHERE rr.sendDate IS NULL)")})
 public class Request implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -52,19 +53,29 @@ public class Request implements Serializable {
     @SequenceGenerator(name = "RequestSequence", sequenceName = "REQUEST_SEQUENCE", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "RequestSequence")
     @Column(name = "ID")
+    @JsonView(JsonViews.RequestOnly.class)
     private Long id;
+    
     @Basic(optional = false)
     @Column(name = "CREATED_DATE")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonView(JsonViews.RequestOnly.class)
     private Date createdDate;
+    
     @Basic(optional = false)
     @Column(name = "CREATOR_NAME", columnDefinition = "nvarchar2(255)")
+    @JsonView(JsonViews.RequestOnly.class)
     private String creatorName;
+    
     @Column(name = "SEND_DATE")
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonView(JsonViews.RequestOnly.class)
     private Date sendDate;
+    
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "request", fetch = FetchType.EAGER)
+    @JsonView(JsonViews.RequestExtended.class)
     private Set<RequestItem> items;
+    
     @OneToOne(/*cascade = CascadeType.ALL,*/mappedBy = "request"/*, fetch = FetchType.LAZY*/)
     private QuotationRequest quotationRequest;
 
@@ -114,7 +125,6 @@ public class Request implements Serializable {
     }
 
     @XmlTransient
-    //@JsonIgnore
     public Set<RequestItem> getItems() {
         return items;
     }
