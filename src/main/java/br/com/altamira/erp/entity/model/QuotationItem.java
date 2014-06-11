@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.Set;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -70,7 +71,7 @@ public class QuotationItem implements Serializable {
     @Basic(optional = false)
     @Column(name = "WEIGHT")
     private BigDecimal weight;
-    @OneToMany(mappedBy = "quotationItem", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "quotationItem", fetch = FetchType.EAGER)
     private Set<QuotationItemQuote> quotationItemQuote;
     @JoinColumn(name = "QUOTATION", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)

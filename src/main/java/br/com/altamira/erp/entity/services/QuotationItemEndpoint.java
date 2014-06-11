@@ -35,8 +35,12 @@ public class QuotationItemEndpoint {
 
     @POST
     @Consumes("application/json")
+    @Produces("application/json")
     public Response create(QuotationItem entity) {
     	entity.setId(null);
+        Quotation quotation = em.createNamedQuery("Quotation.getCurrent", Quotation.class).getSingleResult();
+        quotation.getQuotationItem().add(entity);
+        entity.setQuotation(quotation);
         em.persist(entity);
         return Response.created(
                 UriBuilder.fromResource(QuotationItemEndpoint.class)
@@ -93,7 +97,10 @@ public class QuotationItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response update(@PathParam("id") long id, QuotationItem entity) {
+        Quotation quotation = em.createNamedQuery("Quotation.getCurrent", Quotation.class).getSingleResult();
+        entity.setQuotation(quotation);
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(QuotationItemEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

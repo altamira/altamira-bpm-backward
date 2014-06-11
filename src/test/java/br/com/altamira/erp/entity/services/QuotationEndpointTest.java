@@ -24,7 +24,7 @@ public class QuotationEndpointTest {
     static Long quotationId = new Long(82);
 
 	@Test
-        @Ignore
+        //@Ignore
 	public void _1testGetCurrent() throws Exception {
             
             // Do the test
@@ -100,7 +100,7 @@ public class QuotationEndpointTest {
 	}
 
 	@Test
-        //@Ignore
+        @Ignore
 	public void _5testDeleteById() throws Exception {
             
             // Get the current quotation
