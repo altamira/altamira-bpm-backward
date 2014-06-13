@@ -35,6 +35,7 @@ public class QuotationRequestEndpoint {
 
     @POST
     @Consumes("application/json")
+    @Produces("application/json")
     public Response create(QuotationRequest entity) {
     	entity.setId(null);
         em.persist(entity);

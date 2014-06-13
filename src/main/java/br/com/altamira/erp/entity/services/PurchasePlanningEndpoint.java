@@ -180,11 +180,14 @@ public class PurchasePlanningEndpoint {
         // get relevant task for planningId
         List<Task> tasks = taskService.createTaskQuery().processVariableValueEquals("planningId", purchasePlanning.getId()).list();
         
-        // complete task
-        Task task = tasks.get(0);
-        String instanceId = task.getProcessInstanceId();
-        runtimeService.setVariable(instanceId, "quotationReopen", false);
-        taskService.complete(task.getId());
+        if(!tasks.isEmpty())
+        {
+            // complete task
+            Task task = tasks.get(0);
+            String instanceId = task.getProcessInstanceId();
+            runtimeService.setVariable(instanceId, "quotationReopen", false);
+            taskService.complete(task.getId());
+        }
 
         return Response.ok(UriBuilder.fromResource(PurchasePlanningEndpoint.class)
                 .path(String.valueOf(entity.getId())).build())

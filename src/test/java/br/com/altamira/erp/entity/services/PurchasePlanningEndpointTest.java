@@ -1,96 +1,107 @@
 package br.com.altamira.erp.entity.services;
 
-import static org.junit.Assert.fail;
-
-import javax.inject.Inject;
-
-import org.jboss.arquillian.container.test.api.Deployment;
+import br.com.altamira.erp.entity.model.PurchasePlanning;
+import java.util.Date;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.com.altamira.erp.entity.model.Material;
-import br.com.altamira.erp.entity.model.MaterialStandard;
-import br.com.altamira.erp.entity.model.MaterialStandardPK;
-import br.com.altamira.erp.entity.model.PurchaseOrder;
-import br.com.altamira.erp.entity.model.PurchaseOrderItem;
-import br.com.altamira.erp.entity.model.PurchasePlanning;
-import br.com.altamira.erp.entity.model.PurchasePlanningItem;
-import br.com.altamira.erp.entity.model.Quotation;
-import br.com.altamira.erp.entity.model.QuotationItem;
-import br.com.altamira.erp.entity.model.QuotationItemQuote;
-import br.com.altamira.erp.entity.model.QuotationRequest;
-import br.com.altamira.erp.entity.model.Request;
-import br.com.altamira.erp.entity.model.RequestItem;
-import br.com.altamira.erp.entity.model.Standard;
-import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierInStock;
-import br.com.altamira.erp.entity.model.SupplierPriceList;
-import br.com.altamira.erp.entity.model.SupplierStandard;
-import br.com.altamira.erp.entity.model.SupplierStandardPK;
-import br.com.altamira.erp.entity.model.UserPreference;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.runners.MethodSorters;
 
 @RunWith(Arquillian.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class PurchasePlanningEndpointTest {
 
-	@Inject
-	private PurchasePlanningEndpoint purchaseplanningendpoint;
-	
-	@Inject
-	private PurchasePlanning purchasePlanning;
-
-	@Deployment
-	public static JavaArchive createDeployment() {
-		return ShrinkWrap
-				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(PurchasePlanningEndpoint.class, Material.class,
-						Quotation.class, QuotationItem.class, Request.class,
-						RequestItem.class, Supplier.class,
-						MaterialStandard.class, PurchaseOrder.class,
-						PurchaseOrderItem.class, PurchasePlanning.class,
-						PurchasePlanningItem.class, Quotation.class,
-						QuotationItem.class, QuotationItemQuote.class,
-						QuotationRequest.class, Standard.class,
-						SupplierInStock.class,
-						SupplierPriceList.class, SupplierStandard.class,
-						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
-				.addAsManifestResource("META-INF/persistence.xml",
-						"persistence.xml")
-				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
-	}
+    static Long purchasePlanningId;
+    
+	@Test
+	public void _1getCurrent() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/current");
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<PurchasePlanning> response = request.get(PurchasePlanning.class);
+            PurchasePlanning purchasePlanning = response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertNotNull(purchasePlanning.getId());
+            
+            purchasePlanningId = purchasePlanning.getId();
+        }
 
 	@Test
-	public void should_be_deployed() {
-		Assert.assertNotNull(purchaseplanningendpoint);
-	}
+	public void _2testFindById() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/"+purchasePlanningId);
+            request.accept(MediaType.APPLICATION_JSON);
+             
+            ClientResponse<PurchasePlanning> response = request.get(PurchasePlanning.class);
+            PurchasePlanning purchasePlanning = response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertNotNull(purchasePlanning.getId());
+            Assert.assertEquals(purchasePlanning.getId(), purchasePlanningId);
+        }
 
 	@Test
-	public void testCreate() {
-		fail("Not yet implemented"); // TODO
-	}
+	public void _3testListAll() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings?start=1&max=5");
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse response = request.get(ClientResponse.class);
+            List<PurchasePlanning> purchasePlanningList = (List<PurchasePlanning>) response.getEntity(new GenericType<List<PurchasePlanning>>() {
+                    });
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertFalse(purchasePlanningList.isEmpty());
+        }
 
 	@Test
-	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
+	public void _4testUpdate() throws Exception {
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/"+purchasePlanningId);
+            test_request.accept(MediaType.APPLICATION_JSON);
+            test_request.header("Content-Type", MediaType.APPLICATION_JSON);
+            
+            ClientResponse<PurchasePlanning> test_response = test_request.put(PurchasePlanning.class);
+            PurchasePlanning purchasePlanning = test_response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), test_response.getStatus());
+            Assert.assertNotNull(purchasePlanning.getClosedDate());
 	}
-
-	@Test
-	public void testFindById() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testListAll() {
-		Assert.assertFalse(purchaseplanningendpoint.listAll(1, 1).isEmpty());
-	}
-
-	@Test
-	public void testUpdate() {
-		fail("Not yet implemented"); // TODO
+        
+        @Test
+        @Ignore
+	public void _5testDeleteById() throws Exception {
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/"+purchasePlanningId);
+            ClientResponse test_response = test_request.delete();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), test_response.getStatus());
+            
+            ClientRequest check_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/"+purchasePlanningId);
+            check_request.accept(MediaType.APPLICATION_JSON);
+            ClientResponse check_response = check_request.get();
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), check_response.getStatus());
 	}
 }

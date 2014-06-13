@@ -21,7 +21,7 @@ import org.junit.runners.MethodSorters;
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class QuotationEndpointTest {
     
-    static Long quotationId = new Long(82);
+    static Long quotationId;
 
 	@Test
         //@Ignore
@@ -42,7 +42,7 @@ public class QuotationEndpointTest {
 	}
         
         @Test
-        @Ignore
+        //@Ignore
 	public void _2testFindById() throws Exception {
             
             // Do the test
@@ -59,7 +59,7 @@ public class QuotationEndpointTest {
 	}
         
         @Test
-        @Ignore
+        //@Ignore
 	public void _3testListAll() throws Exception {
             
             // Do the test
@@ -76,7 +76,7 @@ public class QuotationEndpointTest {
 	}
         
         @Test
-        @Ignore
+        //@Ignore
 	public void _4testUpdate() throws Exception {
             
             // Get the current quotation

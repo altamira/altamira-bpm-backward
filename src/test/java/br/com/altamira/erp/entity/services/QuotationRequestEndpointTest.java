@@ -1,97 +1,122 @@
 package br.com.altamira.erp.entity.services;
 
-import static org.junit.Assert.fail;
-
-import javax.inject.Inject;
-
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import br.com.altamira.erp.entity.model.Quotation;
+import br.com.altamira.erp.entity.model.QuotationRequest;
+import br.com.altamira.erp.entity.model.Request;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.junit.Assert;
+import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.util.GenericType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import br.com.altamira.erp.entity.model.Material;
-import br.com.altamira.erp.entity.model.MaterialStandard;
-import br.com.altamira.erp.entity.model.MaterialStandardPK;
-import br.com.altamira.erp.entity.model.PurchaseOrder;
-import br.com.altamira.erp.entity.model.PurchaseOrderItem;
-import br.com.altamira.erp.entity.model.PurchasePlanning;
-import br.com.altamira.erp.entity.model.PurchasePlanningItem;
-import br.com.altamira.erp.entity.model.Quotation;
-import br.com.altamira.erp.entity.model.QuotationItem;
-import br.com.altamira.erp.entity.model.QuotationItemQuote;
-import br.com.altamira.erp.entity.model.QuotationRequest;
-import br.com.altamira.erp.entity.model.Request;
-import br.com.altamira.erp.entity.model.RequestItem;
-import br.com.altamira.erp.entity.model.Standard;
-import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierInStock;
-import br.com.altamira.erp.entity.model.SupplierPriceList;
-import br.com.altamira.erp.entity.model.SupplierStandard;
-import br.com.altamira.erp.entity.model.SupplierStandardPK;
-import br.com.altamira.erp.entity.model.UserPreference;
+import org.junit.FixMethodOrder;
+import org.junit.Ignore;
+import org.junit.runners.MethodSorters;
 
 @RunWith(Arquillian.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class QuotationRequestEndpointTest {
 
-	@Inject
-	private QuotationRequestEndpoint quotationrequestendpoint;
-	
-	@Inject
-	private QuotationRequest quotationRequest;
-
-	@Deployment
-	public static JavaArchive createDeployment() {
-		return ShrinkWrap
-				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(PurchasePlanningEndpoint.class, Material.class,
-						Quotation.class, QuotationItem.class, Request.class,
-						RequestItem.class, Supplier.class,
-						MaterialStandard.class, PurchaseOrder.class,
-						PurchaseOrderItem.class, PurchasePlanning.class,
-						PurchasePlanningItem.class, Quotation.class,
-						QuotationItem.class, QuotationItemQuote.class,
-						QuotationRequest.class, Standard.class,
-						SupplierInStock.class,
-						SupplierPriceList.class, SupplierStandard.class,
-						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
-				.addAsManifestResource("META-INF/persistence.xml",
-						"persistence.xml")
-				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+    static Long quotationRequestId;
+    
+	@Test
+        //@Ignore
+	public void _1testCreate() throws Exception {
+            
+            // Get the current request
+            ClientRequest pre_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/requests/current");
+            pre_request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<Request> pre_response = pre_request.get(Request.class);
+            Request request = pre_response.getEntity();
+            
+            // Get the current quotation
+            ClientRequest pre_request1 = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current");
+            pre_request1.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<Quotation> pre_response1 = pre_request1.get(Quotation.class);
+            Quotation quotation = pre_response1.getEntity();
+            
+            // add current request to current quotation
+            QuotationRequest quotationRequest = new QuotationRequest();
+            quotationRequest.setQuotation(quotation);
+            quotationRequest.setRequest(request);
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current/requests");
+            test_request.accept(MediaType.APPLICATION_JSON);
+            test_request.body(MediaType.APPLICATION_JSON, quotationRequest);
+            
+            ClientResponse<QuotationRequest> test_response = test_request.post(QuotationRequest.class);
+            QuotationRequest quotationRequestRES = test_response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), test_response.getStatus());
+            Assert.assertNotNull(quotationRequestRES.getId());
+            
+            // store new quotation request id
+            quotationRequestId = quotationRequestRES.getId();
 	}
 
 	@Test
-	public void should_be_deployed() {
-		Assert.assertNotNull(quotationrequestendpoint);
+        //@Ignore
+	public void _2testFindById() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current/requests/"+quotationRequestId);
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<QuotationRequest> response = request.get(QuotationRequest.class);
+            QuotationRequest quotationRequest = response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertEquals(quotationRequest.getId(), quotationRequestId);
 	}
 
 	@Test
-	public void testCreate() {
-		fail("Not yet implemented"); // TODO
+        //@Ignore
+	public void _3testListAll() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current/requests?start=1&max=10");
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse response = request.get(ClientResponse.class);
+            List<QuotationRequest> quotationRequests = (List<QuotationRequest>) response.getEntity(new GenericType<List<QuotationRequest>>() {
+                    });
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertNotNull(quotationRequests);
 	}
 
 	@Test
-	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
+        @Ignore
+	public void _4testUpdate() throws Exception {
+            
+            // Not constructive
 	}
 
-	@Test
-	public void testFindById() {
-		fail("Not yet implemented"); // TODO
+        @Test
+        //@Ignore
+	public void _5testDeleteById() throws Exception {
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current/requests/"+quotationRequestId);
+            ClientResponse test_response = test_request.delete();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), test_response.getStatus());
+            
+            ClientRequest check_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/current/requests/"+quotationRequestId);
+            check_request.accept(MediaType.APPLICATION_JSON);
+            ClientResponse check_response = check_request.get();
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), check_response.getStatus());
 	}
-
-	@Test
-	public void testListAll() {
-		Assert.assertFalse(quotationrequestendpoint.listAll(1, 1).isEmpty());
-	}
-
-	@Test
-	public void testUpdate() {
-		fail("Not yet implemented"); // TODO
-	}
-
 }

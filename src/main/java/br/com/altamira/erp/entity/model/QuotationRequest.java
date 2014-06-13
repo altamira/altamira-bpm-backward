@@ -10,12 +10,15 @@ import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -35,7 +38,8 @@ public class QuotationRequest implements Serializable {
 	// @Max(value=?) @Min(value=?)//if you know range of your decimal fields
     // consider using these annotations to enforce field validation
     @Id
-    @Basic(optional = false)
+    @SequenceGenerator(name = "QuotationRequestSequence", sequenceName = "QUOTATION_REQUEST_SEQUENCE", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "QuotationRequestSequence")
     @Column(name = "ID")
     private Long id;
     @JoinColumn(name = "REQUEST", referencedColumnName = "ID")
