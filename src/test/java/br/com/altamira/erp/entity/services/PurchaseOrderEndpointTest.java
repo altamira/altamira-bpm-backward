@@ -15,6 +15,7 @@ import org.jboss.resteasy.util.GenericType;
 import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -87,6 +88,7 @@ public class PurchaseOrderEndpointTest {
     }
     
     @Test
+    @Ignore
     public void _3testListAll() throws Exception {
         
         // Do the test

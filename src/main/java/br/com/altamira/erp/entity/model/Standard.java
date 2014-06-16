@@ -58,6 +58,8 @@ public class Standard implements Serializable {
     private Set<MaterialStandard> materialStandardSet;
     @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "standard", fetch = FetchType.LAZY)
     private Set<SupplierStandard> supplierStandardSet;
+    @OneToMany(/*cascade = CascadeType.ALL,*/mappedBy = "standard", fetch = FetchType.LAZY)
+    private Set<SupplierInStock> supplierInStockSet;
 
     public Standard() {
     }
@@ -113,6 +115,16 @@ public class Standard implements Serializable {
 
     public void setSupplierStandardSet(Set<SupplierStandard> supplierStandardSet) {
         this.supplierStandardSet = supplierStandardSet;
+    }
+    
+    @XmlTransient
+    @JsonIgnore
+    public Set<SupplierInStock> getSupplierInStockSet() {
+        return supplierInStockSet;
+    }
+
+    public void setSupplierInStockSet(Set<SupplierInStock> supplierInStockSet) {
+        this.supplierInStockSet = supplierInStockSet;
     }
 
     @Override

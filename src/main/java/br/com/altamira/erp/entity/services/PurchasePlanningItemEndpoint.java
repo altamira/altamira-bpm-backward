@@ -44,7 +44,9 @@ public class PurchasePlanningItemEndpoint {
     @Consumes("application/json")
     public Response create(@PathParam("purchasePlanning") long purchasePlanningId, PurchasePlanningItem entity) {
     	entity.setId(null);
-    	PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+    	//PurchasePlanning purchasePlanning = purchasePlanningDao.getCurrent();
+        // Calling CREATE_PURCHASE_PLANNING procedure while creating PurchasePlanningItem will give integrity violation error because procedure inserts missing records when called.
+        PurchasePlanning purchasePlanning = em.createNamedQuery("PurchasePlanning.getCurrent", PurchasePlanning.class).getSingleResult();
     	purchasePlanning.getPurchasePlanningItem().add(entity);
 		entity.setPurchasePlanning(purchasePlanning);
         em.persist(entity);
@@ -104,6 +106,7 @@ public class PurchasePlanningItemEndpoint {
     @PUT
     @Path("/{id:[0-9][0-9]*}")
     @Consumes("application/json")
+    @Produces("application/json")
     public Response update(@PathParam("purchasePlanning") long purchasePlanningId, @PathParam("id") long id, PurchasePlanningItem entity) {
     	entity.setPurchasePlanning(em.find(PurchasePlanning.class, purchasePlanningId));
     	entity.setId(id);

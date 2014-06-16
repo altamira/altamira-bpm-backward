@@ -1,96 +1,123 @@
 package br.com.altamira.erp.entity.services;
 
+import br.com.altamira.erp.entity.model.UserPreference;
+import java.util.List;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import static org.junit.Assert.fail;
 
-import javax.inject.Inject;
-
-import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.jboss.resteasy.client.ClientRequest;
+import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
+import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.MethodSorters;
 
-import br.com.altamira.erp.entity.model.Material;
-import br.com.altamira.erp.entity.model.MaterialStandard;
-import br.com.altamira.erp.entity.model.MaterialStandardPK;
-import br.com.altamira.erp.entity.model.PurchaseOrder;
-import br.com.altamira.erp.entity.model.PurchaseOrderItem;
-import br.com.altamira.erp.entity.model.PurchasePlanning;
-import br.com.altamira.erp.entity.model.PurchasePlanningItem;
-import br.com.altamira.erp.entity.model.Quotation;
-import br.com.altamira.erp.entity.model.QuotationItem;
-import br.com.altamira.erp.entity.model.QuotationItemQuote;
-import br.com.altamira.erp.entity.model.QuotationRequest;
-import br.com.altamira.erp.entity.model.Request;
-import br.com.altamira.erp.entity.model.RequestItem;
-import br.com.altamira.erp.entity.model.Standard;
-import br.com.altamira.erp.entity.model.Supplier;
-import br.com.altamira.erp.entity.model.SupplierInStock;
-import br.com.altamira.erp.entity.model.SupplierPriceList;
-import br.com.altamira.erp.entity.model.SupplierStandard;
-import br.com.altamira.erp.entity.model.SupplierStandardPK;
-import br.com.altamira.erp.entity.model.UserPreference;
 
 @RunWith(Arquillian.class)
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserPreferenceEndpointTest {
 
-	@Inject
-	private UserPreferenceEndpoint userpreferenceendpoint;
-	
-	@Inject 
-	private UserPreference userPreference;
-
-	@Deployment
-	public static JavaArchive createDeployment() {
-		return ShrinkWrap
-				.create(JavaArchive.class, "altamira-bpm.jar")
-				.addClasses(PurchasePlanningEndpoint.class, Material.class,
-						Quotation.class, QuotationItem.class, Request.class,
-						RequestItem.class, Supplier.class,
-						MaterialStandard.class, PurchaseOrder.class,
-						PurchaseOrderItem.class, PurchasePlanning.class,
-						PurchasePlanningItem.class, Quotation.class,
-						QuotationItem.class, QuotationItemQuote.class,
-						QuotationRequest.class, Standard.class,
-						SupplierInStock.class,
-						SupplierPriceList.class, SupplierStandard.class,
-						UserPreference.class, SupplierStandardPK.class,
-						MaterialStandardPK.class, br.com.altamira.bpm.AltamiraCustomDialect.class)
-				.addAsManifestResource("META-INF/persistence.xml",
-						"persistence.xml")
-				.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml");
+        static String userName;
+    
+	@Test
+	public void _1testCreate() throws Exception {
+            
+            // Prepare test data
+            UserPreference userPreference = new UserPreference();
+            userPreference.setName("Test");
+            userPreference.setPreferences("Test preferences");
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences");
+            request.accept(MediaType.APPLICATION_JSON);
+            request.body(MediaType.APPLICATION_JSON, userPreference);
+            
+            ClientResponse<UserPreference> response = request.post(UserPreference.class);
+            UserPreference userPreferenceCrtd = response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+            Assert.assertNotNull(userPreferenceCrtd.getName());
+            
+            // store user preference
+            userName = userPreferenceCrtd.getName();
 	}
 
 	@Test
-	public void should_be_deployed() {
-		Assert.assertNotNull(userpreferenceendpoint);
-	}
-	
-	@Test
-	public void testCreate() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testDeleteById() {
-		fail("Not yet implemented"); // TODO
-	}
-
-	@Test
-	public void testFindById() {
-		fail("Not yet implemented"); // TODO
+	public void _2testFindByName() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences/"+userName);
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<UserPreference> response = request.get(UserPreference.class);
+            UserPreference userPreference = response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertEquals(userPreference.getName(), userName);
 	}
 
 	@Test
-	public void testListAll() {
-		Assert.assertFalse(userpreferenceendpoint.listAll(1, 1).isEmpty());
+	public void _3testListAll() throws Exception {
+            
+            // Do the test
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences?start=1&max=10");
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse response = request.get(ClientResponse.class);
+            List<UserPreference> userPreferences = (List<UserPreference>) response.getEntity(new GenericType<List<UserPreference>>() {
+                    });
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
+            Assert.assertNotNull(userPreferences);
 	}
 
 	@Test
-	public void testUpdate() {
-		fail("Not yet implemented"); // TODO
+	public void _4testUpdate() throws Exception {
+            
+            // Get User Preference
+            ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences/"+userName);
+            request.accept(MediaType.APPLICATION_JSON);
+            
+            ClientResponse<UserPreference> response = request.get(UserPreference.class);
+            UserPreference userPreference = response.getEntity();
+            
+            // Prepare test data
+            userPreference.setPreferences("Test preferences updated");
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences/"+userName);
+            test_request.accept(MediaType.APPLICATION_JSON);
+            test_request.header("Content-Type", MediaType.APPLICATION_JSON);
+            test_request.body(MediaType.APPLICATION_JSON, userPreference);
+            
+            ClientResponse<UserPreference> test_response = test_request.put(UserPreference.class);
+            UserPreference userPreferenceUpdt = test_response.getEntity();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.OK.getStatusCode(), test_response.getStatus());
+            Assert.assertEquals(userPreferenceUpdt.getPreferences(), "Test preferences updated");
+	}
+        
+        @Test
+	public void _5testDeleteById() throws Exception {
+            
+            // Do the test
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences/"+userName);
+            ClientResponse test_response = test_request.delete();
+            
+            // Check the results
+            Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), test_response.getStatus());
+            
+            ClientRequest check_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/userpreferences/"+userName);
+            check_request.accept(MediaType.APPLICATION_JSON);
+            ClientResponse check_response = check_request.get();
+            Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), check_response.getStatus());
 	}
 }

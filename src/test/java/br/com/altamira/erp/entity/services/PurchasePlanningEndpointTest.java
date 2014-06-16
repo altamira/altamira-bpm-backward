@@ -76,7 +76,7 @@ public class PurchasePlanningEndpointTest {
 	public void _4testUpdate() throws Exception {
             
             // Do the test
-            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/quotations/"+purchasePlanningId);
+            ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/"+purchasePlanningId);
             test_request.accept(MediaType.APPLICATION_JSON);
             test_request.header("Content-Type", MediaType.APPLICATION_JSON);
             

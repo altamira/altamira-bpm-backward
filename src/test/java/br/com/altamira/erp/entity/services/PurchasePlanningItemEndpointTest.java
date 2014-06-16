@@ -17,6 +17,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -78,7 +79,7 @@ public class PurchasePlanningItemEndpointTest {
         PurchasePlanningItem purchasePlanningItem = response.getEntity();
         
         // Check the results
-        Assert.assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
+        Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
         Assert.assertNotNull(purchasePlanningItem.getId());
         
         // store new purchase planning item id
@@ -130,7 +131,7 @@ public class PurchasePlanningItemEndpointTest {
         purchasePlanningItem.setWeight(new BigDecimal("52.50"));
         
         // Do the test
-        ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings"+test_planningId+"/items/"+new_planningId);
+        ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/"+test_planningId+"/items/"+new_planningId);
         test_request.accept(MediaType.APPLICATION_JSON);
         test_request.header("Content-Type", MediaType.APPLICATION_JSON);
         test_request.body(MediaType.APPLICATION_JSON, purchasePlanningItem);

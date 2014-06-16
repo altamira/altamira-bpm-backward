@@ -61,6 +61,9 @@ public class SupplierInStock implements Serializable {
     @JoinColumn(name = "QUOTATION_ITEM_QUOTE", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private QuotationItemQuote quotationItemQuote;
+    @JoinColumn(name = "STANDARD", referencedColumnName = "ID")
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private Standard standard;
 
     public SupplierInStock() {
     }
@@ -118,6 +121,16 @@ public class SupplierInStock implements Serializable {
     public void setQuotationItemQuote(QuotationItemQuote quotationItemQuote) {
         this.quotationItemQuote = quotationItemQuote;
     }
+    
+    @XmlTransient
+    public Standard getStandard() {
+        return standard;
+    }
+
+    public void setStandard(Standard standard) {
+        this.standard = standard;
+    }
+
 
     @Override
     public int hashCode() {
