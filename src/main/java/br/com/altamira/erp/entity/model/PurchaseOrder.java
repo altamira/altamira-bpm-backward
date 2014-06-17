@@ -136,8 +136,6 @@ public class PurchaseOrder implements Serializable {
         this.supplier = supplier;
     }
 
-    @XmlTransient
-    @JsonIgnore
     public PurchasePlanning getPurchasePlanning() {
         return purchasePlanning;
     }

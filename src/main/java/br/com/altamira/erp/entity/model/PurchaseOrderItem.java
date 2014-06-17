@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 
 /**
  *
@@ -53,22 +54,29 @@ public class PurchaseOrderItem implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PurchaseOrderItemSequence")
     @Column(name = "ID")
     private Long id;
+    
     @Basic(optional = false)
     @Column(name = "\"DATE\"")
     @Temporal(TemporalType.TIMESTAMP)
     private Date date;
+    
     @Basic(optional = false)
     @Column(name = "WEIGHT")
     private BigDecimal weight;
+    
     @Column(name = "PRICE")
     private BigDecimal price;
+    
     @Column(name = "TAX")
     private BigDecimal tax;
+    
     @Column(name = "STANDARD")
     private BigDecimal standard;
+    
     @JoinColumn(name = "PLANNING_ITEM", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchasePlanningItem planningItem;
+    
     @JoinColumn(name = "PURCHASE_ORDER", referencedColumnName = "ID")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private PurchaseOrder purchaseOrder;
@@ -134,24 +142,26 @@ public class PurchaseOrderItem implements Serializable {
         this.standard = standard;
     }
 
+    @JsonProperty("planningItem")
+    public void setPlanningItem(PurchasePlanningItem planningItem) {
+        this.planningItem = planningItem;
+    }
+    
     @XmlTransient
     @JsonIgnore
     public PurchasePlanningItem getPlanningItem() {
         return planningItem;
     }
 
-    public void setPlanningItem(PurchasePlanningItem planningItem) {
-        this.planningItem = planningItem;
+    @JsonProperty("purchaseOrder")
+    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
+        this.purchaseOrder = purchaseOrder;
     }
-
+    
     @XmlTransient
     @JsonIgnore
     public PurchaseOrder getPurchaseOrder() {
         return purchaseOrder;
-    }
-
-    public void setPurchaseOrder(PurchaseOrder purchaseOrder) {
-        this.purchaseOrder = purchaseOrder;
     }
 
     @Override

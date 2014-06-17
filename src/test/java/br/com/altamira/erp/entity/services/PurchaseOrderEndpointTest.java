@@ -8,9 +8,13 @@ import java.math.BigInteger;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.GenericType;
 import org.joda.time.DateTime;
 import org.junit.Assert;
@@ -31,11 +35,18 @@ public class PurchaseOrderEndpointTest {
     public void _1testCreate() throws Exception {
         
         // Get current purchase planning
-        ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/current");
+        ResteasyClient client = new ResteasyClientBuilder().build();
+        ResteasyWebTarget target = client.target("http://localhost:8080/altamira-bpm/rest/purchaseplannings/current");
+        Response response = target.request().get();
+
+        Object responseObj = response.readEntity(Object.class);
+        PurchasePlanning purchasePlanning = new ObjectMapper().convertValue(responseObj, PurchasePlanning.class);
+        
+        /*ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseplannings/current");
         request.accept(MediaType.APPLICATION_JSON);
             
         ClientResponse<PurchasePlanning> response = request.get(PurchasePlanning.class);
-        PurchasePlanning purchasePlanning = response.getEntity();
+        PurchasePlanning purchasePlanning = response.getEntity();*/
         
         // create new Purchase Order entity
         ClientRequest request_supplier = new ClientRequest("http://localhost:8080/altamira-bpm/rest/suppliers/"+new Long(1));

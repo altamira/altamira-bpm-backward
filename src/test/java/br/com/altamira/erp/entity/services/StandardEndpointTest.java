@@ -26,8 +26,8 @@ public class StandardEndpointTest {
             
             // prepare test data
             Standard standard = new Standard();
-            standard.setName("ISO");
-            standard.setDescription("ISO Standard");
+            standard.setName("Test");
+            standard.setDescription("Test Standard");
             
             // Do the test
             ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/standards");
@@ -87,8 +87,8 @@ public class StandardEndpointTest {
             Standard standard = response.getEntity();
             
             // prepare test data
-            standard.setName("ISO UPDT");
-            standard.setDescription("ISO Standard Updated");
+            standard.setName("Test UPDT");
+            standard.setDescription("Test Standard Updated");
             
             // Do the tests
             ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/standards/"+standardId);
@@ -101,8 +101,8 @@ public class StandardEndpointTest {
             
             // Check the results
             Assert.assertEquals(Response.Status.OK.getStatusCode(), test_response.getStatus());
-            Assert.assertEquals(standardUpdt.getName(), "ISO UPDT");
-            Assert.assertEquals(standardUpdt.getDescription(), "ISO Standard Updated");
+            Assert.assertEquals(standardUpdt.getName(), "Test UPDT");
+            Assert.assertEquals(standardUpdt.getDescription(), "Test Standard Updated");
 	}
         
         @Test

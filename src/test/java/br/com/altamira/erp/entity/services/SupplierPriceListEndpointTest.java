@@ -8,7 +8,6 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import static org.junit.Assert.fail;
 
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.resteasy.client.ClientRequest;
@@ -16,8 +15,9 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.util.GenericType;
 import org.joda.time.DateTime;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
@@ -31,8 +31,8 @@ public class SupplierPriceListEndpointTest {
         static Supplier test_supplier;
         static Long supplierPriceListId;
 
-        @Before
-        public void setup() throws Exception {
+        @BeforeClass
+        public static void setup() throws Exception {
             
             // create material
             Material material = new Material();

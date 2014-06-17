@@ -61,7 +61,7 @@ public class SupplierPriceListEndpoint {
     @Produces("application/json")
     public Response findById(@PathParam("id") long id) {
         TypedQuery<SupplierPriceList> findByIdQuery = em.createNamedQuery("SupplierPriceList.findById", SupplierPriceList.class);
-        findByIdQuery.setParameter("entityId", id);
+        findByIdQuery.setParameter("id", id);
         SupplierPriceList entity;
         try {
             entity = findByIdQuery.getSingleResult();

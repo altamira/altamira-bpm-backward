@@ -27,7 +27,7 @@ public class SupplierEndpointTest {
             
             // Prepare test data
             Supplier supplier = new Supplier();
-            supplier.setName("MBA");
+            supplier.setName("TEST");
             
             // Do the test
             ClientRequest request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/suppliers");
@@ -42,7 +42,7 @@ public class SupplierEndpointTest {
             Assert.assertNotNull(supplierCrtd.getId());
             
             // store supplier id
-            supplierId = supplier.getId();
+            supplierId = supplierCrtd.getId();
 	}
 
 	@Test
@@ -87,7 +87,7 @@ public class SupplierEndpointTest {
             Supplier supplier = response.getEntity();
             
             // Prepare test data
-            supplier.setAlias("MBA");
+            supplier.setAlias("TEST");
             supplier.setCityTaxId("1");
             supplier.setFederalTaxId("1");
             supplier.setStateTaxId("1");
@@ -103,7 +103,7 @@ public class SupplierEndpointTest {
             
             // Check the results
             Assert.assertEquals(Response.Status.OK.getStatusCode(), test_response.getStatus());
-            Assert.assertEquals(supplierUpdt.getAlias(), "MBA");
+            Assert.assertEquals(supplierUpdt.getAlias(), "TEST");
             Assert.assertEquals(supplierUpdt.getCityTaxId(), "1");
             Assert.assertEquals(supplierUpdt.getFederalTaxId(), "1");
             Assert.assertEquals(supplierUpdt.getStateTaxId(), "1");

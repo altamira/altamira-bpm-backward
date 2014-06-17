@@ -21,6 +21,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.GenericType;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,8 +36,8 @@ public class SupplierInStockEndpointTest {
         static Standard test_standard;
         static Long supplierInStockId;
     
-        @Before
-        public void setup() throws Exception {
+        @BeforeClass
+        public static void setup() throws Exception {
             
             // Get the valid quotation item quote
             ResteasyClient client = new ResteasyClientBuilder().build();

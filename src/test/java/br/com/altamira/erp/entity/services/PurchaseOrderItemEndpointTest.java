@@ -8,8 +8,11 @@ import br.com.altamira.erp.entity.model.Supplier;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.beanutils.BeanMap;
+import org.apache.commons.beanutils.BeanUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.resteasy.client.ClientRequest;
@@ -19,12 +22,14 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.util.GenericType;
 import org.joda.time.DateTime;
+import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import org.junit.FixMethodOrder;
+import org.junit.Ignore;
 import org.junit.runners.MethodSorters;
 
 @RunWith(Arquillian.class)
@@ -35,8 +40,8 @@ public class PurchaseOrderItemEndpointTest {
     static PurchaseOrder test_purchaseOrder;
     static Long new_purchaseOrderItemId;
     
-    @Before
-    public void setup() throws Exception {
+    @BeforeClass
+    public static void setup() throws Exception {
         
         // Get current Purchase planning
         ResteasyClient client = new ResteasyClientBuilder().build();
@@ -177,6 +182,22 @@ public class PurchaseOrderItemEndpointTest {
         Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), test_response.getStatus());
         
         ClientRequest check_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest"+"/purchaseorders/"+test_purchaseOrder.getId()+"/items/"+new_purchaseOrderItemId);
+        check_request.accept(MediaType.APPLICATION_JSON);
+        ClientResponse check_response = check_request.get();
+        Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), check_response.getStatus());
+    }
+    
+    @AfterClass
+    public static void cleaup() throws Exception {
+        
+        // Delete the purchase order
+        ClientRequest test_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseorders/"+test_purchaseOrder.getId());
+        ClientResponse test_response = test_request.delete();
+        
+        // Check the results
+        Assert.assertEquals(Response.Status.NO_CONTENT.getStatusCode(), test_response.getStatus());
+        
+        ClientRequest check_request = new ClientRequest("http://localhost:8080/altamira-bpm/rest/purchaseorders/"+test_purchaseOrder.getId());
         check_request.accept(MediaType.APPLICATION_JSON);
         ClientResponse check_response = check_request.get();
         Assert.assertEquals(Response.Status.NOT_FOUND.getStatusCode(), check_response.getStatus());

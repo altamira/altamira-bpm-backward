@@ -57,10 +57,10 @@ public class SupplierPriceList implements Serializable {
     @Column(name = "PRICE")
     private BigDecimal price;
     @JoinColumn(name = "SUPPLIER", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Supplier supplier;
     @JoinColumn(name = "MATERIAL", referencedColumnName = "ID")
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.EAGER)
     private Material material;
 
     public SupplierPriceList() {

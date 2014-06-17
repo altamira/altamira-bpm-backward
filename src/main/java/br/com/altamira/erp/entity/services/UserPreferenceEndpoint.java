@@ -45,7 +45,7 @@ public class UserPreferenceEndpoint {
     }
 
     @DELETE
-    @Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[a-zA-Z][a-zA-Z]*}")
     public Response deleteById(@PathParam("id") String id) {
         UserPreference entity = em.find(UserPreference.class, id);
         if (entity == null) {
@@ -56,7 +56,7 @@ public class UserPreferenceEndpoint {
     }
 
     @GET
-    @Path("/{name:[a-z][A-Z]*}")
+    @Path("/{name:[a-zA-Z][a-zA-Z]*}")
     @Produces("application/json")
     public Response findByName(@PathParam("name") String name) {
         TypedQuery<UserPreference> findByIdQuery = em.createNamedQuery("UserPreference.findByName", UserPreference.class);
@@ -90,9 +90,9 @@ public class UserPreferenceEndpoint {
     }
 
     @PUT
-    @Path("/{id:[0-9][0-9]*}")
+    @Path("/{id:[a-zA-Z][a-zA-Z]*}")
     @Consumes("application/json")
-    public Response update(@PathParam("id") long id, UserPreference entity) {
+    public Response update(@PathParam("id") String id, UserPreference entity) {
         entity = em.merge(entity);
         return Response.ok(UriBuilder.fromResource(UserPreferenceEndpoint.class)
                 .path(String.valueOf(entity.getName())).build())
